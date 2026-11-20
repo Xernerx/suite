@@ -22,15 +22,28 @@ loadEnvFiles();
 
 import { Terminal } from '@xernerx/terminal';
 import { verifyWebsocketToken, checkTokenWebsocketAccess } from './lib/auth';
+import { recordServiceErrorLog } from './app/xernerx/server';
 
 const terminal = new Terminal({ scope: 'WS', title: 'XERNERX', format: ['title', 'scope', 'datetime', 'memory'], spin: false });
 
 process.on('uncaughtException', (err) => {
 	terminal.error(`Uncaught exception: ${err?.stack || err?.message || err}`);
+	recordServiceErrorLog({
+		service: 'websocket',
+		level: 'fatal',
+		message: err?.message || String(err),
+		stack: err?.stack || null,
+	}).catch(() => {});
 });
 
-process.on('unhandledRejection', (reason) => {
+process.on('unhandledRejection', (reason: any) => {
 	terminal.error(`Unhandled rejection: ${reason}`);
+	recordServiceErrorLog({
+		service: 'websocket',
+		level: 'error',
+		message: reason?.message || String(reason),
+		stack: reason?.stack || null,
+	}).catch(() => {});
 });
 
 /* ================= TYPES ================= */
@@ -163,6 +176,15 @@ async function handleMessage(ws: AuthedWebSocket, msg: any) {
 		send(ws, { ...responseData, id });
 	} catch (err: unknown) {
 		terminal.error(`Error handling ${msg.service}/${msg.action}: ${(err as Error)?.message || err}`);
+		if (msg.action !== 'errors' && msg.action !== 'error') {
+			recordServiceErrorLog({
+				service: 'websocket',
+				level: 'error',
+				message: `Error handling ${msg.service}/${msg.action}: ${(err as Error)?.message || err}`,
+				stack: (err as Error)?.stack || null,
+				meta: { rpcService: msg.service, rpcAction: msg.action, rpcMethod: msg.method },
+			}).catch(() => {});
+		}
 		send(ws, {
 			id,
 			message: (err as Error)?.message || 'Server error',

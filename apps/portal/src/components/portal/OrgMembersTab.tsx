@@ -2,13 +2,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Users, User, Trash2, Copy, Check } from 'lucide-react';
+import { Users, Trash2, Copy, Check } from 'lucide-react';
 import { UserProfilePopover } from '@xernerx/components';
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import Image from 'next/image';
-import Link from 'next/link';
 import InviteMemberModal from '@/components/portal/InviteMemberModal';
+import { PortalSafeAvatar } from '@/components/portal/PortalSafeAvatar';
+import { resolveUserAvatarUrl } from '@/lib/portalHelpers';
 
 interface OrgMembersTabProps {
 	session: any;
@@ -280,20 +280,14 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 								<div className="flex items-center gap-2 flex-wrap">
 									<UserProfilePopover userId={selectedOrg.owner} initialUser={memberProfiles[selectedOrg.owner]}>
 										<div className="flex items-center gap-2 hover:text-(--accent) transition-colors">
-											{memberProfiles[selectedOrg.owner]?.avatar ? (
-												<Image
-													src={`https://cdn.discordapp.com/avatars/${selectedOrg.owner}/${memberProfiles[selectedOrg.owner].avatar}.png`}
-													alt="Avatar"
-													width={24}
-													height={24}
-													unoptimized
-													className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-												/>
-											) : (
-												<div className="w-6 h-6 rounded-full bg-(--accent)/10 flex items-center justify-center border border-(--accent)/20 shadow-sm">
-													<User className="w-3 h-3 text-(--accent)" />
-												</div>
-											)}
+											<PortalSafeAvatar
+												src={resolveUserAvatarUrl(selectedOrg.owner, memberProfiles[selectedOrg.owner], 64)}
+												alt="Avatar"
+												fallbackKind="user"
+												className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
+												fallbackClassName="w-6 h-6 rounded-full bg-(--accent)/10 flex items-center justify-center border border-(--accent)/20 shadow-sm"
+												iconClassName="w-3 h-3 text-(--accent)"
+											/>
 											<span className="font-medium">
 												{memberProfiles[selectedOrg.owner]?.global_name || memberProfiles[selectedOrg.owner]?.username || t('app.portal.members.unknownUser')}
 											</span>
@@ -320,20 +314,14 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 											<div className="flex items-center gap-2 flex-wrap">
 												<UserProfilePopover userId={memberId} initialUser={memberProfiles[memberId]}>
 													<div className="flex items-center gap-2 hover:text-(--accent) transition-colors">
-														{memberProfiles[memberId]?.avatar ? (
-															<Image
-																src={`https://cdn.discordapp.com/avatars/${memberId}/${memberProfiles[memberId].avatar}.png`}
-																alt="Avatar"
-																width={24}
-																height={24}
-																unoptimized
-																className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-															/>
-														) : (
-															<div className="w-6 h-6 rounded-full bg-(--foreground)/50 flex items-center justify-center border border-(--border)/10 shadow-sm">
-																<User className="w-3 h-3 text-(--text-muted)" />
-															</div>
-														)}
+														<PortalSafeAvatar
+															src={resolveUserAvatarUrl(memberId, memberProfiles[memberId], 64)}
+															alt="Avatar"
+															fallbackKind="user"
+															className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
+															fallbackClassName="w-6 h-6 rounded-full bg-(--foreground)/50 flex items-center justify-center border border-(--border)/10 shadow-sm"
+															iconClassName="w-3 h-3 text-(--text-muted)"
+														/>
 														<span className="font-medium">
 															{memberProfiles[memberId]?.global_name || memberProfiles[memberId]?.username || t('app.portal.members.unknownUser')}
 														</span>
@@ -370,20 +358,14 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 											<div className="flex items-center gap-2 flex-wrap">
 												<UserProfilePopover userId={app.userId} initialUser={profile}>
 													<div className="flex items-center gap-2 hover:text-(--accent) transition-colors">
-														{profile?.avatar ? (
-															<Image
-																src={`https://cdn.discordapp.com/avatars/${app.userId}/${profile.avatar}.png`}
-																alt={profile?.global_name || profile?.username || ''}
-																width={24}
-																height={24}
-																unoptimized
-																className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-															/>
-														) : (
-															<div className="w-6 h-6 rounded-full bg-(--foreground)/30 flex items-center justify-center border border-(--border)/10 shadow-sm text-(--text-muted)">
-																<User className="w-3 h-3 text-(--text-muted)" />
-															</div>
-														)}
+														<PortalSafeAvatar
+															src={resolveUserAvatarUrl(app.userId, profile, 64)}
+															alt={profile?.global_name || profile?.username || 'Avatar'}
+															fallbackKind="user"
+															className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
+															fallbackClassName="w-6 h-6 rounded-full bg-(--foreground)/30 flex items-center justify-center border border-(--border)/10 shadow-sm text-(--text-muted)"
+															iconClassName="w-3 h-3 text-(--text-muted)"
+														/>
 														<span className="font-medium">{profile?.global_name || profile?.username || t('app.portal.members.unknownUser')}</span>
 													</div>
 												</UserProfilePopover>

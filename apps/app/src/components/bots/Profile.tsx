@@ -2,11 +2,11 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { Activity, Calendar, Check, ChevronRight, ChevronUp, Copy, Rocket, Server, ShieldCheck, Sparkles, Star, Tag, Terminal, User, Users } from 'lucide-react';
 import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary, useSidebar, useToast } from '@xernerx/providers';
 import { Button, Markdown } from '@xernerx/ui';
+import SafeAvatar from '@/components/SafeAvatar';
 import { BotVitalsSidebar } from './BotVitalsSidebar';
 import { BotDiscoveryRow } from './BotDiscoveryRow';
 
@@ -44,7 +44,7 @@ export default function Profile({ bot }: { bot: any }) {
 	const allCommands = Array.isArray(bot.commands) ? bot.commands : [];
 	const featuredCommands = allCommands.slice(0, 5);
 
-	const sortedReleases = Array.isArray(bot.releases) ? [...bot.releases].sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()) : [];
+	const sortedReleases = Array.isArray(bot.releases) ? bot.releases.toSorted((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()) : [];
 	const latestRelease = sortedReleases[0] || null;
 
 	const handleCopyCommand = (cmdName: string) => {
@@ -85,7 +85,12 @@ export default function Profile({ bot }: { bot: any }) {
 			id: 'rating',
 			label: t('app.bots.overview.kpiRating'),
 			value: reviewCount > 0 ? `${avgRating.toFixed(1)} ★` : '—',
-			sub: reviewCount > 0 ? t('app.bots.overview.reviewsCount', { count: reviewCount }) : t('app.bots.overview.noRatingsYet'),
+			sub:
+				reviewCount > 0
+					? reviewCount === 1
+						? `1 ${t('app.bots.reviews.review').toLowerCase()}`
+						: t('app.bots.overview.reviewsCount', { count: reviewCount })
+					: t('app.bots.overview.noRatingsYet'),
 			icon: Star,
 			targetView: 'reviews',
 		},
@@ -93,7 +98,7 @@ export default function Profile({ bot }: { bot: any }) {
 			id: 'commands',
 			label: t('app.bots.tabs.commands'),
 			value: allCommands.length.toLocaleString(),
-			sub: t('app.bots.overview.shardsCount', { count: shardCount }),
+			sub: shardCount === 1 ? t('app.bots.overview.shardCountSingular', { count: 1 }) : t('app.bots.overview.shardsCount', { count: shardCount }),
 			icon: Terminal,
 			targetView: 'commands',
 		},
@@ -199,7 +204,9 @@ export default function Profile({ bot }: { bot: any }) {
 														<span className="font-mono text-sm font-extrabold text-(--accent) truncate">/{cmd.name}</span>
 														{rawOpts.length > 0 && (
 															<span className="px-2 py-0.5 rounded-full bg-(--foreground)/70 border border-(--border)/10 text-[10px] font-bold text-(--text-muted)">
-																{t('app.bots.commands.optionsCount', { count: rawOpts.length })}
+																{rawOpts.length === 1
+																	? t('app.bots.commands.optionCountSingular', { count: 1 })
+																	: t('app.bots.commands.optionsCount', { count: rawOpts.length })}
 															</span>
 														)}
 													</div>
@@ -329,7 +336,7 @@ export default function Profile({ bot }: { bot: any }) {
 										? review.user.avatarUrl
 										: review.user?.avatar
 											? `https://cdn.discordapp.com/avatars/${review.userId}/${review.user.avatar}.png?size=64`
-											: `https://cdn.discordapp.com/embed/avatars/0.png`;
+											: null;
 									const reviewerName = review.user?.global_name || review.user?.username || t('common.unknownUser');
 
 									return (
@@ -338,7 +345,20 @@ export default function Profile({ bot }: { bot: any }) {
 												<div className="flex items-center justify-between gap-2">
 													<UserProfilePopover userId={review.userId} initialUser={review.user}>
 														<div className="flex items-center gap-2.5 cursor-pointer group">
-															<Image src={reviewerAvatar} alt={reviewerName} width={28} height={28} unoptimized className="w-7 h-7 rounded-full object-cover" />
+															<SafeAvatar
+																src={reviewerAvatar}
+																alt={reviewerName}
+																width={28}
+																height={28}
+																className="w-7 h-7 rounded-full object-cover shrink-0"
+																fallback={
+																	<div className="w-7 h-7 rounded-full bg-(--foreground) border border-(--border)/15 flex items-center justify-center text-[11px] font-bold text-(--text-muted) shrink-0">
+																		{String(reviewerName || '?')
+																			.charAt(0)
+																			.toUpperCase()}
+																	</div>
+																}
+															/>
 															<div className="flex flex-col text-left">
 																<span className="text-xs font-bold text-(--text) group-hover:text-(--accent) transition-colors truncate max-w-[140px]">
 																	{reviewerName}

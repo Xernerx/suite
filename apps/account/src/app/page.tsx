@@ -12,7 +12,7 @@ import Billing from '@/components/Billing';
 import Connections from '@/components/Connections';
 import Devices from '@/components/Devices';
 import Language from '@/components/Language';
-import { Loading } from '@xernerx/feedback';
+import { AccountViewSkeleton } from '@/components/AccountViewSkeleton';
 import Notifications from '@/components/Notifications';
 import Preferences from '@/components/Preferences';
 import Profile from '@/components/Profile';
@@ -189,7 +189,7 @@ export default function Home() {
 		return <SignInPage />;
 	}
 
-	if (status === 'loading') return <Loading />;
+	if (status === 'loading') return <AccountViewSkeleton />;
 
 	const currentView = isBlacklisted ? 'account' : view || 'profile';
 	const ActiveComponent = COMPONENT_MAP[currentView] || null;

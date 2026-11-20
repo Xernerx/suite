@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Settings, Bot, ExternalLink, Tag, Plus, X, ShieldCheck, Globe } from 'lucide-react';
-import { Input, Markdown } from '@xernerx/ui';
+import { Button, Input, Markdown } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 
 const PRESET_SERVER_TAGS = ['Community', 'Gaming', 'Chill', 'Developer', 'Anime', 'Music', 'Art', 'Tech', 'Roleplay', 'Giveaways', 'Study', 'Esports'];
@@ -155,6 +155,7 @@ export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 									onChange={(e) => setTagInput(e.target.value)}
 									onKeyDown={(e) => {
 										if (e.key === 'Enter') {
+											if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 											e.preventDefault();
 											handleAddCustomTag();
 										}
@@ -162,15 +163,16 @@ export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 									placeholder={t('app.dashboard.tagsPlaceholder')}
 								/>
 							</div>
-							<button
+							<Button
 								type="button"
+								variant="secondary"
 								onClick={handleAddCustomTag}
 								disabled={!tagInput.trim() || currentTags.length >= 12}
-								className="px-4 py-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 hover:bg-(--accent) hover:text-(--text-active) disabled:opacity-40 transition-all text-xs font-bold inline-flex items-center gap-1.5 shrink-0"
+								className="text-xs font-bold gap-1.5 shrink-0"
 							>
-								<Plus className="w-4 h-4" />
+								<Plus className="w-4 h-4 text-(--accent)" />
 								{t('common.add')}
-							</button>
+							</Button>
 						</div>
 
 						<div className="flex flex-wrap gap-1.5 pt-1">

@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Check, CheckCircle2, Copy, ExternalLink, Server as ServerIcon, Settings2, ThumbsUp, Users } from 'lucide-react';
+import { Bot, Check, CheckCircle2, Copy, ExternalLink, Server as ServerIcon, Settings2, ThumbsUp, Users } from 'lucide-react';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { AdminServerSummary } from './types';
 import { ServerModal } from './ServerModal';
@@ -22,6 +22,7 @@ export function ServerCard({ server, getEnvUrl, onServerDeleted, onServerUpdated
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [modalInitialTab, setModalInitialTab] = useState<'profile' | 'links' | 'bots'>('profile');
 	const [copiedId, setCopiedId] = useState(false);
 
 	const iconUrl = server.icon
@@ -42,7 +43,10 @@ export function ServerCard({ server, getEnvUrl, onServerDeleted, onServerUpdated
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, scale: 0.95 }}
-				onClick={() => setIsModalOpen(true)}
+				onClick={() => {
+					setModalInitialTab('profile');
+					setIsModalOpen(true);
+				}}
 				className="flex items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-xl hover:-translate-y-1 hover:border-(--accent)/30 group relative"
 				style={{ padding: 'calc(var(--ui-gap) * 0.75)' }}
 			>
@@ -91,6 +95,15 @@ export function ServerCard({ server, getEnvUrl, onServerDeleted, onServerUpdated
 								<ThumbsUp size={11} className="text-(--accent)" />
 								{voteCount.toLocaleString()}
 							</span>
+							{(server.botProfiles?.bots || []).map((botKey) => (
+								<span
+									key={botKey}
+									className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-(--accent)/10 border border-(--accent)/25 text-(--accent) font-bold"
+								>
+									<Bot size={10} />
+									{botKey === 'yourapps' ? 'YourApps' : 'Virtue'}
+								</span>
+							))}
 							{server.vanitySlug && <span className="text-xs font-mono text-(--accent) truncate">/{server.vanitySlug}</span>}
 						</div>
 
@@ -112,6 +125,18 @@ export function ServerCard({ server, getEnvUrl, onServerDeleted, onServerUpdated
 				</div>
 
 				<div className="flex items-center gap-1.5 relative z-10 shrink-0 mr-2">
+					<button
+						type="button"
+						title={t('admin.servers.tabs.bots')}
+						onClick={(e) => {
+							e.stopPropagation();
+							setModalInitialTab('bots');
+							setIsModalOpen(true);
+						}}
+						className="flex items-center justify-center w-8 h-8 rounded-full bg-(--accent)/15 hover:bg-(--accent)/25 text-(--accent) opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+					>
+						<Bot size={14} />
+					</button>
 					<a
 						href={`${getEnvUrl('https://app.xernerx.com')}/servers/${server.vanitySlug || server.id}`}
 						target="_blank"
@@ -137,6 +162,7 @@ export function ServerCard({ server, getEnvUrl, onServerDeleted, onServerUpdated
 				onServerUpdated={onServerUpdated}
 				onViewAuditLogs={onViewAuditLogs}
 				onNavigateEntity={onNavigateEntity}
+				initialTab={modalInitialTab}
 			/>
 		</>
 	);

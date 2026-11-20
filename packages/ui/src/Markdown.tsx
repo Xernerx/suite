@@ -2,8 +2,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import ReactMarkdown, { type Components } from 'react-markdown';
-import { Bold, Code, Columns2, Eye, Film, Heading3, ImagePlus, Italic, Link as LinkIcon, List, Loader2, Pencil, Quote } from 'lucide-react';
+import { Bold, Code, Columns2, ExternalLink, Eye, Film, Heading3, ImagePlus, Italic, Link as LinkIcon, List, Loader2, Pencil, Quote, RotateCcw, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { useDictionary, useEnvironment, usePermissions, useToast, useUser } from '@xernerx/providers';
 import { CodeBlock } from './CodeBlock';
 import { Input } from './Input';
@@ -69,6 +70,245 @@ export interface MarkdownProps {
 	components?: Components;
 }
 
+function MarkdownImage({ src, alt, className = '', ...props }: React.ImgHTMLAttributes<HTMLImageElement>) {
+	const [lightboxOpen, setLightboxOpen] = useState(false);
+	const [zoom, setZoom] = useState(1);
+	const [pan, setPan] = useState({ x: 0, y: 0 });
+	const [isDragging, setIsDragging] = useState(false);
+	const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0, moved: false });
+	const srcStr = typeof src === 'string' ? src : '';
+	const altStr = typeof alt === 'string' ? alt : '';
+
+	const updateZoom = (nextZoom: number) => {
+		const clamped = Math.min(4, Math.max(1, Number(nextZoom.toFixed(2))));
+		setZoom(clamped);
+		if (clamped === 1) {
+			setPan({ x: 0, y: 0 });
+		}
+	};
+
+	const closeLightbox = () => {
+		setLightboxOpen(false);
+		setZoom(1);
+		setPan({ x: 0, y: 0 });
+		setIsDragging(false);
+	};
+
+	useEffect(() => {
+		if (!lightboxOpen) return;
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				closeLightbox();
+			} else if (e.key === '+' || e.key === '=') {
+				e.preventDefault();
+				setZoom((z) => Math.min(4, Number((z + 0.5).toFixed(2))));
+			} else if (e.key === '-') {
+				e.preventDefault();
+				setZoom((z) => {
+					const next = Math.max(1, Number((z - 0.5).toFixed(2)));
+					if (next === 1) setPan({ x: 0, y: 0 });
+					return next;
+				});
+			} else if (e.key === '0') {
+				e.preventDefault();
+				updateZoom(1);
+			}
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [lightboxOpen]);
+
+	if (!srcStr) return null;
+
+	const isVideo = srcStr.includes('#video') || altStr.toLowerCase().startsWith('video:') || /\.(mp4|webm|mov|ogg)(\?|$|#)/i.test(srcStr);
+	if (isVideo) {
+		const cleanAlt = altStr.replace(/^video:/i, '').trim();
+		return (
+			<video
+				src={srcStr}
+				controls
+				playsInline
+				preload="metadata"
+				title={cleanAlt || undefined}
+				className={`not-prose rounded-2xl border border-(--border)/15 max-h-[560px] max-w-full my-3 bg-(--background)/60 shadow-sm ${className}`.trim()}
+			/>
+		);
+	}
+
+	const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
+		props.onClick?.(e);
+		if (e.defaultPrevented) return;
+		// Allow linked images `[![alt](img)](href)` to navigate to their link normally
+		if (e.currentTarget.closest('a')) return;
+		e.stopPropagation();
+		setZoom(1);
+		setPan({ x: 0, y: 0 });
+		setLightboxOpen(true);
+	};
+
+	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+		e.stopPropagation();
+		const delta = e.deltaY < 0 ? 0.25 : -0.25;
+		updateZoom(zoom + delta);
+	};
+
+	const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
+		if (e.button !== 0) return;
+		e.preventDefault();
+		dragStartRef.current = {
+			x: e.clientX,
+			y: e.clientY,
+			panX: pan.x,
+			panY: pan.y,
+			moved: false,
+		};
+		if (zoom > 1) {
+			setIsDragging(true);
+		}
+	};
+
+	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (!isDragging || zoom <= 1) return;
+		const dx = e.clientX - dragStartRef.current.x;
+		const dy = e.clientY - dragStartRef.current.y;
+		if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+			dragStartRef.current.moved = true;
+		}
+		setPan({
+			x: dragStartRef.current.panX + dx,
+			y: dragStartRef.current.panY + dy,
+		});
+	};
+
+	const handleMouseUp = () => {
+		setIsDragging(false);
+	};
+
+	const handleLightboxImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
+		e.stopPropagation();
+		if (dragStartRef.current.moved) {
+			dragStartRef.current.moved = false;
+			return;
+		}
+		updateZoom(zoom > 1 ? 1 : 2);
+	};
+
+	return (
+		<>
+			<img
+				{...props}
+				src={srcStr}
+				alt={altStr}
+				loading="lazy"
+				onClick={handleImageClick}
+				className={`not-prose rounded-2xl border border-(--border)/15 max-h-[560px] max-w-full my-3 object-contain shadow-sm cursor-zoom-in transition-all hover:brightness-105 ${className}`.trim()}
+			/>
+			{lightboxOpen &&
+				typeof document !== 'undefined' &&
+				createPortal(
+					<div
+						role="dialog"
+						aria-modal="true"
+						aria-label={altStr || 'Image preview'}
+						onClick={closeLightbox}
+						onWheel={handleWheel}
+						onMouseMove={handleMouseMove}
+						onMouseUp={handleMouseUp}
+						onMouseLeave={handleMouseUp}
+						className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-(--background)/88 backdrop-blur-md p-3 sm:p-6 animate-in fade-in duration-150 select-none overflow-hidden"
+					>
+						<div
+							onClick={(e) => e.stopPropagation()}
+							className="relative z-10 flex items-center justify-between w-full max-w-[96vw] gap-4 px-3 py-2 mb-3 rounded-2xl bg-(--foreground)/80 border border-(--border)/20 backdrop-blur-md shadow-lg"
+						>
+							<span className="text-xs sm:text-sm font-semibold text-(--text) truncate max-w-[50vw]">{altStr}</span>
+							<div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
+								<div className="flex items-center gap-1 rounded-xl bg-(--background)/60 border border-(--border)/15 p-0.5">
+									<button
+										type="button"
+										onClick={() => updateZoom(zoom - 0.5)}
+										disabled={zoom <= 1}
+										title="Zoom out (-)"
+										aria-label="Zoom out"
+										className="inline-flex items-center justify-center rounded-lg p-1.5 text-(--text) hover:bg-(--accent)/15 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
+									>
+										<ZoomOut className="w-3.5 h-3.5" />
+									</button>
+									<button
+										type="button"
+										onClick={() => updateZoom(1)}
+										title="Reset zoom (0)"
+										className="px-2 py-1 text-xs font-bold text-(--text) hover:bg-(--accent)/15 rounded-lg transition-colors cursor-pointer min-w-[3.25rem] text-center"
+									>
+										{Math.round(zoom * 100)}%
+									</button>
+									<button
+										type="button"
+										onClick={() => updateZoom(zoom + 0.5)}
+										disabled={zoom >= 4}
+										title="Zoom in (+)"
+										aria-label="Zoom in"
+										className="inline-flex items-center justify-center rounded-lg p-1.5 text-(--text) hover:bg-(--accent)/15 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
+									>
+										<ZoomIn className="w-3.5 h-3.5" />
+									</button>
+									{zoom > 1 && (
+										<button
+											type="button"
+											onClick={() => updateZoom(1)}
+											title="Reset view"
+											aria-label="Reset view"
+											className="inline-flex items-center justify-center rounded-lg p-1.5 text-(--text) hover:bg-(--accent)/15 transition-colors cursor-pointer"
+										>
+											<RotateCcw className="w-3.5 h-3.5" />
+										</button>
+									)}
+								</div>
+
+								<a
+									href={srcStr}
+									target="_blank"
+									rel="noopener noreferrer"
+									title="Open original in new tab"
+									className="inline-flex items-center gap-1.5 rounded-xl bg-(--background)/60 hover:bg-(--accent)/15 border border-(--border)/15 px-3 py-1.5 text-xs font-semibold text-(--text) transition-colors"
+								>
+									<ExternalLink className="w-3.5 h-3.5" />
+									<span className="hidden sm:inline">Open original</span>
+								</a>
+								<button
+									type="button"
+									onClick={closeLightbox}
+									aria-label="Close image preview"
+									className="inline-flex items-center justify-center rounded-xl bg-(--background)/60 hover:bg-(--accent)/15 border border-(--border)/15 p-1.5 text-(--text) transition-colors cursor-pointer"
+								>
+									<X className="w-4 h-4" />
+								</button>
+							</div>
+						</div>
+
+						<div className="relative flex-1 flex items-center justify-center w-full max-w-[96vw] max-h-[86vh] overflow-hidden">
+							<img
+								src={srcStr}
+								alt={altStr}
+								draggable={false}
+								onMouseDown={handleMouseDown}
+								onClick={handleLightboxImageClick}
+								style={{
+									transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
+									transition: isDragging ? 'none' : 'transform 150ms cubic-bezier(0.2, 0, 0, 1)',
+								}}
+								className={`max-h-[85vh] max-w-[95vw] min-h-[min(52vh,480px)] w-auto h-auto rounded-2xl border border-white/15 object-contain shadow-2xl bg-(--background)/40 ${
+									zoom > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'
+								}`}
+							/>
+						</div>
+					</div>,
+					document.body
+				)}
+		</>
+	);
+}
+
 const DEFAULT_COMPONENTS: Components = {
 	p: ({ node: _node, className = '', ...props }) => <p {...props} className={`text-(--text) leading-relaxed ${className}`.trim()} style={{ color: 'var(--text)' }} />,
 	strong: ({ node: _node, className = '', ...props }) => <strong {...props} className={`font-bold text-(--text) ${className}`.trim()} style={{ color: 'var(--text)' }} />,
@@ -95,34 +335,7 @@ const DEFAULT_COMPONENTS: Components = {
 			className={`text-(--accent) font-semibold underline decoration-(--accent)/40 underline-offset-4 hover:decoration-(--accent) transition-colors ${className}`.trim()}
 		/>
 	),
-	img: ({ node: _node, className = '', src, alt, ...props }) => {
-		const srcStr = typeof src === 'string' ? src : '';
-		const altStr = typeof alt === 'string' ? alt : '';
-		if (!srcStr) return null;
-		const isVideo = srcStr.includes('#video') || altStr.toLowerCase().startsWith('video:') || /\.(mp4|webm|mov|ogg)(\?|$|#)/i.test(srcStr);
-		if (isVideo) {
-			const cleanAlt = altStr.replace(/^video:/i, '').trim();
-			return (
-				<video
-					src={srcStr}
-					controls
-					playsInline
-					preload="metadata"
-					title={cleanAlt || undefined}
-					className={`not-prose rounded-2xl border border-(--border)/15 max-h-[480px] max-w-full my-3 bg-(--background)/60 shadow-sm ${className}`.trim()}
-				/>
-			);
-		}
-		return (
-			<img
-				{...props}
-				src={srcStr}
-				alt={altStr}
-				loading="lazy"
-				className={`not-prose rounded-2xl border border-(--border)/15 max-h-[480px] max-w-full my-3 object-contain shadow-sm ${className}`.trim()}
-			/>
-		);
-	},
+	img: ({ node: _node, ...props }) => <MarkdownImage {...props} />,
 	hr: ({ node: _node, className = '', ...props }) => <hr {...props} className={`border-(--border)/15 my-6 ${className}`.trim()} />,
 	pre: ({ children }) => <>{children}</>,
 	code: ({ node: _node, className = '', children, ...props }) => {

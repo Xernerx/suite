@@ -8,6 +8,7 @@ import { Button, Confirm, Input, Markdown, Modal, Selector, Toggle } from '@xern
 import { useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { AdminServerSummary } from './types';
+import { ServerBotProfilesTab } from './ServerBotProfilesTab';
 
 interface ServerModalProps {
 	open: boolean;
@@ -18,13 +19,20 @@ interface ServerModalProps {
 	onServerUpdated: (updated: AdminServerSummary) => void;
 	onViewAuditLogs?: (serverId: string) => void;
 	onNavigateEntity?: (tab: string, query: string) => void;
+	initialTab?: 'profile' | 'links' | 'bots';
 }
 
-export function ServerModal({ open, onOpenChange, server, getEnvUrl, onServerDeleted, onServerUpdated, onViewAuditLogs, onNavigateEntity }: ServerModalProps) {
+export function ServerModal({ open, onOpenChange, server, getEnvUrl, onServerDeleted, onServerUpdated, onViewAuditLogs, onNavigateEntity, initialTab = 'profile' }: ServerModalProps) {
 	const { t } = useDictionary();
 	const { toast } = useToast();
 
-	const [activeTab, setActiveTab] = useState<'profile' | 'links'>('profile');
+	const [activeTab, setActiveTab] = useState<'profile' | 'links' | 'bots'>(initialTab);
+
+	useEffect(() => {
+		if (open) {
+			setActiveTab(initialTab);
+		}
+	}, [open, initialTab]);
 	const [loadingDetails, setLoadingDetails] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [deleting, setDeleting] = useState(false);
@@ -189,7 +197,13 @@ export function ServerModal({ open, onOpenChange, server, getEnvUrl, onServerDel
 
 	return (
 		<>
-			<Modal open={open} onOpenChange={onOpenChange} title={t('admin.servers.manageServer')} description={t('admin.servers.manageServerDesc', { name: displayName })} maxWidth="max-w-7xl">
+			<Modal
+				open={open}
+				onOpenChange={onOpenChange}
+				title={t('admin.servers.manageServer')}
+				description={t('admin.servers.manageServerDesc', { name: displayName })}
+				maxWidth="max-w-(--page-width)"
+			>
 				{loadingDetails ? (
 					<div className="flex justify-center py-8">
 						<Loading variant="small" />
@@ -273,8 +287,8 @@ export function ServerModal({ open, onOpenChange, server, getEnvUrl, onServerDel
 
 						{/* Right Form */}
 						<form onSubmit={handleSave} className="col-span-1 md:col-span-2 flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-							<div className="sticky top-0 z-10 flex items-center gap-1.5 bg-(--background)/95 backdrop-blur-md p-1 rounded-2xl border border-(--border)/10">
-								{(['profile', 'links'] as const).map((tabKey) => (
+							<div className="sticky top-0 z-10 flex flex-wrap items-center gap-1.5 bg-(--background)/95 backdrop-blur-md p-1 rounded-2xl border border-(--border)/10">
+								{(['profile', 'links', 'bots'] as const).map((tabKey) => (
 									<button
 										key={tabKey}
 										type="button"
@@ -285,7 +299,7 @@ export function ServerModal({ open, onOpenChange, server, getEnvUrl, onServerDel
 												: 'text-(--text-muted) hover:text-(--text) hover:bg-(--foreground)/50'
 										}`}
 									>
-										{tabKey === 'profile' ? t('admin.users.tabs.profile') : t('admin.bots.tabs.linksAndPromotion')}
+										{tabKey === 'profile' ? t('admin.users.tabs.profile') : tabKey === 'links' ? t('admin.bots.tabs.linksAndPromotion') : t('admin.servers.tabs.bots')}
 									</button>
 								))}
 							</div>
@@ -384,6 +398,8 @@ export function ServerModal({ open, onOpenChange, server, getEnvUrl, onServerDel
 								</>
 							)}
 
+							{activeTab === 'bots' && <ServerBotProfilesTab serverId={server.id} serverName={displayName} getEnvUrl={getEnvUrl} />}
+
 							<div className="sticky bottom-0 z-10 flex items-center justify-between pt-3 pb-1 bg-(--background)/95 backdrop-blur-md border-t border-(--border)/10">
 								<Button type="button" variant="danger" size="sm" onClick={() => setConfirmDeleteOpen(true)} className="flex items-center gap-1.5">
 									<Trash2 size={14} />
@@ -393,9 +409,11 @@ export function ServerModal({ open, onOpenChange, server, getEnvUrl, onServerDel
 									<Button type="button" variant="secondary" size="sm" onClick={() => onOpenChange(false)}>
 										{t('common.actions.cancel')}
 									</Button>
-									<Button type="submit" variant="primary" size="sm" loading={saving}>
-										{t('common.actions.saveChanges')}
-									</Button>
+									{activeTab !== 'bots' && (
+										<Button type="submit" variant="primary" size="sm" loading={saving}>
+											{t('common.actions.saveChanges')}
+										</Button>
+									)}
 								</div>
 							</div>
 						</form>

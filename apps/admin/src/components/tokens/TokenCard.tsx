@@ -41,8 +41,8 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 
 	const isDirty = useMemo(() => {
 		if (!fullToken) return false;
-		const sortedSelectedOwners = [...selectedOwners].sort();
-		const sortedOriginalOwners = [...(fullToken.owners || [])].sort();
+		const sortedSelectedOwners = selectedOwners.toSorted();
+		const sortedOriginalOwners = (fullToken.owners || []).toSorted();
 		const ownersChanged = JSON.stringify(sortedSelectedOwners) !== JSON.stringify(sortedOriginalOwners);
 		const initialTtl = fullToken.expiresAt ? 'keep' : 'never';
 		const normalizedIps = allowedIpsInput

@@ -5,6 +5,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Lock, Megaphone, ShieldCheck, Sparkles, Terminal, Users } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
+import { normalizeBlogSlug } from '@/lib/fallbackPosts';
 import type { BlogCategory, BlogPostItem } from './types';
 
 const CATEGORY_ICONS: Record<BlogCategory, React.ElementType> = {
@@ -31,6 +32,7 @@ export function BlogPostCard({ post, featuredVariant = false }: { post: BlogPost
 		}
 	}, [post.publishedAt]);
 
+	const safeSlug = normalizeBlogSlug(post.slug || post.id);
 	const avatarUrl =
 		post.author?.avatar && post.author?.id && !post.author.avatar.startsWith('http')
 			? `https://cdn.discordapp.com/avatars/${post.author.id}/${post.author.avatar}.png?size=64`
@@ -39,7 +41,7 @@ export function BlogPostCard({ post, featuredVariant = false }: { post: BlogPost
 	if (featuredVariant) {
 		return (
 			<Link
-				href={`/${post.slug}`}
+				href={`/${encodeURIComponent(safeSlug)}`}
 				className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-(--foreground)/40 backdrop-blur-md border border-(--accent)/30 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)] hover:border-(--accent)/60 transition-all duration-300"
 				style={{ padding: 'calc(var(--ui-gap) * 1.25)', gap: 'calc(var(--ui-gap) * 0.75)' }}
 			>
@@ -70,7 +72,15 @@ export function BlogPostCard({ post, featuredVariant = false }: { post: BlogPost
 
 				<div className="flex items-center justify-between gap-4 pt-3 border-t border-(--border)/10">
 					<div className="flex items-center gap-2.5">
-						<img src={avatarUrl} alt={post.author?.globalName || 'Xernerx'} className="h-7 w-7 rounded-full object-cover border border-(--border)/15 bg-(--background)" />
+						<img
+							src={avatarUrl}
+							alt={post.author?.globalName || 'Xernerx'}
+							onError={(e) => {
+								e.currentTarget.onerror = null;
+								e.currentTarget.src = '/logo.png';
+							}}
+							className="h-7 w-7 rounded-full object-cover border border-(--border)/15 bg-(--background)"
+						/>
 						<span className="text-xs font-bold text-(--text)">{post.author?.globalName || 'Xernerx Studios'}</span>
 					</div>
 
@@ -84,7 +94,7 @@ export function BlogPostCard({ post, featuredVariant = false }: { post: BlogPost
 
 	return (
 		<Link
-			href={`/${post.slug}`}
+			href={`/${encodeURIComponent(safeSlug)}`}
 			className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 hover:border-(--accent)/40 shadow-sm transition-all duration-300"
 			style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
 		>
@@ -106,7 +116,15 @@ export function BlogPostCard({ post, featuredVariant = false }: { post: BlogPost
 
 			<div className="flex items-center justify-between gap-2 pt-3 border-t border-(--border)/10">
 				<div className="flex items-center gap-2 min-w-0">
-					<img src={avatarUrl} alt={post.author?.globalName || 'Xernerx'} className="h-6 w-6 rounded-full object-cover border border-(--border)/15 bg-(--background) shrink-0" />
+					<img
+						src={avatarUrl}
+						alt={post.author?.globalName || 'Xernerx'}
+						onError={(e) => {
+							e.currentTarget.onerror = null;
+							e.currentTarget.src = '/logo.png';
+						}}
+						className="h-6 w-6 rounded-full object-cover border border-(--border)/15 bg-(--background) shrink-0"
+					/>
 					<span className="text-xs font-medium text-(--text-muted) truncate">{post.author?.globalName || 'Xernerx Studios'}</span>
 				</div>
 

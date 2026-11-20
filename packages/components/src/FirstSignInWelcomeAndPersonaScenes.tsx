@@ -1,15 +1,23 @@
 /** @format */
 'use client';
 
-import { Button, Check } from '@xernerx/ui';
+import { Button, Check, getButtonClasses } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSupport } from '@xernerx/providers';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Bot, CheckCircle2, Clock, Code2, Coins, Compass, LayoutDashboard, LayoutGrid, LifeBuoy, ShieldCheck, Sparkles, Terminal, UserPlus, Webhook } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, CheckCircle2, Clock, Code2, Coins, Compass, Gauge, LayoutGrid, LifeBuoy, ShieldCheck, Sparkles, Terminal, UserPlus, Webhook } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { OnboardingPersona, OnboardingStagePhase } from './FirstSignInOnboarding';
 import type { TourNavTargetPhase } from './FirstSignInPageTours';
+
+const SOLID_CARD_STYLE: React.CSSProperties = {
+	backgroundColor: 'color-mix(in srgb, var(--background) 93%, var(--foreground))',
+};
+
+const SOLID_ACCENT_CARD_STYLE: React.CSSProperties = {
+	backgroundColor: 'color-mix(in srgb, var(--background) 86%, var(--accent))',
+};
 
 export function FirstSignInWelcomeScene({
 	displayName,
@@ -26,6 +34,11 @@ export function FirstSignInWelcomeScene({
 }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
+	const [avatarFailed, setAvatarFailed] = useState(false);
+
+	useEffect(() => {
+		setAvatarFailed(false);
+	}, [avatarUrl]);
 
 	return (
 		<motion.div
@@ -38,14 +51,15 @@ export function FirstSignInWelcomeScene({
 			style={{ gap: 'var(--ui-gap)' }}
 		>
 			<div className="relative">
-				{avatarUrl ? (
+				{avatarUrl && !avatarFailed ? (
 					<Image
 						src={avatarUrl}
 						alt={displayName}
 						width={96}
 						height={96}
 						unoptimized
-						className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl border-2 border-(--accent) shadow-[0_0_36px_color-mix(in_srgb,var(--accent)_40%,transparent)]"
+						onError={() => setAvatarFailed(true)}
+						className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl border-2 border-(--accent) object-cover shadow-[0_0_36px_color-mix(in_srgb,var(--accent)_40%,transparent)]"
 					/>
 				) : (
 					<div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-(--accent)/20 border-2 border-(--accent) flex items-center justify-center text-(--accent) text-3xl sm:text-4xl font-extrabold shadow-[0_0_36px_color-mix(in_srgb,var(--accent)_40%,transparent)]">
@@ -58,31 +72,46 @@ export function FirstSignInWelcomeScene({
 				</div>
 			</div>
 
-			<div className="flex flex-col items-center max-w-2xl">
+			<div className="flex flex-col items-center max-w-2xl [text-shadow:0_2px_18px_var(--background)]">
 				<h1 className="text-2xl sm:text-5xl font-extrabold text-(--text) tracking-tight leading-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('components.firstSignIn.welcome.heading', { name: displayName })}
 				</h1>
 				<p className="text-xs sm:text-base text-(--text-muted) mt-2 leading-relaxed">{t('components.firstSignIn.welcome.subtitle')}</p>
 			</div>
 
-			<div className="w-full max-w-2xl rounded-3xl bg-(--background)/75 backdrop-blur-2xl border border-(--accent)/30 p-4 sm:p-6 text-left shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_15%,transparent)]">
+			<div
+				style={SOLID_CARD_STYLE}
+				className="w-full max-w-2xl rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--accent)/35 p-4 sm:p-6 text-left shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_18%,transparent)]"
+			>
 				<span className="block text-xs font-extrabold uppercase tracking-wider text-(--accent) mb-1.5">{t('components.firstSignIn.welcome.legalHeader')}</span>
 				<p className="text-xs text-(--text-muted) mb-3.5 leading-relaxed">{t('components.firstSignIn.welcome.legalDescription')}</p>
 				<div className="grid grid-cols-2 gap-2.5 mb-2.5">
-					<Link href={getEnvUrl('https://www.xernerx.com/terms')} target="_blank" rel="noopener noreferrer" className="w-full">
-						<Button variant="secondary" className="w-full justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-2xl border border-(--border)/15">
-							<span className="truncate">{t('components.termsPrompt.termsLink')}</span>
-							<span className="text-(--accent) shrink-0">↗</span>
-						</Button>
+					<Link
+						href={getEnvUrl('https://www.xernerx.com/terms')}
+						target="_blank"
+						rel="noopener noreferrer"
+						className={getButtonClasses({
+							variant: 'secondary',
+							className: 'w-full justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-2xl border border-(--border)/15 bg-(--foreground)/65 hover:bg-(--foreground)',
+						})}
+					>
+						<span className="truncate">{t('components.termsPrompt.termsLink')}</span>
+						<span className="text-(--accent) shrink-0">↗</span>
 					</Link>
-					<Link href={getEnvUrl('https://www.xernerx.com/privacy')} target="_blank" rel="noopener noreferrer" className="w-full">
-						<Button variant="secondary" className="w-full justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-2xl border border-(--border)/15">
-							<span className="truncate">{t('components.termsPrompt.privacyLink')}</span>
-							<span className="text-(--accent) shrink-0">↗</span>
-						</Button>
+					<Link
+						href={getEnvUrl('https://www.xernerx.com/privacy')}
+						target="_blank"
+						rel="noopener noreferrer"
+						className={getButtonClasses({
+							variant: 'secondary',
+							className: 'w-full justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-2xl border border-(--border)/15 bg-(--foreground)/65 hover:bg-(--foreground)',
+						})}
+					>
+						<span className="truncate">{t('components.termsPrompt.privacyLink')}</span>
+						<span className="text-(--accent) shrink-0">↗</span>
 					</Link>
 				</div>
-				<div className="flex items-center gap-3 rounded-2xl bg-(--foreground)/50 hover:bg-(--foreground)/70 border border-(--border)/15 p-3 sm:p-3.5 transition-colors">
+				<div className="flex items-center gap-3 rounded-2xl bg-(--foreground)/75 hover:bg-(--foreground) border border-(--border)/15 p-3 sm:p-3.5 transition-colors">
 					<Check
 						checked={termsChecked || !isInitialTermsNull}
 						onCheckedChange={(val) => onTermsCheckedChange(val)}
@@ -119,7 +148,7 @@ export function FirstSignInWhoWeAreScene({
 			className="flex flex-col items-center text-center"
 			style={{ gap: 'var(--ui-gap)' }}
 		>
-			<div className="flex flex-col items-center max-w-2xl">
+			<div className="flex flex-col items-center max-w-2xl [text-shadow:0_2px_18px_var(--background)]">
 				<h2 className="text-3xl sm:text-5xl font-extrabold text-(--text) tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('components.firstSignIn.whoWeAre.heading')}
 				</h2>
@@ -129,10 +158,9 @@ export function FirstSignInWhoWeAreScene({
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-3xl text-left">
 				<div
 					onClick={() => onToggleBotUser(!isBotUser)}
+					style={isBotUser ? SOLID_ACCENT_CARD_STYLE : SOLID_CARD_STYLE}
 					className={`flex items-start gap-4 rounded-3xl p-5 border backdrop-blur-2xl transition-all cursor-pointer text-left select-none ${
-						isBotUser
-							? 'bg-(--accent)/15 border-(--accent) shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_25%,transparent)]'
-							: 'bg-(--background)/70 border-(--border)/15 hover:border-(--accent)/40'
+						isBotUser ? 'border-(--accent) shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_25%,transparent)]' : 'border-(--border)/15 hover:border-(--accent)/40'
 					}`}
 				>
 					<div
@@ -155,10 +183,9 @@ export function FirstSignInWhoWeAreScene({
 
 				<div
 					onClick={() => onToggleDeveloper(!isDeveloper)}
+					style={isDeveloper ? SOLID_ACCENT_CARD_STYLE : SOLID_CARD_STYLE}
 					className={`flex items-start gap-4 rounded-3xl p-5 border backdrop-blur-2xl transition-all cursor-pointer text-left select-none ${
-						isDeveloper
-							? 'bg-(--accent)/15 border-(--accent) shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_25%,transparent)]'
-							: 'bg-(--background)/70 border-(--border)/15 hover:border-(--accent)/40'
+						isDeveloper ? 'border-(--accent) shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_25%,transparent)]' : 'border-(--border)/15 hover:border-(--accent)/40'
 					}`}
 				>
 					<div
@@ -181,7 +208,7 @@ export function FirstSignInWhoWeAreScene({
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl text-left">
-				<div className="flex flex-col gap-2.5 rounded-3xl bg-(--background)/75 backdrop-blur-2xl border border-(--border)/15 p-5 shadow-xl">
+				<div style={SOLID_CARD_STYLE} className="flex flex-col gap-2.5 rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--border)/15 p-5 shadow-xl">
 					<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
 						{persona === 'developer' ? <Terminal size={20} /> : <Bot size={20} />}
 					</div>
@@ -193,9 +220,9 @@ export function FirstSignInWhoWeAreScene({
 					</p>
 				</div>
 
-				<div className="flex flex-col gap-2.5 rounded-3xl bg-(--background)/75 backdrop-blur-2xl border border-(--border)/15 p-5 shadow-xl">
+				<div style={SOLID_CARD_STYLE} className="flex flex-col gap-2.5 rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--border)/15 p-5 shadow-xl">
 					<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
-						{persona === 'both' ? <Code2 size={20} /> : persona === 'developer' ? <Webhook size={20} /> : <LayoutDashboard size={20} />}
+						{persona === 'both' ? <Code2 size={20} /> : persona === 'developer' ? <Webhook size={20} /> : <Gauge size={20} />}
 					</div>
 					<h4 className="text-sm font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{persona === 'both'
@@ -213,7 +240,7 @@ export function FirstSignInWhoWeAreScene({
 					</p>
 				</div>
 
-				<div className="flex flex-col gap-2.5 rounded-3xl bg-(--background)/75 backdrop-blur-2xl border border-(--border)/15 p-5 shadow-xl">
+				<div style={SOLID_CARD_STYLE} className="flex flex-col gap-2.5 rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--border)/15 p-5 shadow-xl">
 					<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
 						<ShieldCheck size={20} />
 					</div>
@@ -250,8 +277,11 @@ export function FirstSignInTourChoiceScene({
 			className="flex flex-col items-center text-center w-full"
 			style={{ gap: 'var(--ui-gap)' }}
 		>
-			<div className="flex flex-col items-center max-w-2xl">
-				<div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-(--accent)/15 text-(--accent) border border-(--accent)/35 shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_30%,transparent)] mb-3">
+			<div className="flex flex-col items-center max-w-2xl [text-shadow:0_2px_18px_var(--background)]">
+				<div
+					style={SOLID_ACCENT_CARD_STYLE}
+					className="flex h-16 w-16 items-center justify-center rounded-3xl text-(--accent) border border-(--accent)/45 shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_30%,transparent)] mb-3"
+				>
 					<Sparkles size={30} />
 				</div>
 				<h2 className="text-2xl sm:text-5xl font-extrabold text-(--text) tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -265,7 +295,8 @@ export function FirstSignInTourChoiceScene({
 					type="button"
 					onClick={onTakeTour}
 					disabled={submitting || postponing}
-					className="group flex flex-col justify-between gap-4 rounded-3xl p-5 sm:p-6 bg-(--accent)/15 hover:bg-(--accent)/22 border-2 border-(--accent) backdrop-blur-2xl transition-all cursor-pointer text-left shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
+					style={SOLID_ACCENT_CARD_STYLE}
+					className="group flex flex-col justify-between gap-4 rounded-3xl p-5 sm:p-6 border-2 border-(--accent) hover:brightness-105 backdrop-blur-2xl transition-all cursor-pointer text-left shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
 				>
 					<div className="flex items-start gap-4">
 						<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--accent) text-white shadow-md">
@@ -293,10 +324,11 @@ export function FirstSignInTourChoiceScene({
 					type="button"
 					onClick={onOpenSkipConfirm}
 					disabled={submitting || postponing}
-					className="group flex flex-col justify-between gap-4 rounded-3xl p-5 sm:p-6 bg-(--background)/80 hover:bg-(--foreground)/50 border border-(--border)/15 hover:border-(--accent)/40 backdrop-blur-2xl transition-all cursor-pointer text-left shadow-xl"
+					style={SOLID_CARD_STYLE}
+					className="group flex flex-col justify-between gap-4 rounded-3xl p-5 sm:p-6 bg-(--background)/94 border border-(--border)/15 hover:border-(--accent)/45 backdrop-blur-2xl transition-all cursor-pointer text-left shadow-xl"
 				>
 					<div className="flex items-start gap-4">
-						<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--foreground)/60 text-(--accent) border border-(--border)/15">
+						<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--foreground) text-(--accent) border border-(--border)/15">
 							<Clock size={24} />
 						</div>
 						<div className="min-w-0 flex-1">
@@ -327,7 +359,8 @@ export function FirstSignInReadyScene() {
 			animate={{ opacity: 1, y: 0, scale: 1 }}
 			exit={{ opacity: 0, y: 18, scale: 0.97 }}
 			transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-			className="w-full max-w-2xl mx-auto rounded-3xl bg-(--background)/92 backdrop-blur-2xl border border-(--accent)/40 p-4 sm:p-5 text-left shadow-[0_0_40px_color-mix(in_srgb,var(--accent)_22%,transparent)] pointer-events-auto"
+			style={SOLID_CARD_STYLE}
+			className="w-full max-w-2xl mx-auto rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--accent)/40 p-4 sm:p-5 text-left shadow-[0_0_40px_color-mix(in_srgb,var(--accent)_22%,transparent)] pointer-events-auto"
 		>
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 				<div className="flex items-start gap-3.5 min-w-0">
@@ -408,7 +441,8 @@ export function FirstSignInStageDock(props: {
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-			className="w-full max-w-2xl shrink-0 mt-2 sm:mt-3 flex items-center justify-between gap-3 rounded-3xl bg-(--background)/90 backdrop-blur-2xl border border-(--border)/15 px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-2xl pointer-events-auto"
+			style={SOLID_CARD_STYLE}
+			className={`w-full ${navPromptTarget ? 'max-w-3xl lg:max-w-4xl' : 'max-w-3xl'} shrink-0 mt-2 sm:mt-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 sm:gap-3 rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--border)/15 px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-2xl pointer-events-auto`}
 		>
 			<div className="flex items-center shrink-0">
 				{currentPhase === 'welcome' && isInitialTermsNull ? (
@@ -425,7 +459,7 @@ export function FirstSignInStageDock(props: {
 				)}
 			</div>
 
-			<div className="flex items-center justify-center gap-1.5 max-w-full overflow-x-auto">
+			<div className="flex max-sm:order-first max-sm:w-full sm:flex-1 sm:min-w-0 items-center justify-center gap-1 sm:gap-1.5 overflow-x-auto py-0.5">
 				{phaseSequence.map((phaseId, idx) => {
 					const num = idx + 1;
 					const active = currentPhase === phaseId;
@@ -446,8 +480,8 @@ export function FirstSignInStageDock(props: {
 								active
 									? 'flex items-center gap-1.5 rounded-full bg-(--accent) px-3 py-1 text-xs font-bold text-white shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_40%,transparent)]'
 									: done
-										? 'h-2.5 w-2.5 rounded-full bg-(--accent-green) cursor-pointer hover:scale-125'
-										: 'h-2.5 w-2.5 rounded-full bg-(--border)/40 opacity-60'
+										? 'h-2 w-2 rounded-full bg-(--accent-green) cursor-pointer hover:scale-125'
+										: 'h-2 w-2 rounded-full bg-(--border)/40 opacity-60'
 							}`}
 						>
 							{active ? (

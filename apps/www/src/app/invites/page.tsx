@@ -3,13 +3,13 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRight, Link as LinkIcon, Copy, Check, ShieldCheck, Sliders, KeyRound } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState, useMemo } from 'react';
 import { getEnabledInviteOptions, type InviteOptionsConfig } from '@xernerx/lib';
 import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
 import { PageFaqSection } from '@/components/PageFaqSection';
+import { DEFAULT_OFFICIAL_INVITES } from '@/lib/defaultOfficialInvites';
 
 interface Invite {
 	id: string;
@@ -29,52 +29,22 @@ export default function InvitesPage() {
 	const { toast } = useToast();
 
 	const defaultInvites = useMemo<Invite[]>(
-		() => [
-			{
-				id: 'virtue',
-				name: 'Virtue',
-				clientId: '1484880634844287138',
-				botName: t('www.applications.virtue.title'),
-				botAvatar: null,
-				description: t('www.applications.virtue.desc'),
-			},
-			{
-				id: 'yourapps',
-				name: 'YourApps',
-				clientId: '619328560141697036',
-				botName: t('www.applications.yourapps.title'),
-				botAvatar: null,
-				description: t('www.applications.yourapps.desc'),
-			},
-			{
-				id: 'metamorphosis',
-				name: 'Metamorphosis',
-				clientId: '881678826906730547',
-				botName: t('www.applications.metamorphosis.title'),
-				botAvatar: null,
-				description: t('www.applications.metamorphosis.desc'),
-			},
-			{
-				id: 'zodiac',
-				name: 'Zodiac',
-				clientId: '950251264095162418',
-				botName: t('www.applications.zodiac.title'),
-				botAvatar: null,
-				description: t('www.applications.zodiac.desc'),
-			},
-			{
-				id: 'todo',
-				name: 'To-Do List Bot',
-				clientId: '782105629572464652',
-				botName: t('www.applications.todo.title'),
-				botAvatar: null,
-				description: t('www.applications.todo.desc'),
-			},
-		],
+		() =>
+			DEFAULT_OFFICIAL_INVITES.map((inv) => ({
+				id: inv.id,
+				name: inv.name,
+				clientId: inv.clientId,
+				permissions: inv.permissions,
+				options: inv.options,
+				botName: t(`www.applications.${inv.id}.title`),
+				botAvatar: inv.defaultAvatarUrl,
+				description: t(`www.applications.${inv.id}.desc`),
+			})),
 		[t]
 	);
 
 	const [invites, setInvites] = useState<Invite[]>([]);
+	const [failedAvatars, setFailedAvatars] = useState<Record<string, boolean>>({});
 	const [searchQuery, setSearchQuery] = useState('');
 	const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -89,6 +59,7 @@ export default function InvitesPage() {
 			try {
 				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/invites'), {
 					credentials: 'include',
+					signal: AbortSignal.timeout(4000),
 				});
 				if (res.ok) {
 					const data = await res.json();
@@ -193,14 +164,12 @@ export default function InvitesPage() {
 											</div>
 
 											<div className="flex items-start justify-between gap-3 mb-6">
-												{invite.botAvatar ? (
-													<Image
+												{invite.botAvatar && !failedAvatars[invite.id] ? (
+													<img
 														src={invite.botAvatar}
 														alt={invite.botName}
-														width={56}
-														height={56}
-														unoptimized
-														className="w-14 h-14 rounded-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-md"
+														onError={() => setFailedAvatars((prev) => ({ ...prev, [invite.id]: true }))}
+														className="w-14 h-14 rounded-2xl object-cover transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-md"
 													/>
 												) : (
 													<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
@@ -214,31 +183,35 @@ export default function InvitesPage() {
 											</div>
 
 											<h2 className="font-bold text-2xl text-(--text) mb-2 group-hover:text-(--accent) transition-colors" style={{ fontFamily: 'var(--font-fredoka)' }}>
-												{invite.botName}
+												{isSingleUrl ? (
+													<a href={`/invites/${invite.id}`} className="after:absolute after:inset-0">
+														{invite.botName}
+													</a>
+												) : (
+													<Link href={`/invites/${invite.id}`} className="after:absolute after:inset-0">
+														{invite.botName}
+													</Link>
+												)}
 											</h2>
 											{invite.description && <p className="text-sm text-(--text-muted) leading-relaxed mb-4">{invite.description}</p>}
 
 											{!isSingleUrl && (
-												<div className="flex flex-wrap items-center gap-1.5 mb-4">
+												<div className="relative z-10 flex flex-wrap items-center gap-1.5 mb-4">
 													{enabledOptions.map((opt) => (
-														<motion.span
+														<motion.a
 															key={opt.key}
+															href={`/invites/${invite.id}/${opt.key}`}
 															whileHover={{ scale: 1.05, y: -1 }}
 															whileTap={{ scale: 0.95 }}
-															onClick={(e) => {
-																e.preventDefault();
-																e.stopPropagation();
-																window.location.assign(`/invites/${invite.id}/${opt.key}`);
-															}}
 															className="rounded-full bg-(--background)/60 hover:bg-(--accent) hover:text-(--accent-contrast) border border-(--border)/10 px-2.5 py-1 text-xs font-semibold text-(--text-muted) transition-colors cursor-pointer"
 														>
 															{t(`www.invites.options.${opt.key}.label`)}
-														</motion.span>
+														</motion.a>
 													))}
 												</div>
 											)}
 
-											<div className="text-sm text-(--text-muted) flex items-center justify-between gap-2 mt-auto pt-2">
+											<div className="relative z-10 text-sm text-(--text-muted) flex items-center justify-between gap-2 mt-auto pt-2">
 												<span className="font-mono bg-(--foreground)/50 px-2.5 py-1 rounded-full text-xs border border-(--border)/10">/invites/{invite.id}</span>
 												<motion.button
 													type="button"
@@ -290,15 +263,7 @@ export default function InvitesPage() {
 											transition={{ duration: 0.4, delay: idx * 0.06, ease: [0.16, 1, 0.3, 1] }}
 											className="h-full"
 										>
-											{isSingleUrl ? (
-												<a href={`/invites/${invite.id}`} className={cardClassName}>
-													{cardInner}
-												</a>
-											) : (
-												<Link href={`/invites/${invite.id}`} className={cardClassName}>
-													{cardInner}
-												</Link>
-											)}
+											<div className={cardClassName}>{cardInner}</div>
 										</motion.div>
 									);
 								})}

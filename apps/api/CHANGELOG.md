@@ -2,6 +2,81 @@
 
 # api
 
+## 0.38.1
+
+### Patch Changes
+
+- ## Scoped Production Filesystem Tracing
+  
+  Prevented whole-project serverless bundle tracing in Next.js Turbopack production builds across API route handlers.
+  
+  ### Changed
+  
+  - **Changelog RSS Feed (`/v1/changelog/rss.xml`)**: Scoped production disk reads strictly to the API's own `CHANGELOG.md` and restricted cross-workspace changelog filesystem fallbacks to development builds with `turbopackIgnore` directives.
+  - **Webhook & Lighthouse Helpers**: Gated parent-directory logo and local `.env` fallbacks in `/secure/announcements/create-webhook` and `/secure/core/lighthouse` strictly to development mode so production deployments remain lean and never trace local environment files.
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
+## 0.38.0
+
+### Minor Changes
+
+- ## Mobile Auth, Error Logging & YourApps Backend Expansion
+  
+  Added native mobile authentication, sign-in approval workflows, centralized staff error logging, and expanded YourApps server application endpoints.
+  
+  ### Added
+  
+  - **Mobile Authentication & Approval API**: Added `/secure/auth/mobile/{oauth/start,oauth/callback,handoff,exchange,session,validate}` and `/secure/auth/approval` routes for bearer-authenticated native mobile sessions and 2-digit sign-in approvals.
+  - **Staff Error Log Ingestion & Querying**: Added `/secure/errors` for storing and inspecting suite runtime error records.
+  - **YourApps Panel Management & Input Sanitization**: Added `/secure/guilds/[id]/applications/panels/[panelId]` and input sanitization helpers supporting polls, anonymous responses, scheduled windows, and consensus reviews.
+  
+  ### Changed
+  
+  - **YourApps Endpoints & Docs Blueprints**: Expanded `/secure/guilds/[id]/applications/*` handlers, Discord panel sync, and `docsBlueprints` catalogs to cover the new application, mobile, and error routes.
+  - **Modern Web APIs**: Replaced manual `AbortController` timers with `AbortSignal.timeout()` and `[...arr].sort()` / `.slice().reverse()` copies with `.toSorted()` and `.toReversed()`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
+## 0.37.0
+
+### Minor Changes
+
+- ## Bot Profile Admin Endpoints, Self-Service Wipes & Discord Avatar Sync
+  
+  Added user/guild bot profile endpoints, self-service YourApps and server setup `DELETE` handlers, live Discord bot avatar refresh, and public-only bot filtering.
+  
+  ### Added
+  
+  - **User & Guild Bot Profile Endpoints**: Added `GET/PATCH /secure/users/:id/bots` and `GET/PATCH /secure/guilds/:id/bots` with automatic entity reconciliation across Virtue and YourApps.
+  - **Self-Service Data & Setup Wipe Endpoints**: Added `DELETE /secure/users/:id/yourapps` and `DELETE` handlers on `/secure/guilds/:id/virtue` and `/secure/guilds/:id/applications` with Discord `MANAGE_GUILD` / owner authorization.
+  
+  ### Changed
+  
+  - **Live Discord Bot Cache & Public Privacy Guard**: Refreshed stale Discord bot avatar/banner hashes automatically, enforced `publicOnly` / session ownership checks on `GET /secure/bots`, added NextAuth session fallback on `/core/users/:id/discord/guilds`, and resolved `api.facts` array entries on the gateway status page.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 0.36.1
 
 ### Patch Changes

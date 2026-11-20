@@ -28,8 +28,8 @@ async function loadLocaleDict(code: Locale): Promise<any> {
 		const candidates = [path.resolve(process.cwd(), 'packages/lib/src/dictionaries', `${code}.json`), path.resolve(process.cwd(), '../../packages/lib/src/dictionaries', `${code}.json`)];
 		for (const filePath of candidates) {
 			try {
-				if (fs.existsSync(filePath)) {
-					return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+				if (fs.existsSync(/*turbopackIgnore: true*/ filePath)) {
+					return JSON.parse(fs.readFileSync(/*turbopackIgnore: true*/ filePath, 'utf8'));
 				}
 			} catch {
 				// Fall back to bundled dynamic import

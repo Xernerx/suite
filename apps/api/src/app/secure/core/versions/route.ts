@@ -15,13 +15,10 @@ export async function GET(req: NextRequest) {
 			if (!isAllowed) {
 				return NextResponse.json({ error: 'Disallowed host' }, { status: 400 });
 			}
-			const controller = new AbortController();
-			const timeout = setTimeout(() => controller.abort(), 5000);
 			const res = await fetch(`${parsed.origin}/api/changelog`, {
-				signal: controller.signal,
+				signal: AbortSignal.timeout(5000),
 				cache: 'no-store',
 			});
-			clearTimeout(timeout);
 			if (!res.ok) {
 				return NextResponse.json({ error: 'Changelog unavailable' }, { status: res.status });
 			}

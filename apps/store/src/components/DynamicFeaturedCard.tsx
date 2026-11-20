@@ -6,7 +6,7 @@ import { AlertCircle, Check, Sparkles, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Loading } from '@xernerx/feedback';
 import { useDictionary } from '@xernerx/providers';
-import { CatalogItem, UserSubscription } from './types';
+import { CatalogItem, formatStorePrice, UserSubscription } from './types';
 
 interface DynamicFeaturedCardProps {
 	item: CatalogItem;
@@ -83,8 +83,8 @@ export function DynamicFeaturedCard({ item, billingInterval, userLoading, action
 			<div className="mb-6 flex items-baseline gap-2">
 				{activePrice ? (
 					<>
-						{hasDiscount && <span className="text-2xl line-through text-(--text-muted) opacity-60">€{originalAmount?.toFixed(0)}</span>}
-						<span className={`text-5xl font-bold ${hasDiscount ? 'text-(--accent-green)' : 'text-(--text)'}`}>€{discountedAmount?.toFixed(0)}</span>
+						{hasDiscount && <span className="text-2xl line-through text-(--text-muted) opacity-60">{formatStorePrice(originalAmount, activePrice.currency)}</span>}
+						<span className={`text-5xl font-bold ${hasDiscount ? 'text-(--accent-green)' : 'text-(--text)'}`}>{formatStorePrice(discountedAmount, activePrice.currency)}</span>
 						<span className="text-(--text-muted) font-medium">{billingInterval === 'month' ? t('account.store.pricing.monthlySuffix') : t('account.store.pricing.yearlySuffix')}</span>
 					</>
 				) : (

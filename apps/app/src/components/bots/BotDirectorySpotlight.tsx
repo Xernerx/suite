@@ -2,11 +2,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, ChevronUp, ExternalLink, Flame, Hash, Server, ShieldCheck, Sparkles, Star, Terminal, Users } from 'lucide-react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
+import SafeAvatar from '@/components/SafeAvatar';
+import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 import type { BotProfile, DiscordProfile } from '@/components/ExploreCards';
 
 export function BotDirectorySpotlight({ bot, onSelectTag }: { bot: BotProfile; onSelectTag?: (tag: string) => void }) {
@@ -50,11 +51,13 @@ export function BotDirectorySpotlight({ bot, onSelectTag }: { bot: BotProfile; o
 		<div className="relative w-full rounded-3xl border border-(--accent)/30 bg-(--foreground)/35 backdrop-blur-md overflow-hidden shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_18%,transparent)]">
 			{/* Background Banner */}
 			<div className="absolute inset-0 pointer-events-none overflow-hidden">
-				{banner ? (
-					<Image src={banner} alt={`${name} spotlight banner`} fill className="object-cover opacity-20 scale-105 blur-[1px]" unoptimized />
-				) : (
-					<div className="w-full h-full bg-gradient-to-br from-(--accent)/20 via-transparent to-(--background)" />
-				)}
+				<SafeAvatar
+					src={banner}
+					alt={`${name} spotlight banner`}
+					fill
+					className="object-cover opacity-20 scale-105 blur-[1px]"
+					fallback={<div className="w-full h-full bg-gradient-to-br from-(--accent)/20 via-transparent to-(--background)" />}
+				/>
 				<div className="absolute inset-0 bg-gradient-to-r from-(--background)/90 via-(--background)/75 to-(--background)/50" />
 			</div>
 
@@ -64,11 +67,14 @@ export function BotDirectorySpotlight({ bot, onSelectTag }: { bot: BotProfile; o
 						href={`/bots/${bot.vanitySlug || bot.id}`}
 						className="w-24 h-24 rounded-3xl border-4 border-(--foreground) bg-(--background) overflow-hidden shadow-lg flex items-center justify-center shrink-0 group"
 					>
-						{avatar ? (
-							<Image src={avatar} alt={name} width={96} height={96} className="w-full h-full object-cover transition-transform group-hover:scale-105" unoptimized />
-						) : (
-							<div className="text-3xl font-extrabold text-(--accent)">{name.charAt(0)}</div>
-						)}
+						<SafeAvatar
+							src={avatar}
+							alt={name}
+							width={96}
+							height={96}
+							className="w-full h-full object-cover transition-transform group-hover:scale-105"
+							fallback={<div className="text-3xl font-extrabold text-(--accent)">{name.charAt(0)}</div>}
+						/>
 					</Link>
 
 					<div className="flex flex-col min-w-0 flex-1">
@@ -143,11 +149,9 @@ export function BotDirectorySpotlight({ bot, onSelectTag }: { bot: BotProfile; o
 					</div>
 
 					<div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-						<Link href={`/bots/${bot.vanitySlug || bot.id}`} className="flex-1 sm:flex-initial">
-							<Button variant="primary" className="w-full flex items-center justify-center gap-2">
-								<span>{t('app.bots.explore.viewBot')}</span>
-								<ArrowRight className="w-4 h-4" />
-							</Button>
+						<Link href={`/bots/${bot.vanitySlug || bot.id}`} className={getButtonLinkClasses('primary', 'md', 'flex-1 sm:flex-initial gap-2')}>
+							<span>{t('app.bots.explore.viewBot')}</span>
+							<ArrowRight className="w-4 h-4" />
 						</Link>
 						<Button variant="secondary" onClick={() => window.open(inviteUrl, '_blank', 'noopener,noreferrer')} className="flex-1 sm:flex-initial flex items-center justify-center gap-2">
 							<span>{t('app.bots.explore.quickInvite')}</span>

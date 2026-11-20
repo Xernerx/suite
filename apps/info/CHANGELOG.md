@@ -2,6 +2,63 @@
 
 # info
 
+## 1.13.4
+
+### Patch Changes
+
+- ## Faster & Leaner Changelog Builds
+  
+  Streamlined how the Changelog page resolves release history in production for faster, smaller deployments.
+  
+  ### Changed
+  
+  - **Production Changelog Loading**: Focused production changelog loading on live release endpoints and the site's own bundled release notes while keeping cross-workspace local previews strictly for development.
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
+## 1.13.3
+
+### Patch Changes
+
+- ## Status & Changelog Request Modernization
+  
+  Simplified request timeout handling and list sorting across the Info hub.
+  
+  ### Changed
+  
+  - **Request Timeouts & Sorting**: Replaced manual `AbortController` timeouts with `AbortSignal.timeout()` on changelog and status probes, and updated suggestion sorting to use `.toSorted()`.
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
+## 1.13.2
+
+### Patch Changes
+
+- ## Environment-Aware Status Labels, Expanded FAQ & Search Polish
+  
+  Updated live status host labels, widened search bars, and expanded Account FAQ guidance.
+  
+  ### Changed
+  
+  - **Live Status Labels & Search Inputs**: Displayed environment-aware service domains on `/status` and widened search bars across Home, Roadmap, Suggestions, and Issues so keyboard shortcut hints never clip.
+  - **Data Control FAQ**: Updated Account data management answers to cover Delete YourApps Data and per-server bot setup deletion.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 1.13.1
 
 ### Patch Changes

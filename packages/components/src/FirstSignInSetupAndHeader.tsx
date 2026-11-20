@@ -4,10 +4,14 @@
 import { Selector } from '@xernerx/ui';
 import { useDictionary, useTheme } from '@xernerx/providers';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, Building2, ChevronLeft, Eye, Gift, Globe, Languages, LayoutDashboard, LayoutGrid, Lock, Monitor, Moon, Search, Store, Sun, User as UserIcon } from 'lucide-react';
+import { Bell, Building2, ChevronLeft, Eye, Gauge, Gift, Globe, Languages, LayoutGrid, Lock, Monitor, Moon, Search, Store, Sun, User as UserIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+
+const SOLID_CARD_STYLE: React.CSSProperties = {
+	backgroundColor: 'color-mix(in srgb, var(--background) 93%, var(--foreground))',
+};
 
 export type PrivacyTier = 'public' | 'limited' | 'private';
 export type HeaderBuildStepId = 'logo' | 'mobile-tray' | 'search' | 'dashboard' | 'portal' | 'store' | 'drawer' | 'alerts' | 'profile';
@@ -116,7 +120,7 @@ export function FirstSignInSetupScene({
 			className="flex flex-col items-center text-center w-full"
 			style={{ gap: 'var(--ui-gap)' }}
 		>
-			<div className="flex flex-col items-center max-w-2xl">
+			<div className="flex flex-col items-center max-w-2xl [text-shadow:0_2px_18px_var(--background)]">
 				<h2 className="text-2xl sm:text-5xl font-extrabold text-(--text) tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('components.firstSignIn.setup.heading')}
 				</h2>
@@ -124,7 +128,10 @@ export function FirstSignInSetupScene({
 			</div>
 
 			{/* Privacy Selector + Selected Tier Card */}
-			<div className="relative z-50 w-full rounded-3xl bg-(--background)/80 backdrop-blur-2xl border border-(--accent)/35 p-4 sm:p-5 text-left shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_18%,transparent)] flex flex-col gap-3">
+			<div
+				style={SOLID_CARD_STYLE}
+				className="relative z-50 w-full rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--accent)/35 p-4 sm:p-5 text-left shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_18%,transparent)] flex flex-col gap-3"
+			>
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 					<div className="flex items-start gap-3 min-w-0">
 						<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-(--accent) text-white border border-(--accent) shadow-sm">
@@ -142,7 +149,7 @@ export function FirstSignInSetupScene({
 					</div>
 				</div>
 
-				<div className="rounded-2xl bg-(--foreground)/55 border border-(--border)/15 px-3.5 py-2.5 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+				<div className="rounded-2xl bg-(--foreground)/75 border border-(--border)/15 px-3.5 py-2.5 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
 					<span className="shrink-0 text-[11px] font-extrabold uppercase tracking-wider text-(--accent)">{t('components.firstSignIn.setup.whereYouShowUpLabel')}</span>
 					<span className="text-xs text-(--text) font-medium leading-snug">{selectedTier.whereYouShowUp}</span>
 				</div>
@@ -150,7 +157,10 @@ export function FirstSignInSetupScene({
 
 			{/* Language & Theme Cards */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 w-full text-left">
-				<div className="relative z-40 flex flex-col justify-between gap-3.5 rounded-3xl bg-(--background)/80 backdrop-blur-2xl border border-(--border)/15 p-4 sm:p-5 shadow-xl">
+				<div
+					style={SOLID_CARD_STYLE}
+					className="relative z-40 flex flex-col justify-between gap-3.5 rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--border)/15 p-4 sm:p-5 shadow-xl"
+				>
 					<div className="flex items-start gap-3">
 						<div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
 							<Languages size={20} />
@@ -167,7 +177,7 @@ export function FirstSignInSetupScene({
 					</div>
 				</div>
 
-				<div className="flex flex-col justify-between gap-3.5 rounded-3xl bg-(--background)/80 backdrop-blur-2xl border border-(--border)/15 p-4 sm:p-5 shadow-xl">
+				<div style={SOLID_CARD_STYLE} className="flex flex-col justify-between gap-3.5 rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--border)/15 p-4 sm:p-5 shadow-xl">
 					<div className="flex items-start gap-3">
 						<div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
 							{theme === 'light' ? <Sun size={20} /> : theme === 'dark' ? <Moon size={20} /> : <Monitor size={20} />}
@@ -179,7 +189,7 @@ export function FirstSignInSetupScene({
 							<p className="text-xs text-(--text-muted) mt-0.5 leading-relaxed">{t('components.firstSignIn.setup.themeDesc')}</p>
 						</div>
 					</div>
-					<div className="grid grid-cols-3 gap-1.5 rounded-2xl bg-(--foreground)/60 border border-(--border)/15 p-1.5 w-full">
+					<div className="grid grid-cols-3 gap-1.5 rounded-2xl bg-(--foreground)/75 border border-(--border)/15 p-1.5 w-full">
 						{(
 							[
 								{ id: 'system', icon: Monitor, label: t('components.firstSignIn.setup.themeSystem') },
@@ -225,6 +235,11 @@ export function FirstSignInHeaderScene({
 }) {
 	const { t } = useDictionary();
 	const currentStepId: HeaderBuildStepId = headerSteps[headerStepIndex] || 'logo';
+	const [avatarFailed, setAvatarFailed] = useState(false);
+
+	useEffect(() => {
+		setAvatarFailed(false);
+	}, [avatarUrl]);
 
 	const stepMeta: Record<HeaderBuildStepId, { icon: React.ElementType; title: string; desc: string; kbd?: string }> = {
 		logo: {
@@ -245,7 +260,7 @@ export function FirstSignInHeaderScene({
 			kbd: 'Ctrl + K',
 		},
 		dashboard: {
-			icon: LayoutDashboard,
+			icon: Gauge,
 			title: t('components.firstSignIn.navigation.shortcutDashboardTitle'),
 			desc: t('components.firstSignIn.navigation.shortcutDashboardDesc'),
 		},
@@ -300,13 +315,22 @@ export function FirstSignInHeaderScene({
 					animate={{ opacity: 1, y: 0, scale: 1 }}
 					exit={{ opacity: 0, y: -14, scale: 0.98 }}
 					transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-					className="w-full rounded-3xl bg-(--background)/85 backdrop-blur-2xl border border-(--accent)/35 p-5 sm:p-7 text-left shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_18%,transparent)]"
+					style={SOLID_CARD_STYLE}
+					className="w-full rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--accent)/35 p-5 sm:p-7 text-left shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_18%,transparent)]"
 				>
 					<div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
 						{currentStepId === 'profile' ? (
 							<div className="relative shrink-0">
-								{avatarUrl ? (
-									<Image src={avatarUrl} alt={displayName} width={52} height={52} unoptimized className="w-13 h-13 rounded-2xl border-2 border-(--accent)" />
+								{avatarUrl && !avatarFailed ? (
+									<Image
+										src={avatarUrl}
+										alt={displayName}
+										width={52}
+										height={52}
+										unoptimized
+										onError={() => setAvatarFailed(true)}
+										className="w-13 h-13 rounded-2xl border-2 border-(--accent) object-cover"
+									/>
 								) : (
 									<div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/35">
 										<UserIcon size={26} />
@@ -320,7 +344,7 @@ export function FirstSignInHeaderScene({
 							<div className="flex items-center gap-2 shrink-0">
 								{hasDashboardShortcut && (
 									<div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/40 shadow-sm">
-										<LayoutDashboard size={20} />
+										<Gauge size={20} />
 									</div>
 								)}
 								{hasPortalShortcut && (

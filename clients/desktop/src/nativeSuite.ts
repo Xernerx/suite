@@ -317,14 +317,11 @@ export async function probeBotRunnerApiEndpoint(store: Store, payload: { botId: 
 	let entry: LocalBotApiRequestLog;
 
 	try {
-		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), 6000);
 		const res = await fetch(rawUrl, {
 			method,
 			headers: { Accept: 'application/json' },
-			signal: controller.signal,
+			signal: AbortSignal.timeout(6000),
 		});
-		clearTimeout(timeout);
 		const latencyMs = Math.max(1, Date.now() - start);
 		let detail: string | undefined;
 		try {
@@ -567,10 +564,7 @@ export async function prepareCdnDragFile(payload: { url: string; filename: strin
 			return targetPath;
 		}
 
-		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), 8000);
-		const res = await fetch(payload.url, { signal: controller.signal });
-		clearTimeout(timeout);
+		const res = await fetch(payload.url, { signal: AbortSignal.timeout(8000) });
 		if (!res.ok) return null;
 
 		const buf = Buffer.from(await res.arrayBuffer());

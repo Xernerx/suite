@@ -20,6 +20,8 @@ export default function Account() {
 	const [isConfirmDataOpen, setIsConfirmDataOpen] = useState(false);
 	const [isDeletingVirtue, setIsDeletingVirtue] = useState(false);
 	const [isConfirmVirtueOpen, setIsConfirmVirtueOpen] = useState(false);
+	const [isDeletingYourApps, setIsDeletingYourApps] = useState(false);
+	const [isConfirmYourAppsOpen, setIsConfirmYourAppsOpen] = useState(false);
 	const [isExportingData, setIsExportingData] = useState(false);
 	const [isRevokingAllSessions, setIsRevokingAllSessions] = useState(false);
 	const [isConfirmRevokeAllOpen, setIsConfirmRevokeAllOpen] = useState(false);
@@ -178,6 +180,33 @@ export default function Account() {
 		}
 	};
 
+	const handleDeleteYourAppsData = async () => {
+		if (!userId) return;
+		try {
+			setIsDeletingYourApps(true);
+			const apiUrl = getEnvUrl('https://api.xernerx.com/');
+			const res = await fetch(`${apiUrl}secure/users/${userId}/yourapps`, {
+				method: 'DELETE',
+				credentials: 'include',
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.error || t('account.account.yourappsData.toastError'));
+			}
+			toast({
+				type: 'success',
+				title: t('account.account.yourappsData.toastSuccessTitle'),
+				description: t('account.account.yourappsData.toastSuccessDesc'),
+			});
+			setIsConfirmYourAppsOpen(false);
+		} catch (error: any) {
+			console.error('Error deleting YourApps data:', error);
+			toast({ type: 'error', title: t('account.account.yourappsData.toastError'), description: error.message });
+		} finally {
+			setIsDeletingYourApps(false);
+		}
+	};
+
 	const handlePrivacyChange = async (val: string) => {
 		if (!userId) return;
 		setPrivacy(val);
@@ -325,6 +354,10 @@ export default function Account() {
 					setIsConfirmVirtueOpen={setIsConfirmVirtueOpen}
 					isDeletingVirtue={isDeletingVirtue}
 					handleDeleteVirtueData={handleDeleteVirtueData}
+					isConfirmYourAppsOpen={isConfirmYourAppsOpen}
+					setIsConfirmYourAppsOpen={setIsConfirmYourAppsOpen}
+					isDeletingYourApps={isDeletingYourApps}
+					handleDeleteYourAppsData={handleDeleteYourAppsData}
 					isConfirmAccountOpen={isConfirmAccountOpen}
 					setIsConfirmAccountOpen={setIsConfirmAccountOpen}
 					isDeletingAccount={isDeletingAccount}

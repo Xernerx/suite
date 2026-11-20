@@ -82,7 +82,15 @@ export default function Servers({
 
 				const matchesFilter =
 					privacyFilter === 'all' ||
-					(privacyFilter === 'verified' ? Boolean(server.verified) : privacyFilter === 'bot' ? Boolean(server.bot) : (server.privacy || 'private') === privacyFilter);
+					(privacyFilter === 'verified'
+						? Boolean(server.verified)
+						: privacyFilter === 'bot'
+							? Boolean(server.bot || (server.botProfiles?.bots?.length ?? 0) > 0)
+							: privacyFilter === 'virtue'
+								? Boolean(server.botProfiles?.bots?.includes('virtue'))
+								: privacyFilter === 'yourapps'
+									? Boolean(server.botProfiles?.bots?.includes('yourapps'))
+									: (server.privacy || 'private') === privacyFilter);
 
 				return matchesSearch && matchesFilter;
 			})
@@ -188,6 +196,8 @@ export default function Servers({
 							{ value: 'private', label: t('admin.bots.privacyPrivate') },
 							{ value: 'verified', label: t('admin.bots.filterVerified') },
 							{ value: 'bot', label: t('admin.servers.filterBotActive') },
+							{ value: 'virtue', label: t('admin.servers.filterVirtueActive') },
+							{ value: 'yourapps', label: t('admin.servers.filterYourAppsActive') },
 						]}
 					/>
 				</div>

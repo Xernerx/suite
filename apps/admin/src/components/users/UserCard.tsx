@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Settings2, User as UserIcon, Copy, Check, Coins, CheckCircle2, Sparkles, Ban, AlertTriangle, X, Code2, Compass, Layers, Clock, EyeOff } from 'lucide-react';
+import { Settings2, User as UserIcon, Copy, Check, Coins, CheckCircle2, Sparkles, Ban, AlertTriangle, X, Code2, Compass, Layers, Clock, EyeOff, Bot } from 'lucide-react';
 import { Tooltip } from '@xernerx/ui';
 import { useDictionary, useToast, useUser } from '@xernerx/providers';
 import { DiscordProfile, FullUser, getNormalizedRoles, getUserPersona, getUserTourStatus, Role, UserSummary } from './types';
@@ -26,7 +26,7 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 	const { toast } = useToast();
 	const { user: currentUser, mutate: mutateCurrentUser } = useUser() as { user: any; mutate: () => Promise<void> };
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [modalInitialTab, setModalInitialTab] = useState<'profile' | 'economy' | 'assets'>('profile');
+	const [modalInitialTab, setModalInitialTab] = useState<'profile' | 'economy' | 'assets' | 'bots'>('profile');
 	const [copiedId, setCopiedId] = useState(false);
 	const [removingRoleId, setRemovingRoleId] = useState<string | null>(null);
 	const [discord, setDiscord] = useState<DiscordProfile | null>(user.discord || null);
@@ -186,6 +186,19 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 									{userCredits.toLocaleString()}
 								</span>
 							)}
+							{(user.botProfiles?.serverCount ?? 0) > 0 && (
+								<span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-(--accent)/10 border border-(--accent)/25 text-(--accent) font-semibold">
+									<Bot size={10} />
+									{(() => {
+										const count = user.botProfiles?.serverCount ?? 0;
+										if (count === 1) {
+											const singular = t('admin.users.botProfiles.cardServerBadge', { count: 1 });
+											return singular === 'admin.users.botProfiles.cardServerBadge' ? '1 Server' : singular;
+										}
+										return t('admin.users.botProfiles.cardServersBadge', { count });
+									})()}
+								</span>
+							)}
 							<Tooltip content={t('admin.users.onboarding.personaTooltip', { persona: personaFullLabel })}>
 								<span
 									className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border font-semibold shrink-0 ${
@@ -277,6 +290,18 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 				</div>
 
 				<div className="flex items-center gap-1.5 relative z-10 shrink-0 mr-2">
+					<button
+						type="button"
+						title={t('admin.users.tabs.bots')}
+						onClick={(e) => {
+							e.stopPropagation();
+							setModalInitialTab('bots');
+							setIsModalOpen(true);
+						}}
+						className="flex items-center justify-center w-8 h-8 rounded-full bg-(--accent)/15 hover:bg-(--accent)/25 text-(--accent) opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+					>
+						<Bot size={15} />
+					</button>
 					<button
 						type="button"
 						title={t('admin.users.creditsModal.manageButton')}

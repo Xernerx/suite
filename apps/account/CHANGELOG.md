@@ -2,6 +2,73 @@
 
 # auth
 
+## 2.18.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
+## 2.18.0
+
+### Minor Changes
+
+- ## Mobile Sign-In Handoff & Account Reliability
+  
+  Added the mobile companion OAuth handoff flow and enhanced QR sign-in approval alongside modern runtime improvements.
+  
+  ### Added
+  
+  - **Mobile OAuth Handoff**: Added a dedicated `/login/mobile` sign-in handoff flow for authenticating the Xernerx Mobile companion app cleanly with your Xernerx Account.
+  - **Enhanced QR & Approval Sign-In**: Upgraded the QR sign-in panel to support live number-matching sign-in approvals from your paired mobile device.
+  
+  ### Changed
+  
+  - **Non-Mutating Sorting**: Modernized credit ledger, token list, and token owner sorting to use native non-mutating array methods.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
+## 2.17.0
+
+### Minor Changes
+
+- ## Delete YourApps Data, Bungie Connection & Activity Markdown
+  
+  Added self-service YourApps data deletion, Bungie connection management, and smoother hydration across Account Settings.
+  
+  ### Added
+  
+  - **Delete YourApps Data**: Added a self-service control in the Account Danger Zone to permanently wipe all submitted YourApps form applications, answers, and saved drafts across all servers.
+  - **Bungie Account Connection**: Added Bungie with its Tricorn emblem to Connected Accounts.
+  - **Loading Skeletons**: Added smooth shimmer skeletons across Devices, Billing, Media, and Activity views while data loads.
+  
+  ### Changed
+  
+  - **Activity Log Formatting**: Rendered formatted Markdown cleanly in Activity & Data entries.
+  - **English (UK) Coverage & Pairing Inputs**: Displayed 100% translation coverage for English (UK) without false warnings, updated vanity profile URL hints dynamically by environment, and widened device pairing inputs so placeholders never clip.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 2.16.1
 
 ### Patch Changes

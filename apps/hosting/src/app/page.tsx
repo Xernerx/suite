@@ -1,14 +1,17 @@
 /** @format */
 'use client';
 
-import { Cloud, Columns2, Server, Settings2, ShieldAlert } from 'lucide-react';
+import { AlertOctagon, Cloud, Columns2, Server, Settings2, ShieldAlert } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useDictionary, useEnvironment, useSession, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
-import { Loading } from '@xernerx/feedback';
 import HostingConsole, { DEFAULT_HOSTING_NODES, isVercelNode, type HostingNodeConfig } from '@/components/HostingConsole';
+import { HostingSkeleton } from '@/components/HostingSkeleton';
 import ReturnPage from '@/components/ReturnPage';
 
 export default function HostingPage() {
+	const pathname = usePathname();
+	const isErrorsRoute = Boolean(pathname?.replace(/\/+$/, '').endsWith('/errors'));
 	const { data: session, status } = useSession();
 	const { user, loading: userLoading } = useUser() as { user: any; loading: boolean };
 	const { getEnvUrl, isReady } = useEnvironment();
@@ -97,7 +100,7 @@ export default function HostingPage() {
 
 	useEffect(() => {
 		if (!isReady || status === 'loading' || userLoading || roleLoading) return;
-		if (!session || !userRolePermissions.access) return;
+		if (!session || (!userRolePermissions.access && !userRolePermissions.hosting)) return;
 
 		show();
 
@@ -120,6 +123,12 @@ export default function HostingPage() {
 				: []),
 			{
 				category: t('hosting.nav.categories.workspace'),
+				icon: AlertOctagon,
+				label: t('hosting.errors.navTitle'),
+				view: 'errors',
+			},
+			{
+				category: t('hosting.nav.categories.workspace'),
 				icon: Settings2,
 				label: t('hosting.console.configureNodes'),
 				onClick: () => setConfigModalOpen(true),
@@ -137,18 +146,26 @@ export default function HostingPage() {
 		if (!hasInitializedView.current) {
 			hasInitializedView.current = true;
 			const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-			const requestedView = params?.get('node') || params?.get('view');
-			const validViews = [...nodes.map((n) => n.id), 'split'];
+			const pathIsErrors = isErrorsRoute || (typeof window !== 'undefined' && window.location.pathname.replace(/\/+$/, '').endsWith('/errors'));
+			const requestedView = (pathIsErrors ? 'errors' : null) || params?.get('node') || params?.get('view');
+			const validViews = [...nodes.map((n) => n.id), 'split', 'errors'];
 			const initial = requestedView && validViews.includes(requestedView) ? requestedView : nodes[0]?.id || 'one-dummi';
 			setView(initial);
 		}
 
 		return () => clearNavItems();
-	}, [isReady, status, userLoading, roleLoading, session, userRolePermissions.access, nodes, show, setNavItems, clearNavItems, setView, t, getEnvUrl]);
+	}, [isReady, status, userLoading, roleLoading, session, userRolePermissions.access, userRolePermissions.hosting, nodes, show, setNavItems, clearNavItems, setView, t, getEnvUrl, isErrorsRoute]);
 
 	useEffect(() => {
 		if (!hasInitializedView.current || !view || typeof window === 'undefined') return;
 		const url = new URL(window.location.href);
+		const onErrorsPath = url.pathname.replace(/\/+$/, '').endsWith('/errors');
+		if (onErrorsPath && view === 'errors') {
+			return;
+		}
+		if (onErrorsPath && view !== 'errors') {
+			url.pathname = '/';
+		}
 		if (url.searchParams.get('node') !== view) {
 			url.searchParams.delete('view');
 			url.searchParams.set('node', view);
@@ -161,14 +178,14 @@ export default function HostingPage() {
 	}
 
 	if (status === 'loading' || userLoading || roleLoading) {
-		return <Loading />;
+		return <HostingSkeleton />;
 	}
 
-	if (!session || !userRolePermissions.access) {
+	if (!session || (!userRolePermissions.access && !userRolePermissions.hosting)) {
 		return <ReturnPage session={session} />;
 	}
 
-	const activeView = view || nodes[0]?.id || 'one-dummi';
+	const activeView = view || (isErrorsRoute ? 'errors' : nodes[0]?.id || 'one-dummi');
 
 	return (
 		<HostingConsole

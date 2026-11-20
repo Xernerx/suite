@@ -64,7 +64,7 @@ export default function ReleasesTab({
 				}
 				setReleases(nextReleases);
 				setBotConfig((prev: any) => (prev ? { ...prev, releases: nextReleases } : prev));
-				setOriginalBotConfig?.((prev: any) => (prev ? JSON.parse(JSON.stringify({ ...prev, releases: nextReleases })) : prev));
+				setOriginalBotConfig?.((prev: any) => (prev ? structuredClone({ ...prev, releases: nextReleases }) : prev));
 				setRelVersion('');
 				setRelTitle('');
 				setRelBody('');
@@ -93,7 +93,7 @@ export default function ReleasesTab({
 				const nextReleases = releases.filter((r) => (r.id || r._id || r.version) !== releaseId);
 				setReleases(nextReleases);
 				setBotConfig((prev: any) => (prev ? { ...prev, releases: nextReleases } : prev));
-				setOriginalBotConfig?.((prev: any) => (prev ? JSON.parse(JSON.stringify({ ...prev, releases: nextReleases })) : prev));
+				setOriginalBotConfig?.((prev: any) => (prev ? structuredClone({ ...prev, releases: nextReleases }) : prev));
 				setReleaseToDelete(null);
 				toast({ type: 'success', title: t('app.portal.bot.releases.deletedToast') });
 			} else {

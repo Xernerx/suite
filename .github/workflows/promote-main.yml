@@ -1,0 +1,137 @@
+name: Promote Canary to Main
+
+on:
+    schedule:
+        # Runs every night at 00:00 UTC; requires >= 24h soak age so late 23:55 pushes wait until the next day's 00:00
+        - cron: '0 0 * * *'
+    workflow_dispatch:
+        inputs:
+            skip_soak:
+                description: 'Promote immediately without waiting for the 24-hour soak window'
+                required: false
+                default: false
+                type: boolean
+            skip_vercel_logs:
+                description: 'Bypass Vercel 24h runtime log & 5xx soak check (emergency override)'
+                required: false
+                default: false
+                type: boolean
+
+env:
+    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+    check-soak:
+        name: Check Canary Soak & Readiness
+        runs-on: ubuntu-latest
+        outputs:
+            should_promote: ${{ steps.soak.outputs.should_promote }}
+            canary_sha: ${{ steps.soak.outputs.canary_sha }}
+            canary_commit_epoch: ${{ steps.soak.outputs.canary_commit_epoch }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: canary
+                  fetch-depth: 0
+
+            - name: Evaluate Soak Timer & Commit Metadata
+              id: soak
+              run: |
+                  git fetch origin main canary
+
+                  CANARY_SHA=$(git rev-parse origin/canary)
+                  LAST_COMMIT_EPOCH=$(git log -1 --format=%ct origin/canary)
+                  echo "canary_sha=${CANARY_SHA}" >> $GITHUB_OUTPUT
+                  echo "canary_commit_epoch=${LAST_COMMIT_EPOCH}" >> $GITHUB_OUTPUT
+
+                  AHEAD_COUNT=$(git rev-list --count origin/main..origin/canary)
+                  echo "Commits on canary ahead of main: ${AHEAD_COUNT} (HEAD=${CANARY_SHA})"
+
+                  if [ "${AHEAD_COUNT}" -eq 0 ]; then
+                    echo "✅ main is already up-to-date with canary."
+                    echo "should_promote=false" >> $GITHUB_OUTPUT
+                    exit 0
+                  fi
+
+                  LATEST_MSG=$(git log -1 --pretty=%B origin/canary)
+                  if [[ "${{ github.event.inputs.skip_soak }}" != "true" ]] && echo "${LATEST_MSG}" | grep -Eiq '\[(wip|hold)\]'; then
+                    echo "⏸️ Latest canary commit contains [wip] or [hold]; skipping automatic promotion."
+                    echo "should_promote=false" >> $GITHUB_OUTPUT
+                    exit 0
+                  fi
+
+                  NOW_EPOCH=$(date +%s)
+                  AGE_SECONDS=$((NOW_EPOCH - LAST_COMMIT_EPOCH))
+                  AGE_HOURS=$((AGE_SECONDS / 3600))
+
+                  echo "Latest canary commit age: ${AGE_SECONDS}s (~${AGE_HOURS}h)"
+
+                  if [[ "${{ github.event.inputs.skip_soak }}" == "true" ]]; then
+                    echo "⚡ Manual override (skip_soak=true): proceeding to verification gate."
+                    echo "should_promote=true" >> $GITHUB_OUTPUT
+                  elif [ "${AGE_SECONDS}" -ge 86400 ]; then
+                    echo "✅ Canary has soaked for >= 24 hours (${AGE_HOURS}h); proceeding to soak-error & verification gate."
+                    echo "should_promote=true" >> $GITHUB_OUTPUT
+                  else
+                    REMAINING_HOURS=$(( (86400 - AGE_SECONDS + 3599) / 3600 ))
+                    echo "⏳ Canary commit is < 24h old (~${REMAINING_HOURS}h remaining); deferring to next day's 00:00 release train."
+                    echo "should_promote=false" >> $GITHUB_OUTPUT
+                  fi
+
+    build:
+        needs: [check-soak]
+        if: needs.check-soak.outputs.should_promote == 'true'
+        uses: ./.github/workflows/build.yml
+        with:
+            ref: canary
+
+    verify-and-promote:
+        name: Soak-Error Audit, Stress Gate & Promote to Main
+        needs: [check-soak, build]
+        if: needs.check-soak.outputs.should_promote == 'true'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            statuses: read
+            checks: read
+            deployments: read
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: main
+                  fetch-depth: 0
+                  token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+
+            - name: Install Vercel CLI for Soak Log Audit
+              if: ${{ github.event.inputs.skip_vercel_logs != 'true' }}
+              run: npm install -g vercel@latest
+
+            - name: Run 5-Gate Canary Soak-Error, Deployment & Stress Verification
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_REPOSITORY: ${{ github.repository }}
+                  CANARY_SHA: ${{ needs.check-soak.outputs.canary_sha }}
+                  CANARY_COMMIT_EPOCH: ${{ needs.check-soak.outputs.canary_commit_epoch }}
+                  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+                  VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+                  REQUIRE_VERCEL_SOAK: ${{ github.event.inputs.skip_vercel_logs != 'true' && 'true' || 'false' }}
+              run: |
+                  git fetch origin canary
+                  git checkout origin/canary -- .xernerx/cli/verify-canary.mjs packages/lib/src/dictionaries
+                  node .xernerx/cli/verify-canary.mjs
+                  git reset --hard HEAD
+                  git clean -fd
+
+            - name: Merge Canary into Main
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  git fetch origin main canary
+                  git checkout main
+                  git merge origin/canary --no-edit -m "chore: promote canary to main"
+                  git push origin HEAD:refs/heads/main

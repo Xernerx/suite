@@ -2,6 +2,30 @@
 
 # @xernerx/desktop
 
+## 2.6.6
+
+### Patch Changes
+
+- ## Desktop Network Timeout Modernization
+  
+  Simplified network timeout handling across the desktop companion's startup, updater, and local bot relay.
+  
+  ### Changed
+  
+  - **Native Timeout Signals**: Replaced manual `AbortController` timer scaffolding with `AbortSignal.timeout()` across server readiness checks, auto-update polling, native CDN drag caching, and local webhook relays.
+
+## 2.6.5
+
+### Patch Changes
+
+- ## Verified Desktop Bridge Identification & Runtime Alignment
+  
+  Hardened desktop bridge identification for native window controls and aligned runtime dependencies.
+  
+  ### Changed
+  
+  - **Desktop Window Controls Handshake**: Exposed explicit Xernerx Desktop identification on the preload bridge so native window controls render exclusively inside the official desktop app.
+
 ## 2.6.4
 
 ### Patch Changes

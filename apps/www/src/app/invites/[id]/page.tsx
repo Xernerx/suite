@@ -5,6 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 import { buildDiscordBotAuthorizeUrl, getEnabledInviteOptions } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 import { InviteOptionChooser } from '@/components/InviteOptionChooser';
+import { findDefaultOfficialInvite } from '@/lib/defaultOfficialInvites';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,15 +20,41 @@ export default async function InviteSlugPage({ params, searchParams }: { params:
 	const [resolvedParams, resolvedSearch, reqHeaders] = await Promise.all([params, searchParams, headers()]);
 	const appBaseUrl = resolveAppBaseUrl(reqHeaders.get('x-forwarded-host') || reqHeaders.get('host'));
 
-	const db = await database('xernerx');
-	const invite: any = await db.models.core.AppInvite.findOne({ id: resolvedParams.id }).lean();
+	let invite: any = null;
+	let botDoc: any = null;
+
+	if (process.env.MONGO_XERNERX) {
+		try {
+			const dbLookup = await Promise.race([
+				(async () => {
+					const db = await database('xernerx');
+					const foundInvite: any = await db.models.core.AppInvite.findOne({ id: resolvedParams.id }).lean();
+					if (!foundInvite) return null;
+					const foundBot = await (db.models.bots as any)?.Bot?.findOne({ id: foundInvite.clientId })
+						.select('name avatar description vanitySlug discordCache')
+						.lean()
+						.catch(() => null);
+					return { invite: foundInvite, botDoc: foundBot };
+				})(),
+				new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
+			]);
+			if (dbLookup) {
+				invite = dbLookup.invite;
+				botDoc = dbLookup.botDoc;
+			}
+		} catch {
+			// Fall back to default official invites below
+		}
+	}
+
+	const fallbackInvite = findDefaultOfficialInvite(resolvedParams.id);
+	if (!invite && fallbackInvite) {
+		invite = fallbackInvite;
+	}
+
 	if (!invite) {
 		notFound();
 	}
-	const botDoc = await (db.models.bots as any)?.Bot?.findOne({ id: invite.clientId })
-		.select('name avatar description vanitySlug')
-		.lean()
-		.catch(() => null);
 
 	const targetSlug = botDoc?.vanitySlug || invite.id || invite.clientId;
 	const enabledOptions = getEnabledInviteOptions(invite);
@@ -49,7 +76,6 @@ export default async function InviteSlugPage({ params, searchParams }: { params:
 		}
 	}
 
-	// Immediately redirect when only 1 invite option URL is set up
 	if (enabledOptions.length === 1) {
 		redirect(
 			buildDiscordBotAuthorizeUrl({
@@ -63,26 +89,30 @@ export default async function InviteSlugPage({ params, searchParams }: { params:
 		);
 	}
 
-	let botName = botDoc?.name || invite.name;
+	let botName = botDoc?.discordCache?.globalName || botDoc?.discordCache?.username || botDoc?.name || invite.name;
 	let botAvatar: string | null =
-		botDoc?.avatar && typeof botDoc.avatar === 'string'
+		botDoc?.discordCache?.avatarUrl ||
+		(botDoc?.avatar && typeof botDoc.avatar === 'string'
 			? botDoc.avatar.startsWith('http')
 				? botDoc.avatar
 				: `https://cdn.discordapp.com/avatars/${invite.clientId}/${botDoc.avatar}.png?size=512`
-			: null;
+			: fallbackInvite?.defaultAvatarUrl || null);
 
-	if (process.env.DISCORD_CLIENT_TOKEN) {
+	const tokens = Array.from(new Set([process.env.DISCORD_BOT_TOKEN, process.env.DISCORD_CLIENT_TOKEN].filter(Boolean))) as string[];
+	for (const token of tokens) {
 		try {
 			const res = await fetch(`https://discord.com/api/v10/users/${invite.clientId}`, {
-				headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+				headers: { Authorization: `Bot ${token}` },
+				signal: AbortSignal.timeout(2500),
 				next: { revalidate: 300 },
 			});
 			if (res.ok) {
 				const data = await res.json();
 				botName = data.global_name || data.username || botName;
-				if (data.avatar) {
-					botAvatar = `https://cdn.discordapp.com/avatars/${invite.clientId}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=512`;
-				}
+				botAvatar = data.avatar
+					? `https://cdn.discordapp.com/avatars/${invite.clientId}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=512`
+					: fallbackInvite?.defaultAvatarUrl || null;
+				break;
 			}
 		} catch {}
 	}

@@ -170,7 +170,9 @@ export default function InfoHomePage() {
 				category: 'status',
 				title: t('info.home.portals.status.title'),
 				description: t('info.home.portals.status.description'),
-				subLabel: 'info.xernerx.com/status',
+				subLabel: `${getEnvUrl('https://info.xernerx.com')
+					.replace(/^https?:\/\//, '')
+					.replace(/\/$/, '')}/status`,
 				keywords: 'status uptime latency ping outage operational websites applications bots services api cdn websocket',
 				href: '/status',
 			},
@@ -324,7 +326,7 @@ export default function InfoHomePage() {
 				initial={{ opacity: 1, y: 0 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5, ease: 'easeOut' }}
-				className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto w-full"
+				className="flex flex-col items-center text-center gap-6 max-w-4xl mx-auto w-full"
 			>
 				<motion.div
 					initial={{ scale: 1, opacity: 1 }}
@@ -337,7 +339,7 @@ export default function InfoHomePage() {
 				<h1 className="text-5xl md:text-6xl font-black tracking-tight text-(--text)">{t('info.home.title')}</h1>
 				<p className="text-xl text-(--text-muted) leading-relaxed">{t('info.home.description')}</p>
 
-				<div className="relative w-full max-w-2xl mt-2 text-left z-30">
+				<div className="relative w-full max-w-3xl mt-2 text-left z-30">
 					<Input
 						variant="search"
 						shortcut={true}

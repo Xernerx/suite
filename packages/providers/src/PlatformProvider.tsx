@@ -22,8 +22,9 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		const ua = navigator.userAgent.toLowerCase();
 
-		// 1. Determine Type
-		const isElectron = ua.includes('electron') || typeof (window as any).electron !== 'undefined';
+		// 1. Determine Type (strictly require Xernerx Desktop preload bridge, never generic Electron userAgent)
+		const bridge = (window as any).electron;
+		const isElectron = Boolean(bridge && (bridge.isXernerxDesktop || typeof bridge.minimize === 'function' || typeof bridge.close === 'function'));
 		const type = isElectron ? 'application' : 'browser';
 
 		// 2. Determine Platform

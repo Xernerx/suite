@@ -2,6 +2,48 @@
 
 # @xernerx/ui
 
+## 0.10.2
+
+### Patch Changes
+
+- @xernerx/providers@0.24.4
+
+## 0.10.1
+
+### Patch Changes
+
+- ## UI Primitive IME Safety & Theme Contrast Fixes
+  
+  Added IME composition guards to core inputs and fixed Light Mode border and monochrome accent contrast across shared UI primitives.
+  
+  ### Changed
+  
+  - **IME-Safe `<Input>` & `<Confirm>`**: Guarded `Enter` keydown handlers in `Input` (`variant="search"`) and `Confirm` keyword confirmation against active IME composition.
+  - **Theme & Monochrome Contrast**: Replaced hardcoded `border-white/10` in `Selector` with `border-(--border)/15` and hardcoded `text-white` over `bg-(--accent)` in `Tabs` with `text-(--accent-contrast)`.
+- Updated dependencies
+  - @xernerx/providers@0.24.3
+
+## 0.10.0
+
+### Minor Changes
+
+- ## Inline Input Variant, `Button asChild`, Tabs Wheel Guard & Theme Lightbox
+  
+  Added `Input` `variant="inline"`, `Button` `asChild` / `getButtonClasses`, horizontal `Tabs` wheel pass-through, and theme-aware `Markdown` lightbox controls.
+  
+  ### Added
+  
+  - **`Input` `variant="inline"` & `Button` `asChild`**: Added surface-style-exempt inline inputs for composite bars and `getButtonClasses` / `asChild` support on `Button`.
+  
+  ### Changed
+  
+  - **`Tabs` & `Markdown` Polish**: Added `overflow-y-hidden` + vertical wheel pass-through on `Tabs` and converted `Markdown` image preview lightbox controls to theme-aware CSS variables.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/providers@0.24.2
+
 ## 0.9.2
 
 ### Patch Changes

@@ -160,6 +160,7 @@ export function MediaModals({
 										onChange={(e) => setSharedInput(e.target.value)}
 										onKeyDown={(e) => {
 											if (e.key === 'Enter') {
+												if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 												e.preventDefault();
 												addSharedUser();
 											}

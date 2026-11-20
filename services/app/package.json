@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/app",
-	"version": "2.7.2",
+	"version": "2.7.5",
 	"description": "Xernerx App Discord bot daemon for support, docs, status, and community hub",
 	"main": "dist/main.js",
 	"type": "module",
@@ -10,28 +10,28 @@
 		"build": "node ../../.xernerx/cli/prepare-package.mjs && tsc",
 		"start": "node --import tsx src/main.ts"
 	},
-	"engines": {
-		"node": ">=22"
-	},
 	"keywords": [],
 	"author": "Xernerx Studios",
 	"license": "SEE LICENSE IN LICENSE",
-	"packageManager": "pnpm@11.20.0",
+	"packageManager": "pnpm@12.21.0",
+	"engines": {
+		"node": ">=24"
+	},
 	"devDependencies": {
 		"@types/react": "^19.3.0",
-		"prettier": "^3.9.10",
+		"prettier": "^3.10.1",
 		"tsc-watch": "^7.2.1",
 		"tsx": "^4.23.15",
 		"typescript": "^6.0.3"
 	},
 	"dependencies": {
 		"@xernerx/commands": "^0.2.8",
-		"@xernerx/framework": "^1.1.2",
+		"@xernerx/framework": "^1.2.0",
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/terminal": "^1.2.0",
-		"discord.js": "^14.27.0",
-		"mongoose": "^9.11.4",
-		"next": "^16.4.5",
+		"discord.js": "^14.28.1",
+		"mongoose": "^9.12.2",
+		"next": "^16.4.6",
 		"server-only": "^0.0.1",
 		"tslib": "^2.9.1"
 	}

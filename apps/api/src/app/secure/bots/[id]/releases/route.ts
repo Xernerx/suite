@@ -48,7 +48,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 			}
 		}
 
-		const releases = (Array.isArray(bot.releases) ? bot.releases : []).slice().sort((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
+		const releases = (Array.isArray(bot.releases) ? bot.releases : []).toSorted((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
 
 		return NextResponse.json({ releases }, { status: 200 });
 	} catch (error) {

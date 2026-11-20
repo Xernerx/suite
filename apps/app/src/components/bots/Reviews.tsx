@@ -7,7 +7,7 @@ import { useDictionary, useEnvironment, useUser, useToast } from '@xernerx/provi
 import { Loading } from '@xernerx/feedback';
 import { Button, Confirm, Input } from '@xernerx/ui';
 import { Star, Trash2, ShieldCheck, ThumbsUp, ThumbsDown, MessageSquareReply, X } from 'lucide-react';
-import Image from 'next/image';
+import SafeAvatar from '@/components/SafeAvatar';
 
 export default function Reviews({ bot, id }: { bot: any; id: string }) {
 	const { t } = useDictionary();
@@ -339,17 +339,19 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 						<div className="flex items-center justify-between">
 							<UserProfilePopover userId={review.userId} initialUser={review.user}>
 								<div className="flex items-center gap-3 group">
-									<Image
-										src={
-											review.user?.avatarUrl ||
-											(review.user?.avatar
-												? `https://cdn.discordapp.com/avatars/${review.userId}/${review.user.avatar}.png?size=64`
-												: `https://cdn.discordapp.com/embed/avatars/${review.user?.discriminator ? Number(review.user.discriminator) % 5 : 0}.png`)
-										}
-										alt="Avatar"
+									<SafeAvatar
+										src={review.user?.avatarUrl || (review.user?.avatar ? `https://cdn.discordapp.com/avatars/${review.userId}/${review.user.avatar}.png?size=64` : null)}
+										alt={review.user?.global_name || review.user?.username || t('common.unknownUser')}
 										width={32}
 										height={32}
-										className="rounded-full object-cover group-hover:ring-2 group-hover:ring-(--accent)/50 transition-all"
+										className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-(--accent)/50 transition-all shrink-0"
+										fallback={
+											<div className="w-8 h-8 rounded-full bg-(--background) border border-(--border)/20 flex items-center justify-center text-xs font-bold text-(--text-muted) shrink-0">
+												{String(review.user?.global_name || review.user?.username || '?')
+													.charAt(0)
+													.toUpperCase()}
+											</div>
+										}
 									/>
 									<div className="flex flex-col text-left">
 										<span className="font-bold text-sm group-hover:text-(--accent) transition-colors">

@@ -4,16 +4,18 @@ import { normalizeInviteOptions } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
+import { applyLiveDiscordToBot, buildDiscordAvatarUrl, fetchLiveDiscordUser, isDiscordManagedMediaValue } from '@/lib/botDiscordSync';
 
 export async function GET() {
 	try {
 		const db = await database('xernerx');
 		const invitesData = await db.models.core.AppInvite.find().sort({ createdAt: -1 }).lean();
 		const clientIds = Array.from(new Set(invitesData.map((i: any) => String(i.clientId)).filter(Boolean)));
+		const BotModel = (db.models.bots as any)?.Bot;
 		const botDocs =
-			clientIds.length > 0 && (db.models.bots as any)?.Bot
-				? await (db.models.bots as any).Bot.find({ id: { $in: clientIds } })
-						.select('id name avatar description vanitySlug')
+			clientIds.length > 0 && BotModel
+				? await BotModel.find({ id: { $in: clientIds } })
+						.select('id name avatar description vanitySlug discordCache')
 						.lean()
 						.catch(() => [])
 				: [];
@@ -21,36 +23,31 @@ export async function GET() {
 
 		const invites = await Promise.all(
 			invitesData.map(async (plain: any) => {
-				const registeredBot = botMap.get(String(plain.clientId));
-				let discordBot: any = null;
+				const clientId = String(plain.clientId);
+				const registeredBot = botMap.get(clientId);
+				const discordUser = await fetchLiveDiscordUser(clientId);
+				let liveAvatarUrl: string | null = null;
 
-				if (process.env.DISCORD_CLIENT_TOKEN) {
-					try {
-						const res = await fetch(`https://discord.com/api/v10/users/${plain.clientId}`, {
-							headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
-						});
-						if (res.ok) {
-							const data = await res.json();
-							discordBot = {
-								...data,
-								avatarUrl: data.avatar ? `https://cdn.discordapp.com/avatars/${plain.clientId}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null,
-							};
-						}
-					} catch {}
+				if (discordUser) {
+					if (registeredBot) {
+						liveAvatarUrl = applyLiveDiscordToBot(registeredBot, clientId, discordUser, BotModel, 512).avatarUrl;
+					} else {
+						liveAvatarUrl = buildDiscordAvatarUrl(clientId, discordUser.avatar, 512);
+					}
 				}
 
 				const fallbackAvatar =
-					registeredBot?.avatar && typeof registeredBot.avatar === 'string'
-						? registeredBot.avatar.startsWith('http')
-							? registeredBot.avatar
-							: `https://cdn.discordapp.com/avatars/${plain.clientId}/${registeredBot.avatar}.png?size=512`
+					registeredBot && !discordUser
+						? !isDiscordManagedMediaValue(registeredBot.avatar)
+							? String(registeredBot.avatar)
+							: registeredBot.discordCache?.avatarUrl || buildDiscordAvatarUrl(clientId, registeredBot.discordCache?.avatar || registeredBot.avatar, 512)
 						: null;
 
 				return {
 					...plain,
 					options: normalizeInviteOptions(plain),
-					botName: discordBot?.global_name || discordBot?.username || registeredBot?.name || plain.name,
-					botAvatar: discordBot?.avatarUrl || fallbackAvatar || null,
+					botName: discordUser?.global_name || discordUser?.username || registeredBot?.name || plain.name,
+					botAvatar: liveAvatarUrl || fallbackAvatar || null,
 					botVanitySlug: registeredBot?.vanitySlug || null,
 					description: plain.description || registeredBot?.description || undefined,
 				};

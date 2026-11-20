@@ -5,8 +5,8 @@ import { ArrowUpRight, ChevronUp, ExternalLink, Flame, Hash, Server, ShieldCheck
 import { Loading } from '@xernerx/feedback';
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
-import Image from 'next/image';
 import Link from 'next/link';
+import SafeAvatar from '@/components/SafeAvatar';
 
 export interface BotProfile {
 	id: string;
@@ -126,59 +126,53 @@ export function BotCard({ bot, onSelectTag }: { bot: BotProfile; onSelectTag?: (
 			cancelled = true;
 			controller.abort();
 		};
-	}, [bot.id, bot.stats, getEnvUrl, isReady]);
+	}, [bot.id, bot.stats, getEnvUrl, isReady, hasCachedDiscord]);
 
 	const name = discord?.global_name || discord?.username || bot.name || t('common.unknownBot');
 	const avatar = discord?.avatarUrl;
 	const banner = discord?.bannerUrl;
 	const isBoosted = Boolean((bot.promotedUntil && new Date(bot.promotedUntil).getTime() > Date.now()) || (bot.boostedUntil && new Date(bot.boostedUntil).getTime() > Date.now()));
 	const inviteUrl = bot.links?.invite || `https://discord.com/oauth2/authorize?client_id=${bot.id}&permissions=8&scope=bot%20applications.commands`;
-	const displayTags = Array.isArray(bot.tags) ? bot.tags.filter(Boolean).slice(0, 3) : [];
+	const allTags = Array.isArray(bot.tags) ? bot.tags.map((tag) => String(tag).trim().toLowerCase()).filter(Boolean) : [];
+	const displayTags = allTags.slice(0, 3);
+	const remainingTagCount = Math.max(0, allTags.length - displayTags.length);
 	const guildCount = stats?.guildCount ?? bot.stats?.guildCount ?? 0;
 	const userCount = stats?.userCount ?? bot.stats?.userCount ?? 0;
 	const voteCount = bot.voteCount ?? 0;
 	const hasRating = Boolean(bot.reviewCount && bot.reviewCount > 0 && bot.reviewAverage && bot.reviewAverage > 0);
-
-	const handleInviteClick = (e: React.MouseEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		window.open(inviteUrl, '_blank', 'noopener,noreferrer');
-	};
-
-	const handleTagClick = (e: React.MouseEvent, tag: string) => {
-		if (!onSelectTag) return;
-		e.preventDefault();
-		e.stopPropagation();
-		onSelectTag(tag);
-	};
+	const botHref = `/bots/${bot.vanitySlug || bot.id}`;
 
 	return (
-		<Link
-			href={`/bots/${bot.vanitySlug || bot.id}`}
-			className="group relative flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl overflow-hidden hover:border-(--accent)/50 transition-all shadow-sm hover:shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_22%,transparent)]"
-		>
-			<div className="h-28 w-full relative bg-gradient-to-br from-(--accent)/25 via-(--foreground) to-(--background) overflow-hidden shrink-0">
-				{banner && <Image src={banner} alt={`${name} banner`} fill className="object-cover transition-transform duration-500 group-hover:scale-105" unoptimized />}
+		<div className="group relative flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl overflow-hidden hover:border-(--accent)/50 transition-all shadow-sm hover:shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_22%,transparent)]">
+			<Link href={botHref} aria-label={name} className="absolute inset-0 z-10 rounded-3xl" />
+
+			<div className="h-28 w-full relative bg-gradient-to-br from-(--accent)/25 via-(--foreground) to-(--background) overflow-hidden shrink-0 pointer-events-none">
+				<SafeAvatar src={banner} alt={`${name} banner`} fill className="object-cover object-[center_24%] transition-transform duration-500 group-hover:scale-105" />
 				<div className="absolute inset-0 bg-gradient-to-t from-(--background)/80 via-transparent to-transparent z-0" />
 				<div className="absolute inset-0 bg-(--accent)/15 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
 
 				{isBoosted && (
-					<div className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-(--accent) text-white text-[10px] font-extrabold uppercase tracking-wider shadow-sm">
+					<div className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-(--accent) text-(--accent-contrast) text-[10px] font-extrabold uppercase tracking-wider shadow-sm">
 						<Flame className="w-3 h-3" />
 						{t('app.categories.promoted')}
 					</div>
 				)}
 			</div>
 
-			<div className="flex flex-col px-5 pb-5 -mt-10 relative z-10 flex-1">
+			<div className="flex flex-col px-5 pb-5 -mt-10 relative z-20 flex-1 pointer-events-none">
 				<div className="flex justify-between items-end gap-2">
 					<div className="w-20 h-20 rounded-2xl border-4 border-(--foreground) bg-(--background) overflow-hidden shadow-md flex items-center justify-center shrink-0">
 						{loading ? (
 							<Loading variant="small" />
-						) : avatar ? (
-							<Image src={avatar} alt={name} width={80} height={80} className="w-full h-full object-cover" unoptimized />
 						) : (
-							<div className="text-2xl font-bold text-(--text-muted)">{name.charAt(0)}</div>
+							<SafeAvatar
+								src={avatar}
+								alt={name}
+								width={80}
+								height={80}
+								className="w-full h-full object-cover"
+								fallback={<div className="text-2xl font-bold text-(--text-muted)">{name.charAt(0)}</div>}
+							/>
 						)}
 					</div>
 
@@ -219,22 +213,38 @@ export function BotCard({ bot, onSelectTag }: { bot: BotProfile; onSelectTag?: (
 						)}
 					</div>
 
-					<p className="text-xs text-(--text-muted) mt-1.5 line-clamp-2 leading-relaxed flex-1">{bot.description || t('common.noDescription')}</p>
+					<div className="mt-1.5 flex-1">
+						<p className="text-xs text-(--text-muted) line-clamp-3 leading-relaxed">{bot.description || t('common.noDescription')}</p>
+					</div>
 
 					{displayTags.length > 0 && (
 						<div className="flex flex-wrap items-center gap-1.5 mt-3">
-							{displayTags.map((tag) => (
-								<span
-									key={tag}
-									onClick={(e) => handleTagClick(e, tag)}
-									className={`inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10 text-[11px] font-semibold text-(--text-muted) ${
-										onSelectTag ? 'hover:border-(--accent)/40 hover:text-(--accent) cursor-pointer transition-colors' : ''
-									}`}
-								>
-									<Hash className="w-2.5 h-2.5 text-(--accent)" />
-									{tag}
+							{displayTags.map((tag) =>
+								onSelectTag ? (
+									<button
+										key={tag}
+										type="button"
+										onClick={() => onSelectTag(tag)}
+										className="pointer-events-auto inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10 text-[11px] font-semibold lowercase text-(--text-muted) hover:border-(--accent)/40 hover:text-(--accent) cursor-pointer transition-colors"
+									>
+										<Hash className="w-2.5 h-2.5 text-(--accent)" />
+										{tag}
+									</button>
+								) : (
+									<span
+										key={tag}
+										className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10 text-[11px] font-semibold lowercase text-(--text-muted)"
+									>
+										<Hash className="w-2.5 h-2.5 text-(--accent)" />
+										{tag}
+									</span>
+								)
+							)}
+							{remainingTagCount > 0 && (
+								<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10 text-[10px] font-bold text-(--text-muted)">
+									+{remainingTagCount}
 								</span>
-							))}
+							)}
 							{bot.commandsCount !== undefined && bot.commandsCount > 0 && (
 								<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-(--accent)/10 border border-(--accent)/25 text-[10px] font-mono font-bold text-(--accent) ml-auto">
 									<Terminal className="w-2.5 h-2.5" />
@@ -250,18 +260,19 @@ export function BotCard({ bot, onSelectTag }: { bot: BotProfile; onSelectTag?: (
 							<ArrowUpRight className="w-3.5 h-3.5" />
 						</span>
 
-						<button
-							type="button"
-							onClick={handleInviteClick}
-							className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-(--accent)/15 hover:bg-(--accent) text-(--accent) hover:text-white border border-(--accent)/30 text-xs font-extrabold transition-all cursor-pointer"
+						<a
+							href={inviteUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-(--accent)/15 hover:bg-(--accent) text-(--accent) hover:text-(--accent-contrast) border border-(--accent)/30 text-xs font-extrabold transition-all"
 						>
 							{t('app.bots.explore.quickInvite')}
 							<ExternalLink className="w-3 h-3" />
-						</button>
+						</a>
 					</div>
 				</div>
 			</div>
-		</Link>
+		</div>
 	);
 }
 
@@ -277,18 +288,21 @@ export function ServerCard({ server }: { server: GuildProfile }) {
 			className="group relative flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl overflow-hidden hover:border-(--accent) transition-colors shadow-sm hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]"
 		>
 			<div className="h-24 w-full relative bg-gradient-to-br from-(--border) to-(--background) overflow-hidden shrink-0 flex items-center justify-center">
-				{banner ? <Image src={banner} alt={`${name} banner`} fill className="object-cover" unoptimized /> : <Server className="w-8 h-8 text-(--text-muted)/30" />}
+				<SafeAvatar src={banner} alt={`${name} banner`} fill className="object-cover" fallback={<Server className="w-8 h-8 text-(--text-muted)/30" />} />
 				<div className="absolute inset-0 bg-(--accent)/20 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
 			</div>
 
 			<div className="flex flex-col px-6 pb-6 -mt-10 relative z-10 flex-1">
 				<div className="flex justify-between items-end">
 					<div className="w-20 h-20 rounded-2xl border-4 border-(--foreground) bg-(--background) overflow-hidden shadow-md flex items-center justify-center shrink-0">
-						{avatar ? (
-							<Image src={avatar} alt={name} width={80} height={80} className="w-full h-full object-cover" unoptimized />
-						) : (
-							<div className="text-2xl font-bold text-(--text-muted)">{name.charAt(0)}</div>
-						)}
+						<SafeAvatar
+							src={avatar}
+							alt={name}
+							width={80}
+							height={80}
+							className="w-full h-full object-cover"
+							fallback={<div className="text-2xl font-bold text-(--text-muted)">{name.charAt(0)}</div>}
+						/>
 					</div>
 
 					<div className="flex items-center gap-2 mb-2">

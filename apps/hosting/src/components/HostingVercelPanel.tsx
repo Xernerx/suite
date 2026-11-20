@@ -311,7 +311,7 @@ export default function HostingVercelPanel({ userId, reloadTrigger = 0, onTokenU
 			{loading ? (
 				<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3" style={{ gap: 'calc(var(--ui-gap) * 0.6)' }}>
 					{Array.from({ length: 6 }).map((_, idx) => (
-						<div key={idx} className="h-40 rounded-2xl bg-(--background)/50 border border-(--border)/10 animate-pulse p-4" />
+						<div key={idx} className="h-40 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 animate-pulse p-4" />
 					))}
 				</div>
 			) : activeTab === 'apps' ? (

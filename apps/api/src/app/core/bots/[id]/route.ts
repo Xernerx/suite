@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { renderWidgetHtml, renderWidgetPng, renderWidgetSvg, resolveAppBaseUrl } from '@/lib/widgetRenderer';
+import { applyLiveDiscordToBot, buildDiscordAvatarUrl, fetchLiveDiscordUser, isDiscordManagedMediaValue } from '@/lib/botDiscordSync';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +24,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 		const officialSlugMap: Record<string, string> = {
 			virtue: '1484880634844287138',
+			yourapps: '619328560141697036',
 			todo: '782105629572464652',
 			'to-do-list': '782105629572464652',
 			'to-do-list-bot': '782105629572464652',
@@ -42,40 +44,26 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		}
 
 		const resolvedId = String(bot.id);
-		const [latestStat, voteCount] = await Promise.all([StatModel.findOne({ id: resolvedId }).sort({ timestamp: -1 }).lean(), VoteModel.countDocuments({ botId: resolvedId })]);
+		const [latestStat, voteCount, discordUser] = await Promise.all([
+			StatModel.findOne({ id: resolvedId }).sort({ timestamp: -1 }).lean(),
+			VoteModel.countDocuments({ botId: resolvedId }),
+			fetchLiveDiscordUser(resolvedId),
+		]);
 
 		let discordName: string | undefined;
-		let avatarUrl: string | null = bot.avatar && bot.avatar.startsWith('http') ? bot.avatar : null;
-		let bannerUrl: string | null = null;
+		let avatarUrl: string | null = !isDiscordManagedMediaValue(bot.avatar) ? String(bot.avatar) : null;
+		let bannerUrl: string | null = !isDiscordManagedMediaValue(bot.banner) ? String(bot.banner) : null;
 
-		const tokens = Array.from(new Set([process.env.DISCORD_BOT_TOKEN, process.env.DISCORD_CLIENT_TOKEN].filter(Boolean))) as string[];
-		for (const token of tokens) {
-			try {
-				const discordRes = await fetch(`https://discord.com/api/v10/users/${resolvedId}`, {
-					headers: { Authorization: `Bot ${token}` },
-					next: { revalidate: 3600 },
-				});
-				if (discordRes.ok) {
-					const discordUser = await discordRes.json();
-					discordName = discordUser.global_name || discordUser.username;
-					if (discordUser.avatar) {
-						const ext = discordUser.avatar.startsWith('a_') ? 'gif' : 'png';
-						avatarUrl = `https://cdn.discordapp.com/avatars/${resolvedId}/${discordUser.avatar}.${ext}?size=512`;
-					}
-					if (discordUser.banner) {
-						const ext = discordUser.banner.startsWith('a_') ? 'gif' : 'png';
-						bannerUrl = `https://cdn.discordapp.com/banners/${resolvedId}/${discordUser.banner}.${ext}?size=1024`;
-					}
-					break;
-				}
-			} catch {
-				// Ignore Discord API error and fall back to database fields
-			}
-		}
-
-		if (!avatarUrl && bot.avatar && !bot.avatar.startsWith('http')) {
-			const ext = bot.avatar.startsWith('a_') ? 'gif' : 'png';
-			avatarUrl = `https://cdn.discordapp.com/avatars/${resolvedId}/${bot.avatar}.${ext}?size=512`;
+		if (discordUser) {
+			discordName = discordUser.global_name || discordUser.username;
+			const synced = applyLiveDiscordToBot(bot, resolvedId, discordUser, BotModel, 512);
+			avatarUrl = synced.avatarUrl;
+			bannerUrl = synced.bannerUrl;
+		} else {
+			const dc = bot.discordCache;
+			discordName = dc?.globalName || dc?.username;
+			avatarUrl = avatarUrl || dc?.avatarUrl || buildDiscordAvatarUrl(resolvedId, dc?.avatar || bot.avatar, 512);
+			bannerUrl = bannerUrl || dc?.bannerUrl || null;
 		}
 
 		const payload = {

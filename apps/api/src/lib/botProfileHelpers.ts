@@ -1,5 +1,7 @@
 /** @format */
 
+import { applyLiveDiscordToBot, buildDiscordAvatarUrl, fetchLiveDiscordUser, isDiscordManagedMediaValue } from '@/lib/botDiscordSync';
+
 export const OFFICIAL_BOT_SLUG_TO_ID: Record<string, string> = {
 	virtue: '1484880634844287138',
 	yourapps: '619328560141697036',
@@ -66,8 +68,8 @@ async function attachBotReviewSummary(bot: any, botId: string, ReviewModel: any,
 		breakdown[star] = (breakdown[star] || 0) + 1;
 	}
 
-	const topReviewsRaw = [...allReviews]
-		.sort((a: any, b: any) => {
+	const topReviewsRaw = allReviews
+		.toSorted((a: any, b: any) => {
 			const scoreA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
 			const scoreB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
 			if (scoreB !== scoreA) return scoreB - scoreA;
@@ -183,17 +185,18 @@ async function attachRelatedBots(bot: any, botId: string, BotModel: any, StatMod
 		const enrichBotSummary = (b: any) => {
 			const st = statMap.get(b.id);
 			const dc = b.discordCache;
+			const freshAvatar = !isDiscordManagedMediaValue(b.avatar) ? b.avatar : dc?.avatarUrl || buildDiscordAvatarUrl(b.id, dc?.avatar || b.avatar, 512);
 			return {
 				...b,
 				name: dc?.globalName || dc?.username || b.name,
-				avatar: b.avatar || dc?.avatarUrl || dc?.avatar,
+				avatar: freshAvatar || null,
 				discord: dc?.username
 					? {
 							id: b.id,
 							username: dc.username,
 							global_name: dc.globalName || dc.username,
-							avatar: dc.avatar || b.avatar,
-							avatarUrl: dc.avatarUrl || null,
+							avatar: dc.avatar || null,
+							avatarUrl: dc.avatarUrl || freshAvatar || null,
 						}
 					: undefined,
 				guildCount: st?.guildCount ?? 0,
@@ -212,64 +215,20 @@ async function attachRelatedBots(bot: any, botId: string, BotModel: any, StatMod
 async function attachBotDiscordAndOwners(bot: any, botId: string, BotModel: any, UserModel: any): Promise<void> {
 	try {
 		const tokens = Array.from(new Set([process.env.DISCORD_BOT_TOKEN, process.env.DISCORD_CLIENT_TOKEN].filter(Boolean))) as string[];
-		let discordUser: any = null;
-
-		for (const token of tokens) {
-			const discordRes = await fetch(`https://discord.com/api/v10/users/${botId}`, {
-				headers: { Authorization: `Bot ${token}` },
-				next: { revalidate: 3600 },
-			}).catch(() => null);
-			if (discordRes?.ok) {
-				discordUser = await discordRes.json();
-				break;
-			}
-		}
+		const discordUser = await fetchLiveDiscordUser(botId);
 
 		if (discordUser) {
-			const avatarUrl = discordUser.avatar ? `https://cdn.discordapp.com/avatars/${botId}/${discordUser.avatar}.${discordUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null;
-			const bannerUrl = discordUser.banner ? `https://cdn.discordapp.com/banners/${botId}/${discordUser.banner}.${discordUser.banner.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null;
-			bot.discord = {
-				...discordUser,
-				avatarUrl,
-				bannerUrl,
-			};
-			setTimeout(async () => {
-				try {
-					await BotModel.updateOne(
-						{ id: botId },
-						{
-							$set: {
-								discordCache: {
-									username: discordUser.username || '',
-									globalName: discordUser.global_name || discordUser.globalName || discordUser.username || '',
-									avatar: discordUser.avatar || '',
-									banner: discordUser.banner || '',
-									avatarUrl: avatarUrl || '',
-									bannerUrl: bannerUrl || '',
-									updatedAt: new Date(),
-								},
-							},
-						}
-					).catch(() => {});
-				} catch {}
-			}, 0);
+			applyLiveDiscordToBot(bot, botId, discordUser, BotModel, 1024);
 		} else if (bot.discordCache?.username || bot.name) {
 			const dc = bot.discordCache || {};
+			const fallbackAvatarUrl = !isDiscordManagedMediaValue(bot.avatar) ? bot.avatar : dc.avatarUrl || buildDiscordAvatarUrl(botId, dc.avatar || bot.avatar, 1024);
 			bot.discord = {
 				id: botId,
 				username: dc.username || bot.name || botId,
 				global_name: dc.globalName || bot.name || dc.username || botId,
-				avatar: dc.avatar || bot.avatar || null,
+				avatar: dc.avatar || null,
 				banner: dc.banner || null,
-				avatarUrl:
-					dc.avatarUrl ||
-					(dc.avatar
-						? `https://cdn.discordapp.com/avatars/${botId}/${dc.avatar}.png?size=1024`
-						: bot.avatar
-							? String(bot.avatar).startsWith('http')
-								? bot.avatar
-								: `https://cdn.discordapp.com/avatars/${botId}/${bot.avatar}.png?size=1024`
-							: null),
+				avatarUrl: fallbackAvatarUrl,
 				bannerUrl: dc.bannerUrl || null,
 				bot: true,
 			};

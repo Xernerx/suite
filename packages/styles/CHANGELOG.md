@@ -2,6 +2,30 @@
 
 # @xernerx/styles
 
+## 0.4.4
+
+### Patch Changes
+
+- ## Cross-Browser `.no-scrollbar` Utility
+  
+  Added an unlayered `.no-scrollbar` utility class to hide horizontal scrollbars cleanly across modern and legacy WebKit browsers.
+  
+  ### Added
+  
+  - **`.no-scrollbar` Utility**: Defined unlayered `scrollbar-width: none` with a gated `@supports not (scrollbar-width: none)` `::-webkit-scrollbar` fallback after the global `*` scrollbar rule in `globals.css`.
+
+## 0.4.3
+
+### Patch Changes
+
+- ## Tailwind CSS v4 & Toolchain Alignment
+  
+  Aligned `@tailwindcss/postcss`, `tailwindcss`, and `pnpm@12.21.0` / Node `>=24` workspace metadata.
+  
+  ### Changed
+  
+  - **Toolchain & Dependency Alignment**: Updated Tailwind CSS v4 PostCSS dependencies and Node `>=24` / `pnpm@12.21.0` package metadata.
+
 ## 0.4.2
 
 ### Patch Changes

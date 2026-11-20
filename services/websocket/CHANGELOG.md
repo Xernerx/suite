@@ -2,6 +2,48 @@
 
 # @xernerx/websocket
 
+## 1.9.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+
+## 1.9.0
+
+### Minor Changes
+
+- ## Expanded Suite & YourApps WebSocket Routing
+  
+  Added new real-time handlers for Xernerx Suite services and expanded YourApps WebSocket actions.
+  
+  ### Added
+  
+  - **Expanded YourApps & Suite Handlers**: Added real-time WebSocket actions supporting YourApps panel/poll synchronization, review workflows, and core suite events.
+  
+  ### Changed
+  
+  - **Gateway Routing**: Updated WebSocket gateway routing to support the expanded service actions.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.0
+
+## 1.8.2
+
+### Patch Changes
+
+- ## WebSocket Gateway Runtime Alignment
+  
+  Updated Mongoose, TypeScript toolchain packages, and Node `>=24` / `pnpm@12.21.0` workspace metadata for the real-time WebSocket gateway.
+  
+  ### Changed
+  
+  - **Runtime Dependencies**: Upgraded `mongoose` and TypeScript runtime tooling alongside `pnpm@12.21.0` / Node `>=24` engine fields.
+- Updated dependencies
+  - @xernerx/lib@1.28.0
+
 ## 1.8.1
 
 ### Patch Changes

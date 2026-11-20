@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Activity, Bell, Building2, Check, Columns2, EyeOff, Gift, Layers, LayoutDashboard, Minus, MousePointerClick, Radio, RefreshCw, Search, Sparkles, Square, Store, X } from 'lucide-react';
+import { Activity, Bell, Building2, Check, Columns2, EyeOff, Gauge, Gift, Layers, Minus, MousePointerClick, Radio, RefreshCw, Search, Sparkles, Square, Store, X } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 
 const PREVIEW_CRESTS = [
@@ -95,7 +95,7 @@ export function DesktopInteractivePreview() {
 							Ctrl K / .
 						</button>
 						<span className="hidden sm:inline-flex h-6 w-6 items-center justify-center rounded-xl bg-(--foreground)/35 border border-(--border)/10 text-(--text-muted)">
-							<LayoutDashboard size={11} />
+							<Gauge size={11} />
 						</span>
 						<span className="hidden sm:inline-flex h-6 w-6 items-center justify-center rounded-xl bg-(--foreground)/35 border border-(--border)/10 text-(--text-muted)">
 							<Building2 size={11} />
@@ -174,15 +174,19 @@ export function DesktopInteractivePreview() {
 							initial={{ height: 0, opacity: 0 }}
 							animate={{ height: 'auto', opacity: 1 }}
 							exit={{ height: 0, opacity: 0 }}
-							className="border-b border-(--border)/10 bg-(--background)/80 px-4 py-2 flex items-center justify-between gap-2 text-[11px] font-mono overflow-hidden"
+							className="border-b border-(--border)/10 bg-(--background) px-4 py-2 overflow-hidden"
 						>
-							<div className="flex items-center gap-1.5 truncate">
-								<span className="text-(--text-muted)">https://</span>
-								<span className="text-(--accent) font-bold">app</span>
-								<span className="text-(--text-muted)">.public.xernerx.com</span>
-								<span className="text-(--text) font-semibold">/servers/xernerx</span>
+							<div className="flex items-center justify-between gap-2 rounded-full bg-(--foreground)/40 backdrop-blur-md border border-(--border)/15 px-3 py-1.5 text-[11px] font-mono">
+								<div className="flex items-center gap-1 truncate">
+									<span className="text-(--text-muted)">https://</span>
+									<span className="px-1.5 py-0.5 rounded-lg bg-(--accent)/12 text-(--accent) font-bold">app</span>
+									<span className="text-(--text-muted)">.</span>
+									<span className="px-1.5 py-0.5 rounded-lg bg-(--accent)/12 text-(--accent) font-bold">public</span>
+									<span className="text-(--text-muted) pr-1.5 border-r border-(--border)/15">.xernerx.com</span>
+									<span className="pl-1 text-(--text) font-medium">/servers/xernerx</span>
+								</div>
+								<span className="px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) text-[9px] font-sans font-bold shrink-0">{t('components.header.omnibar.badgeServer')}</span>
 							</div>
-							<span className="px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) text-[9px] font-sans font-bold shrink-0">{t('components.header.omnibar.badgeServer')}</span>
 						</motion.div>
 					)}
 				</AnimatePresence>

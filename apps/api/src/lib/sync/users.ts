@@ -74,8 +74,8 @@ export async function syncUserRoles(userId: string, db: any, targetGuildId?: str
 			const unmanagedRoles = currentRoles.filter((rId: string) => !managedDiscordRoles.includes(rId));
 			const finalRoles = Array.from(new Set([...unmanagedRoles, ...desiredDiscordRoles]));
 
-			const currentSorted = [...currentRoles].sort().join(',');
-			const finalSorted = [...finalRoles].sort().join(',');
+			const currentSorted = currentRoles.toSorted().join(',');
+			const finalSorted = finalRoles.toSorted().join(',');
 
 			if (currentSorted !== finalSorted) {
 				await sleep(1000);

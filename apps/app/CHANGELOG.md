@@ -2,6 +2,76 @@
 
 # app
 
+## 2.26.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
+## 2.26.0
+
+### Minor Changes
+
+- ## YourApps Server Applications Suite & Dashboard Polish
+  
+  Expanded the YourApps server dashboard and public web application portals with polls, starter templates, consensus reviews, and smoother form interactions.
+  
+  ### Added
+  
+  - **Starter Templates & Applications Settings**: Added ready-to-use position templates and a dedicated YourApps server settings panel for configuring channels, roles, and permissions.
+  - **Interactive Apply Panels & Polls**: Added modal builders for publishing and syncing Discord Apply panels and native polls directly from your dashboard.
+  - **Rules, Review Workflows & Submission Inspector**: Added scheduling windows, eligibility rules, consensus review settings, and a rich submission inspector modal with internal notes, follow-up requests, and interview creation.
+  - **Expanded Web Form Inputs**: Added full question-type input support on server web application portals including file uploads, pickers, and multi-select choices.
+  
+  ### Changed
+  
+  - **IME-Safe Tag & Choice Entry**: Prevented CJK IME composition confirmations from prematurely submitting custom server tags or application choices.
+  - **State Snapshots & Sorting**: Replaced JSON round-trip config clones with `structuredClone()` and modernized bot/server release and review sorting.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
+## 2.25.0
+
+### Minor Changes
+
+- ## Server Bot Setup Deletion, Profile Polish & Explorer Refinements
+  
+  Added self-service Virtue and YourApps server setup deletion in the Dashboard alongside profile, leaderboard, and bot directory improvements.
+  
+  ### Added
+  
+  - **Delete Virtue & YourApps Setup Data**: Added self-service danger zone controls in Server Settings, Virtue, and YourApps dashboard tabs to permanently wipe per-server bot configurations.
+  - **Bungie Tricorn Profile Badge**: Added the Bungie Tricorn emblem and clean handle formatting for linked Bungie accounts on public user profiles.
+  
+  ### Changed
+  
+  - **Public Profile Filtering & Showcases**: Displayed accurate global levels and XP on user profiles, formatted Featured Showcases as titled cards, and restricted Published Bots, Official Servers, and Organizations on public profiles strictly to public listings.
+  - **Dashboard Server Switching**: Cleared stale form inputs immediately when switching servers in the sidebar and truncated long server names cleanly.
+  - **Bot Directory, Milestones & Leaderboards**: Bound `/bots` headings dynamically to active categories without duplicating the `#1` spotlighted bot, unified milestone progress math, labeled onboarding credit rewards, normalized lowercase tag pills, and removed duplicate podium rank badges.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 2.24.1
 
 ### Patch Changes

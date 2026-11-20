@@ -39,6 +39,9 @@ minimumReleaseAgeExclude:
     - '@xernerx/terminal@1.1.14 || 1.1.15'
     - 'xernerx@5.0.1'
     - '@xernerx/extension-builder@0.1.0'
+    - lucide-react-native@1.77.0
+    - react-native-reanimated@4.8.0
+    - react-native-worklets@0.14.0
 
 overrides:
     suite: 'link:'

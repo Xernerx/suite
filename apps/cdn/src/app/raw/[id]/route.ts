@@ -5,20 +5,19 @@ import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 import { getCdnCorsHeaders } from '@/lib/cors';
 
-function getCorsHeaders(origin: string | null) {
-	return getCdnCorsHeaders(origin, 'GET, OPTIONS');
+function getCorsHeaders(req: Request) {
+	return getCdnCorsHeaders(req.headers.get('origin'), 'GET, OPTIONS', undefined, req.headers.get('access-control-request-headers'));
 }
 
 export async function OPTIONS(req: Request) {
 	return new Response(null, {
 		status: 204,
-		headers: getCorsHeaders(req.headers.get('origin')),
+		headers: getCorsHeaders(req),
 	});
 }
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-	const origin = req.headers.get('origin');
-	const corsHeaders = getCorsHeaders(origin);
+	const corsHeaders = getCorsHeaders(req);
 
 	try {
 		const { id } = await params;
@@ -29,7 +28,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 		const media = await MediaModel.findById(id);
 		if (!media) {
-			return new Response('Not Found', { status: 404 });
+			return new Response('Not Found', { status: 404, headers: corsHeaders });
 		}
 
 		// Privacy checks
@@ -38,7 +37,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			const userId = (session?.user as any)?.id;
 
 			if (!userId) {
-				return new Response('Not Found', { status: 404 });
+				return new Response('Not Found', { status: 404, headers: corsHeaders });
 			}
 
 			const UserModel = models.users.User;
@@ -49,7 +48,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			const canManage = roles.some((r) => r.permissions?.manageMedia);
 
 			if (media.uploaderId !== userId && !media.shared?.includes(userId) && !canManage) {
-				return new Response('Not Found', { status: 404 });
+				return new Response('Not Found', { status: 404, headers: corsHeaders });
 			}
 		}
 
@@ -61,16 +60,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			const res = await get(media.url, { access: 'private' });
 			if (!res) {
 				console.error(`DEBUG RAW - SDK get() returned null (blob not found):`, media.url);
-				return new Response('Failed to retrieve media from storage', { status: 404 });
+				return new Response('Failed to retrieve media from storage', { status: 404, headers: corsHeaders });
 			}
 			stream = res.stream;
 		} catch (e: any) {
 			console.error(`DEBUG RAW - SDK get() failed:`, e);
-			return new Response('Failed to retrieve media from storage', { status: 502 });
+			return new Response('Failed to retrieve media from storage', { status: 502, headers: corsHeaders });
 		}
 
 		if (!stream) {
-			return new Response('Failed to retrieve media from storage', { status: 502 });
+			return new Response('Failed to retrieve media from storage', { status: 502, headers: corsHeaders });
 		}
 
 		// Stream the response directly to the client
@@ -88,6 +87,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		});
 	} catch (error: any) {
 		console.error('Failed to view media:', error);
-		return new Response('Internal Server Error', { status: 500 });
+		return new Response('Internal Server Error', { status: 500, headers: corsHeaders });
 	}
 }

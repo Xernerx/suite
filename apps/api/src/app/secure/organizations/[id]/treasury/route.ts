@@ -36,7 +36,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			return NextResponse.json({ error: 'Forbidden: Only organization members can view the treasury.' }, { status: 403 });
 		}
 
-		const ledger = Array.isArray(org.treasuryLedger) ? [...org.treasuryLedger].sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()) : [];
+		const ledger = Array.isArray(org.treasuryLedger) ? org.treasuryLedger.toSorted((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()) : [];
 
 		return NextResponse.json(
 			{
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			return NextResponse.json({
 				success: true,
 				treasuryBalance: Number(updatedOrg?.treasuryBalance) || 0,
-				treasuryLedger: (updatedOrg?.treasuryLedger || []).slice().reverse(),
+				treasuryLedger: (updatedOrg?.treasuryLedger || []).toReversed(),
 			});
 		}
 
@@ -221,7 +221,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			return NextResponse.json({
 				success: true,
 				treasuryBalance: Number(updatedOrg?.treasuryBalance) || 0,
-				treasuryLedger: (updatedOrg?.treasuryLedger || []).slice().reverse(),
+				treasuryLedger: (updatedOrg?.treasuryLedger || []).toReversed(),
 			});
 		}
 
@@ -302,7 +302,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 				success: true,
 				vanityUnlocked: true,
 				treasuryBalance: Number(updatedOrg?.treasuryBalance) || 0,
-				treasuryLedger: (updatedOrg?.treasuryLedger || []).slice().reverse(),
+				treasuryLedger: (updatedOrg?.treasuryLedger || []).toReversed(),
 			});
 		}
 

@@ -17,6 +17,11 @@ export function BotProfilePreview({ botId, getEnvUrl, onClear }: BotProfilePrevi
 	const { t } = useDictionary();
 	const [profile, setProfile] = useState<any>(null);
 	const [loading, setLoading] = useState(false);
+	const [avatarFailed, setAvatarFailed] = useState(false);
+
+	useEffect(() => {
+		setAvatarFailed(false);
+	}, [botId, profile?.avatar, profile?.avatarUrl]);
 
 	useEffect(() => {
 		if (!botId || botId.length < 15) {
@@ -81,8 +86,8 @@ export function BotProfilePreview({ botId, getEnvUrl, onClear }: BotProfilePrevi
 
 	return (
 		<div className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm w-max">
-			{avatarUrl ? (
-				<Image src={avatarUrl} alt={name} width={16} height={16} unoptimized className="h-4 w-4 rounded-full object-cover shrink-0" />
+			{avatarUrl && !avatarFailed ? (
+				<Image src={avatarUrl} alt={name} width={16} height={16} unoptimized className="h-4 w-4 rounded-full object-cover shrink-0" onError={() => setAvatarFailed(true)} />
 			) : (
 				<div className="flex h-4 w-4 items-center justify-center rounded-full bg-(--foreground) shrink-0">
 					<span className="text-[8px] font-bold text-(--text-muted)">{name.charAt(0)}</span>

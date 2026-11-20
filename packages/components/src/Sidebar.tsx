@@ -22,6 +22,20 @@ const deviceIcons = {
 	tablet: Tablet,
 } as const;
 
+const DISCORD_NAMEPLATE_PALETTES: Record<string, string> = {
+	crimson: 'linear-gradient(90deg, #2a0a10 0%, #591321 55%, #7a1b2d 100%)',
+	berry: 'linear-gradient(90deg, #281024 0%, #521c45 55%, #6e265c 100%)',
+	bubblegum: 'linear-gradient(90deg, #2d1222 0%, #5c2244 55%, #7d2f5d 100%)',
+	violet: 'linear-gradient(90deg, #1d1130 0%, #3b2063 55%, #4f2b82 100%)',
+	cobalt: 'linear-gradient(90deg, #0e1a33 0%, #1b3669 55%, #24488a 100%)',
+	sky: 'linear-gradient(90deg, #0d2233 0%, #194566 55%, #225c87 100%)',
+	teal: 'linear-gradient(90deg, #0c2629 0%, #174d52 55%, #1f666d 100%)',
+	forest: 'linear-gradient(90deg, #0f2618 0%, #1e4d31 55%, #286641 100%)',
+	clover: 'linear-gradient(90deg, #122915 0%, #24522a 55%, #306e38 100%)',
+	lemon: 'linear-gradient(90deg, #2b230d 0%, #574619 55%, #735d22 100%)',
+	white: 'linear-gradient(90deg, #1e2028 0%, #343846 55%, #464b5e 100%)',
+};
+
 export function Sidebar() {
 	const { data: session } = useSession();
 	const { state, isMobileOpen, setMobileOpen, navItems, view, setView, topSlot, bottomSlot, accountSlot, accountCards } = useSidebar();
@@ -36,6 +50,9 @@ export function Sidebar() {
 	const pathname = usePathname();
 	const [isMounted, setIsMounted] = useState(false);
 	const [localTourPostponed, setLocalTourPostponed] = useState(false);
+	const [avatarFailed, setAvatarFailed] = useState(false);
+	const [decorationFailed, setDecorationFailed] = useState(false);
+	const [nameplateFailed, setNameplateFailed] = useState(false);
 
 	// Manage which dropdown is active
 	const [activeMenu, setActiveMenu] = useState<'none' | 'user' | 'notifications'>('none');
@@ -151,6 +168,16 @@ export function Sidebar() {
 			: null;
 	const customNameplate = (discordUser as any)?.credits?.profileCosmetics?.nameplate || 'none';
 	const customAvatarFrame = (discordUser as any)?.credits?.profileCosmetics?.avatarFrame || 'none';
+	const hasActiveNameplate = Boolean(nameplateUrl && !nameplateFailed && customNameplate === 'none');
+	const nameplatePaletteKey = String(activeUser?.collectibles?.nameplate?.palette || '').toLowerCase();
+	const nameplateGradient =
+		DISCORD_NAMEPLATE_PALETTES[nameplatePaletteKey] || 'linear-gradient(90deg, color-mix(in srgb, var(--accent) 28%, #14141b) 0%, color-mix(in srgb, var(--accent) 48%, #1c1c26) 100%)';
+
+	useEffect(() => {
+		setAvatarFailed(false);
+		setDecorationFailed(false);
+		setNameplateFailed(false);
+	}, [avatarUrl, decorationUrl, nameplateUrl]);
 
 	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
 	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
@@ -290,11 +317,11 @@ export function Sidebar() {
 							return (
 								<Fragment key={idx}>
 									{showCategory && (
-										<div className={`mt-4 mb-1 transition-all duration-300 ${isCollapsed ? 'flex justify-center' : 'px-4'}`}>
+										<div className={`mt-4 mb-1 min-w-0 transition-all duration-300 ${isCollapsed ? 'flex justify-center' : 'px-4'}`}>
 											{isCollapsed ? (
 												<div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-(--border) to-transparent" />
 											) : (
-												<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{item.category}</span>
+												<span className="block truncate text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{item.category}</span>
 											)}
 										</div>
 									)}
@@ -309,7 +336,7 @@ export function Sidebar() {
 												if (item.onClick) item.onClick();
 												setMobileOpen(false);
 											}}
-											className={`w-full group relative flex items-center text-left rounded-xl transition-all duration-200 
+											className={`w-full min-w-0 group relative flex items-center text-left rounded-xl transition-all duration-200 
 											${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground)/30 backdrop-blur-md hover:text-(--text)'}
 											${isCollapsed ? 'justify-center px-0' : 'justify-start'}
 										`}
@@ -323,7 +350,7 @@ export function Sidebar() {
 											)}
 											{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
 											<span
-												className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
+												className={`truncate transition-all duration-300 font-medium text-[14px] 
 											${isCollapsed ? 'w-0 opacity-0' : 'flex-1 min-w-0 opacity-100'}`}
 											>
 												{item.label}
@@ -344,7 +371,7 @@ export function Sidebar() {
 												if (item.onClick) item.onClick();
 												setMobileOpen(false);
 											}}
-											className={`group relative flex items-center text-left rounded-xl transition-all duration-200 
+											className={`min-w-0 group relative flex items-center text-left rounded-xl transition-all duration-200 
 											${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground)/30 backdrop-blur-md hover:text-(--text)'}
 											${isCollapsed ? 'justify-center px-0' : 'justify-start'}
 										`}
@@ -358,7 +385,7 @@ export function Sidebar() {
 											)}
 											{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
 											<span
-												className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
+												className={`truncate transition-all duration-300 font-medium text-[14px] 
 											${isCollapsed ? 'w-0 opacity-0' : 'flex-1 min-w-0 opacity-100'}`}
 											>
 												{item.label}
@@ -440,18 +467,34 @@ export function Sidebar() {
 								{/* Combined Trigger Card Wrapper */}
 								<div
 									className={`group relative overflow-hidden flex w-full items-center rounded-2xl border transition-all 
-                                ${customNameplate !== 'none' ? `xrx-nameplate-${customNameplate} border-(--accent)/35 shadow-sm` : !nameplateUrl ? 'border-(--border)/10 bg-(--foreground)/30 hover:bg-(--foreground)/45 backdrop-blur-md' : 'border-(--border)/10 shadow-inner'}
-                                ${customNameplate === 'none' && !nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)/45 backdrop-blur-md' : ''}
+                                ${customNameplate !== 'none' ? `xrx-nameplate-${customNameplate} border-(--accent)/35 shadow-sm` : !hasActiveNameplate ? 'border-(--border)/10 bg-(--foreground)/30 hover:bg-(--foreground)/45 backdrop-blur-md' : 'border-(--border)/15 shadow-sm'}
+                                ${customNameplate === 'none' && !hasActiveNameplate && activeMenu !== 'none' ? 'bg-(--foreground)/45 backdrop-blur-md' : ''}
                                 ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
                                 ${isSidebarItemHighlighted('moved-dock') ? 'ring-2 ring-(--accent) shadow-[0_0_22px_color-mix(in_srgb,var(--accent)_60%,transparent)] bg-(--accent)/15' : ''}
                             `}
-									style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
+									style={{
+										padding: 'calc(var(--ui-gap) * 0.75)',
+										gap: 'var(--ui-gap)',
+										...(hasActiveNameplate ? { backgroundImage: nameplateGradient } : {}),
+									}}
 								>
 									{/* Root Nameplate Video Background */}
-									{nameplateUrl && customNameplate === 'none' && (
+									{hasActiveNameplate && nameplateUrl && (
 										<>
-											<video src={nameplateUrl} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-fill z-0 pointer-events-none opacity-90" />
-											<div className="absolute inset-0 bg-(--background)/10 z-0 pointer-events-none" />
+											<video
+												src={nameplateUrl}
+												autoPlay
+												loop
+												muted
+												playsInline
+												onError={() => setNameplateFailed(true)}
+												className="absolute inset-0 w-full h-full object-cover object-right z-0 pointer-events-none opacity-95"
+												style={{
+													WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.35) 22%, rgba(0,0,0,0.85) 45%, #000 65%)',
+													maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.35) 22%, rgba(0,0,0,0.85) 45%, #000 65%)',
+												}}
+											/>
+											<div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/10 to-transparent z-0 pointer-events-none" />
 										</>
 									)}
 
@@ -461,12 +504,12 @@ export function Sidebar() {
 										aria-label={isGiftReady ? t('components.cards.sidebaruser.giftReadyTooltip') : activeUser.global_name || activeUser.name}
 										title={isGiftReady ? t('components.cards.sidebaruser.giftReadyTooltip') : activeUser.global_name || activeUser.name}
 										onClick={() => setActiveMenu(activeMenu === 'user' ? 'none' : 'user')}
-										className="relative z-10 flex flex-1 items-center overflow-hidden text-left rounded-lg"
+										className="relative z-10 flex flex-1 min-w-0 items-center overflow-hidden text-left rounded-lg cursor-pointer"
 										style={{ gap: 'var(--ui-gap)' }}
 									>
 										{/* Avatar */}
 										<div className="relative shrink-0">
-											{avatarUrl ? (
+											{avatarUrl && !avatarFailed ? (
 												<div className="relative h-9 w-9">
 													<Image
 														src={avatarUrl}
@@ -476,9 +519,10 @@ export function Sidebar() {
 														unoptimized
 														draggable={false}
 														loading="eager"
+														onError={() => setAvatarFailed(true)}
 													/>
 
-													{decorationUrl && (
+													{decorationUrl && !decorationFailed && (
 														<Image
 															src={decorationUrl}
 															alt={t('components.sidebar.alt2')}
@@ -486,6 +530,7 @@ export function Sidebar() {
 															className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
 															unoptimized
 															draggable={false}
+															onError={() => setDecorationFailed(true)}
 														/>
 													)}
 												</div>
@@ -509,36 +554,36 @@ export function Sidebar() {
 
 										{/* Names */}
 										<div
-											className={`flex flex-col overflow-hidden transition-all duration-300 relative ${isCollapsed ? 'w-0 opacity-0 hidden' : 'flex-1 opacity-100'}`}
+											className={`flex flex-col overflow-hidden transition-all duration-300 relative ${isCollapsed ? 'w-0 opacity-0 hidden' : 'flex-1 min-w-0 opacity-100'}`}
 											style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}
 										>
-											<span className={`truncate text-sm font-bold tracking-wide ${nameplateUrl ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-(--text)'}`}>
+											<span className={`truncate text-sm font-bold tracking-wide ${hasActiveNameplate ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-(--text)'}`}>
 												{activeUser.global_name || activeUser.name}
 											</span>
-											<span className={`truncate text-xs ${nameplateUrl ? 'text-white/80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]' : 'text-(--text-muted)'}`}>
+											<span className={`truncate text-xs ${hasActiveNameplate ? 'text-white/80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]' : 'text-(--text-muted)'}`}>
 												@{activeUser.username || activeUser.name?.toLowerCase().replace(/\s/g, '')}
 											</span>
 										</div>
 									</button>
 
 									{/* Action Buttons (Right Side) */}
-									<div className={`relative z-10 flex ${isCollapsed ? 'flex-col' : 'items-center'} gap-1`}>
+									<div className={`relative z-10 flex ${isCollapsed ? 'flex-col' : 'items-center'} gap-1 shrink-0`}>
 										{/* Notifications Trigger */}
 										<button
 											type="button"
 											aria-label={t('components.header.notifications')}
 											title={t('components.header.notifications')}
 											onClick={() => setActiveMenu(activeMenu === 'notifications' ? 'none' : 'notifications')}
-											className={`shrink-0 flex items-center justify-center rounded-xl transition-colors 
-                                            ${nameplateUrl ? 'hover:bg-(--background)/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
-                                            ${activeMenu === 'notifications' ? (nameplateUrl ? 'bg-(--background)/40 text-white' : 'bg-(--background) text-(--text)') : ''}
+											className={`shrink-0 flex items-center justify-center rounded-xl transition-colors cursor-pointer 
+                                            ${hasActiveNameplate ? 'hover:bg-(--background)/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
+                                            ${activeMenu === 'notifications' ? (hasActiveNameplate ? 'bg-(--background)/40 text-white' : 'bg-(--background) text-(--text)') : ''}
                                         `}
 											style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
 										>
 											<div className="relative">
 												<Bell
 													size={isCollapsed ? 20 : 18}
-													className={`transition-transform duration-200 ${activeMenu === 'notifications' && !nameplateUrl ? 'text-(--accent)' : ''}`}
+													className={`transition-transform duration-200 ${activeMenu === 'notifications' && !hasActiveNameplate ? 'text-(--accent)' : ''}`}
 												/>
 
 												{totalUnread > 0 && (
@@ -558,8 +603,8 @@ export function Sidebar() {
 												setActiveMenu('none');
 												setNavOpen(true);
 											}}
-											className={`shrink-0 flex items-center justify-center rounded-xl transition-all 
-                                            ${nameplateUrl ? 'hover:bg-(--background)/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
+											className={`shrink-0 flex items-center justify-center rounded-xl transition-all cursor-pointer 
+                                            ${hasActiveNameplate ? 'hover:bg-(--background)/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
                                             ${isNavPromptActive ? 'ring-2 ring-(--accent) bg-(--accent)/20 text-(--accent) shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_75%,transparent)] scale-110 animate-pulse pointer-events-auto cursor-pointer' : ''}
                                         `}
 											style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}

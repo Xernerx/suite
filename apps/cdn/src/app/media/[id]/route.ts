@@ -7,20 +7,19 @@ import { getServerSession } from 'next-auth';
 import { del } from '@vercel/blob';
 import { getCdnCorsHeaders } from '@/lib/cors';
 
-function getCorsHeaders(origin: string | null) {
-	return getCdnCorsHeaders(origin, 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+function getCorsHeaders(req: Request) {
+	return getCdnCorsHeaders(req.headers.get('origin'), 'GET, POST, PUT, PATCH, DELETE, OPTIONS', undefined, req.headers.get('access-control-request-headers'));
 }
 
 export async function OPTIONS(req: Request) {
 	return new Response(null, {
 		status: 204,
-		headers: getCorsHeaders(req.headers.get('origin')),
+		headers: getCorsHeaders(req),
 	});
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-	const origin = req.headers.get('origin');
-	const corsHeaders = getCorsHeaders(origin);
+	const corsHeaders = getCorsHeaders(req);
 
 	try {
 		const { id } = await params;
@@ -66,8 +65,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-	const origin = req.headers.get('origin');
-	const corsHeaders = getCorsHeaders(origin);
+	const corsHeaders = getCorsHeaders(req);
 
 	try {
 		const { id } = await params;

@@ -30,7 +30,8 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 	const softwareTrackRef = useRef<HTMLDivElement>(null);
 	const containerRef = useRef<HTMLElement | null>(null);
 	const [ready, setReady] = useState(false);
-	const [matrixConstructed, setMatrixConstructed] = useState(false);
+	const [matrixConstructed, setMatrixConstructed] = useState(true);
+	const [reducedMotion, setReducedMotion] = useState(false);
 	const [botProfiles, setBotProfiles] = useState<Record<string, BotProfileData>>({});
 
 	const consumerServiceItems = buildConsumerServiceItems(t, getEnvUrl);
@@ -115,6 +116,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 							id: String(bot.id),
 							name: bot.name,
 							avatarUrl: bot.avatarUrl,
+							bannerUrl: bot.bannerUrl,
 							status: bot.status,
 							activity: bot.activity,
 							guildCount: bot.guildCount,
@@ -135,6 +137,9 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 		setBackgroundMode('sticky-ripple');
 		setDotVariant('full');
 
+		const prefersReduced = typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
+		setReducedMotion(prefersReduced);
+
 		const isAutomated =
 			typeof navigator !== 'undefined' &&
 			(Boolean((navigator as any).webdriver) ||
@@ -142,21 +147,32 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					navigator.userAgent || ''
 				));
 
+		const alreadyConstructed = typeof window !== 'undefined' && Boolean((window as any).__xernerxHomeConstructCompleted);
+
 		let fallbackTimer = 0;
 		const handleConstructComplete = () => {
+			if (typeof window !== 'undefined') {
+				(window as any).__xernerxHomeConstructCompleted = true;
+				(window as any).__xernerxConstructPending = false;
+				window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
+			}
 			setMatrixConstructed(true);
-			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
 		};
 
-		if (isAutomated) {
-			setMatrixConstructed(true);
+		if (isAutomated || prefersReduced || alreadyConstructed) {
+			handleConstructComplete();
 		} else {
 			setMatrixConstructed(false);
 			(window as any).__xernerxConstructPending = true;
+			// Register completion & early-interaction listeners BEFORE firing construct-logo so synchronous completions are never missed
+			window.addEventListener('xernerx:construct-complete', handleConstructComplete);
+			window.addEventListener('wheel', handleConstructComplete, { passive: true, once: true });
+			window.addEventListener('touchmove', handleConstructComplete, { passive: true, once: true });
+			window.addEventListener('pointerdown', handleConstructComplete, { passive: true, once: true });
+			window.addEventListener('keydown', handleConstructComplete, { once: true });
 			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: true } }));
 			window.dispatchEvent(new CustomEvent('xernerx:construct-logo'));
-			window.addEventListener('xernerx:construct-complete', handleConstructComplete);
-			fallbackTimer = window.setTimeout(handleConstructComplete, 3550);
+			fallbackTimer = window.setTimeout(handleConstructComplete, 1800);
 		}
 
 		const scrollEl = document.getElementById('main-scroll-container');
@@ -193,6 +209,10 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 		return () => {
 			window.clearTimeout(fallbackTimer);
 			window.removeEventListener('xernerx:construct-complete', handleConstructComplete);
+			window.removeEventListener('wheel', handleConstructComplete);
+			window.removeEventListener('touchmove', handleConstructComplete);
+			window.removeEventListener('pointerdown', handleConstructComplete);
+			window.removeEventListener('keydown', handleConstructComplete);
 			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
 			scrollEl?.removeEventListener('scroll', handleScroll);
 			setBackgroundMode(null);
@@ -200,16 +220,16 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 		};
 	}, [hide, setBackgroundMode, setDotVariant]);
 
-	const pageReady = !isLoading && matrixConstructed;
+	const pageReady = matrixConstructed && (!isLoading || reducedMotion);
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: '56vh' }}
-			animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: '56vh' }}
-			transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
+			initial={false}
+			animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
+			transition={{ duration: reducedMotion ? 0 : 0.75, ease: [0.22, 1, 0.36, 1] }}
 			className={`flex flex-col selection:bg-(--accent) selection:text-white ${pageReady ? '' : 'pointer-events-none select-none'}`}
 		>
-			<HomeHeroAndFeatures pageReady={pageReady} publicPackages={publicPackages} />
+			<HomeHeroAndFeatures pageReady={pageReady} reducedMotion={reducedMotion} publicPackages={publicPackages} />
 
 			{/* CONSUMER SERVICES (Horizontal Scroll) */}
 			<section id="services" ref={servicesRef} className="relative h-[300dvh]">

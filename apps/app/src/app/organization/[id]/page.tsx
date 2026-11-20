@@ -4,12 +4,12 @@
 import { useEffect, useState, use } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useSession } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button } from '@xernerx/ui';
-import { User, ArrowLeft, Settings, Users, Bot, Server, LayoutDashboard, Compass } from 'lucide-react';
-import Image from 'next/image';
+import { User, ArrowLeft, Settings, Bot, Server, Gauge, Compass } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import SafeAvatar from '@/components/SafeAvatar';
+import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 import Header from '@/components/organization/Header';
 import Profile from '@/components/organization/Profile';
 
@@ -36,7 +36,7 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 
 		const items: any[] = [
 			{ label: t('app.dashboard.nav.explore'), href: '/', icon: Compass, category: t('app.portal.categories.navigation') },
-			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, category: t('app.portal.categories.navigation') },
+			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: Gauge, category: t('app.portal.categories.navigation') },
 			{ label: t('app.organization.nav.goBack'), onClick: () => router.back(), icon: ArrowLeft, category: t('app.portal.categories.navigation') },
 			{ label: t('app.organization.nav.profile'), view: 'profile', icon: User, category: t('app.organization.nav.orgDetails') },
 		];
@@ -48,7 +48,9 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 					return {
 						label: b.discord?.global_name || b.discord?.username || b.name || t('common.unknownBot'),
 						href: `/bots/${b.vanitySlug || b.id}`,
-						icon: avatarUrl ? () => <Image src={avatarUrl} alt={b.name || b.id} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" /> : Bot,
+						icon: avatarUrl
+							? () => <SafeAvatar src={avatarUrl} alt={b.name || b.id} width={20} height={20} className="w-5 h-5 rounded-full object-cover" fallback={<Bot size={14} />} />
+							: Bot,
 						category: t('app.organization.nav.publishedBots'),
 					};
 				})
@@ -61,16 +63,16 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 					label: s.name,
 					href: `/servers/${s.id}`,
 					icon: s.iconUrl
-						? () => <Image src={s.iconUrl} alt={s.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
+						? () => <SafeAvatar src={s.iconUrl} alt={s.name} width={20} height={20} className="w-5 h-5 rounded-full object-cover" fallback={<Server size={14} />} />
 						: s.icon
 							? () => (
-									<Image
+									<SafeAvatar
 										src={`https://cdn.discordapp.com/icons/${s.id}/${s.icon}.png?size=64`}
 										alt={s.name}
 										width={20}
 										height={20}
-										unoptimized
 										className="w-5 h-5 rounded-full object-cover"
+										fallback={<Server size={14} />}
 									/>
 								)
 							: Server,
@@ -104,8 +106,8 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 			try {
 				const [orgRes, botsRes, serversRes] = await Promise.all([
 					fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${id}`), { credentials: 'include' }),
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?organization=${id}`), { credentials: 'include' }),
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?organization=${id}`), { credentials: 'include' }),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?organization=${encodeURIComponent(id)}&publicOnly=true`), { credentials: 'include' }),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?organization=${encodeURIComponent(id)}`), { credentials: 'include' }),
 				]);
 
 				if (orgRes.ok) {
@@ -159,7 +161,7 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 
 					if (botsRes.ok) {
 						const fetchedBots = await botsRes.json();
-						const visibleBots = Array.isArray(fetchedBots) ? fetchedBots.filter((b: any) => b.privacy === 'public' || isOrgMember) : [];
+						const visibleBots = Array.isArray(fetchedBots) ? fetchedBots.filter((b: any) => b.privacy === 'public') : [];
 
 						const botsWithDiscord = await Promise.all(
 							visibleBots.map(async (b: any) => {
@@ -180,7 +182,7 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 					}
 					if (serversRes.ok) {
 						const fetchedServers = await serversRes.json();
-						const visibleServers = Array.isArray(fetchedServers) ? fetchedServers.filter((g: any) => g.privacy === 'public' || isOrgMember) : [];
+						const visibleServers = Array.isArray(fetchedServers) ? fetchedServers.filter((g: any) => g.privacy === 'public') : [];
 						setServers(visibleServers);
 					}
 				}
@@ -209,8 +211,8 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 					{t('app.organization.notFoundTitle')}
 				</h1>
 				<p className="text-(--text-muted) mb-8">{t('app.organization.notFoundDesc')}</p>
-				<Link href="/">
-					<Button variant="primary">{t('app.organization.returnHome')}</Button>
+				<Link href="/" className={getButtonLinkClasses('primary')}>
+					{t('app.organization.returnHome')}
 				</Link>
 			</div>
 		);

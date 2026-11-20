@@ -1,10 +1,10 @@
 /** @format */
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronUp, Compass, Server, ShieldCheck, Sparkles, User, Users } from 'lucide-react';
+import { Bot, ChevronUp, Compass, Server, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
+import SafeAvatar from '@/components/SafeAvatar';
 
 interface BotDiscoveryRowProps {
 	bot: any;
@@ -21,13 +21,18 @@ function RelatedBotCard({ item }: { item: any }) {
 		>
 			<div className="flex items-start gap-3.5">
 				<div className="relative shrink-0">
-					{avatarUrl ? (
-						<Image src={avatarUrl} alt={item.name || item.id} width={48} height={48} unoptimized className="w-12 h-12 rounded-2xl object-cover border border-(--border)/15" />
-					) : (
-						<div className="w-12 h-12 rounded-2xl bg-(--background)/70 border border-(--border)/15 flex items-center justify-center text-(--text-muted)">
-							<User className="w-5 h-5" />
-						</div>
-					)}
+					<SafeAvatar
+						src={avatarUrl}
+						alt={item.name || item.id}
+						width={48}
+						height={48}
+						className="w-12 h-12 rounded-2xl object-cover border border-(--border)/15"
+						fallback={
+							<div className="w-12 h-12 rounded-2xl bg-(--background)/70 border border-(--border)/15 flex items-center justify-center text-(--text-muted)">
+								<Bot className="w-5 h-5" />
+							</div>
+						}
+					/>
 					{item.status && item.status !== 'offline' && (
 						<span
 							className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-(--background) ${

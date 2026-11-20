@@ -2,11 +2,13 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Compass, Server, ExternalLink, Copy, Check, Trophy, Rocket } from 'lucide-react';
+import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
 import { useDictionary, useToast } from '@xernerx/providers';
+import SafeAvatar from '@/components/SafeAvatar';
+import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 
 export const VALID_DASHBOARD_TABS = ['info', 'stats', 'links', 'virtue', 'applications', 'settings'];
 
@@ -58,9 +60,16 @@ export function buildDashboardNavItems(t: (path: string, variables?: Record<stri
 			label: g.name,
 			onClick: () => onSelectGuild(g),
 			category: t('app.dashboard.categories.servers'),
-			icon: g.iconUrl
-				? () => <Image src={g.iconUrl!} alt={g.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
-				: () => <div className="w-5 h-5 rounded-full bg-(--foreground) flex items-center justify-center text-[10px]">{g.name.charAt(0)}</div>,
+			icon: () => (
+				<SafeAvatar
+					src={g.iconUrl}
+					alt={g.name}
+					width={20}
+					height={20}
+					className="w-5 h-5 rounded-full object-cover"
+					fallback={<div className="w-5 h-5 rounded-full bg-(--foreground) flex items-center justify-center text-[10px]">{g.name.charAt(0)}</div>}
+				/>
+			),
 			view: `server-${g.id}`,
 		})),
 	];
@@ -96,20 +105,18 @@ export function DashboardGuildHeader({ effectiveGuild, copyableGuildId, vanitySl
 				/>
 			)}
 			<div className="relative z-10 flex items-center" style={{ gap: 'var(--ui-gap)' }}>
-				{effectiveGuild.iconUrl ? (
-					<Image
-						src={effectiveGuild.iconUrl}
-						alt={effectiveGuild.name}
-						width={80}
-						height={80}
-						unoptimized
-						className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
-					/>
-				) : (
-					<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
-						<Server className="w-8 h-8 text-(--text-muted)" />
-					</div>
-				)}
+				<SafeAvatar
+					src={effectiveGuild.iconUrl}
+					alt={effectiveGuild.name}
+					width={80}
+					height={80}
+					className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
+					fallback={
+						<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
+							<Server className="w-8 h-8 text-(--text-muted)" />
+						</div>
+					}
+				/>
 				<div className="flex flex-col gap-1.5">
 					<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{effectiveGuild.name}
@@ -132,12 +139,45 @@ export function DashboardGuildHeader({ effectiveGuild, copyableGuildId, vanitySl
 					<Rocket className="w-4 h-4" />
 					{t('app.boost.boostServerBtn')}
 				</Button>
-				<Link href={`/servers/${vanitySlug || effectiveGuild.id}`}>
-					<Button variant="secondary" className="gap-2">
-						<ExternalLink className="w-4 h-4" />
-						{t('app.portal.workspace.viewPublicProfile')}
-					</Button>
+				<Link href={`/servers/${vanitySlug || effectiveGuild.id}`} className={getButtonLinkClasses('secondary', 'md', 'gap-2')}>
+					<ExternalLink className="w-4 h-4" />
+					{t('app.portal.workspace.viewPublicProfile')}
 				</Link>
+			</div>
+		</div>
+	);
+}
+
+export function DashboardLoadingSkeleton() {
+	const { t } = useDictionary();
+
+	return (
+		<div className="flex flex-col w-full" style={{ gap: 'var(--ui-gap)' }}>
+			<h1 className="sr-only">{t('app.seo.dashboard.h1')}</h1>
+			<p className="sr-only">{t('app.seo.dashboard.guideIntro')}</p>
+			<div
+				data-tour="dash-header"
+				className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm animate-pulse"
+				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+			>
+				<div className="flex items-center" style={{ gap: 'var(--ui-gap)' }}>
+					<div className="h-20 w-20 rounded-full bg-(--background)/60 border border-(--border)/10 shrink-0" />
+					<div className="flex flex-col gap-2.5">
+						<div className="h-7 w-48 rounded-2xl bg-(--background)/60" />
+						<div className="h-5 w-36 rounded-xl bg-(--background)/50" />
+					</div>
+				</div>
+				<div className="flex items-center gap-2">
+					<div className="h-10 w-32 rounded-2xl bg-(--background)/50" />
+					<div className="h-10 w-36 rounded-2xl bg-(--background)/50" />
+				</div>
+			</div>
+			<div data-tour="dash-tabs" className="h-12 w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md animate-pulse" />
+			<div
+				data-tour="dash-config"
+				className="flex flex-col items-center justify-center text-center py-16 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm gap-3"
+			>
+				<Loading message={t('app.dashboard.loadingServers')} />
 			</div>
 		</div>
 	);

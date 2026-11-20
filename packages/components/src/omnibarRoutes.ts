@@ -1,0 +1,81 @@
+/** @format */
+
+export const SUBDOMAIN_ROUTES: Record<string, { path: string; label: string }[]> = {
+	app: [
+		{ path: '/', label: 'Explore Hub' },
+		{ path: '/bots', label: 'Bot Directory' },
+		{ path: '/servers', label: 'Server Directory' },
+		{ path: '/leaderboard', label: 'Global Leaderboards' },
+		{ path: '/compare', label: 'Compare Bots & Servers' },
+		{ path: '/dashboard', label: 'Server & Bot Dashboard' },
+		{ path: '/dashboard?tab=applications', label: 'Server Applications Studio (YourApps)' },
+		{ path: '/overlay', label: 'Live Companion Overlay' },
+	],
+	admin: [
+		{ path: '/', label: 'Overview & Platform Health' },
+		{ path: '/?view=users', label: 'Users & Bot Profiles' },
+		{ path: '/?view=bots', label: 'Bots Directory & Moderation' },
+		{ path: '/?view=servers', label: 'Servers & Bot Profiles' },
+		{ path: '/?view=blog', label: 'Newsroom & Blog Studio' },
+		{ path: '/?view=store', label: 'Store & Subscriptions' },
+		{ path: '/?view=translations', label: 'Localization & Translations' },
+		{ path: '/?view=audit-logs', label: 'Staff Audit Logs' },
+		{ path: '/?view=settings', label: 'System Configuration' },
+	],
+	hosting: [
+		{ path: '/', label: 'Infrastructure & Node Console' },
+		{ path: '/errors', label: 'Service & Bot Error Logs' },
+	],
+	portal: [
+		{ path: '/', label: 'Developer Portal Studio' },
+		{ path: '/?org=personal', label: 'Personal Developer Workspace' },
+	],
+	account: [
+		{ path: '/', label: 'Profile & Identity' },
+		{ path: '/?view=appearance', label: 'Theme & Appearance' },
+		{ path: '/?view=tokens', label: 'Developer API Tokens' },
+		{ path: '/?view=billing', label: 'Subscriptions & Billing' },
+		{ path: '/?view=devices', label: 'Trusted Devices & QR Login' },
+	],
+	store: [
+		{ path: '/', label: 'Store & Subscriptions' },
+		{ path: '/?item=bot-virtue', label: 'Virtue — Premium User Pass' },
+		{ path: '/?tab=credits', label: 'Virtual Credits & Daily Gift' },
+	],
+	info: [
+		{ path: '/', label: 'System Status & Uptime' },
+		{ path: '/roadmap', label: 'Public Roadmap' },
+		{ path: '/suggestions', label: 'Feature Suggestions' },
+		{ path: '/issues', label: 'Bug Tracker' },
+		{ path: '/faq', label: 'Frequently Asked Questions' },
+		{ path: '/changelog', label: 'Suite Changelog' },
+	],
+	docs: [
+		{ path: '/', label: 'Documentation Home' },
+		{ path: '/api/v1', label: 'v1 REST API Reference' },
+		{ path: '/cdn', label: 'CDN Media Reference' },
+		{ path: '/websocket', label: 'WebSocket Gateway Reference' },
+		{ path: '/packages', label: 'TypeScript SDK Packages' },
+	],
+	haste: [
+		{ path: '/', label: 'New Code Paste' },
+		{ path: '/?view=mine', label: 'My Saved Pastes' },
+	],
+	blog: [
+		{ path: '/', label: 'Blog Home & Latest Articles' },
+		{ path: '/platform-and-bot-security-architecture', label: 'Platform & Bot Security Architecture' },
+		{ path: '/the-customization-update-stage-render-forms-and-cosmetics-studio', label: 'The Customization Update' },
+		{ path: '/rss.xml', label: 'RSS 2.0 Syndication Feed' },
+	],
+	www: [
+		{ path: '/', label: 'Xernerx Showcase' },
+		{ path: '/invites', label: 'Official Bot Invites Hub' },
+		{ path: '/download', label: 'Download Desktop App' },
+		{ path: '/applications', label: 'Team Applications' },
+		{ path: '/security', label: 'Platform & Bot Security' },
+		{ path: '/license', label: 'Software & Ecosystem License' },
+		{ path: '/terms', label: 'Terms of Service' },
+		{ path: '/privacy', label: 'Privacy Policy' },
+		{ path: '/cookies', label: 'Cookie Policy' },
+	],
+};

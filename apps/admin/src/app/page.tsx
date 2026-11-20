@@ -32,7 +32,7 @@ import ApplicationConfigs from '@/components/ApplicationConfigs';
 import ApplicationReviews from '@/components/ApplicationReviews';
 import AuditLogs from '@/components/AuditLogs';
 import Bots from '@/components/Bots';
-import { Loading } from '@xernerx/feedback';
+import { AdminSkeleton } from '@/components/AdminSkeleton';
 import { Button } from '@xernerx/ui';
 import HomeOverview from '@/components/HomeOverview';
 import Organizations from '@/components/Organizations';
@@ -162,7 +162,7 @@ export default function Home() {
 			.filter((id: any): id is string => typeof id === 'string' && id.trim().length > 0)
 			.sort()
 			.join(',');
-	}, [user?.roles, user?.role]);
+	}, [user]);
 
 	useEffect(() => {
 		if (!isReady || userLoading) return;
@@ -393,7 +393,7 @@ export default function Home() {
 		]
 	);
 
-	if ((userLoading || roleLoading || serverLoading) && !dbError) return <Loading />;
+	if ((userLoading || roleLoading || serverLoading) && !dbError) return <AdminSkeleton variant="shell" />;
 
 	if (dbError) {
 		return (

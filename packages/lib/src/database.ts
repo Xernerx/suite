@@ -13,42 +13,9 @@ const globalWithMongoose = global as typeof global & {
 	__models_v4?: Record<string, Record<string, Record<string, Model<any>>>>;
 	__root_connections_v5?: Record<string, Connection>;
 	__db_connections_v5?: Record<string, Record<string, Connection>>;
-	__models_v5?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v6?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v7?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v8?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v9?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v10?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v11?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v12?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v13?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v14?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v15?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v16?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v17?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v18?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v19?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v20?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v21?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v22?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v23?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v24?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v25?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v26?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v27?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v28?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v29?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v30?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v31?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v32?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v33?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v34?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v35?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v36?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v37?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v38?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v39?: Record<string, Record<string, Record<string, Model<any>>>>;
-	__models_v40?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__inflight_connections_v5?: Record<string, Promise<Connection> | undefined>;
+	__models_v43?: Record<string, Record<string, Record<string, Model<any>>>>;
+	[key: string]: any;
 };
 
 // Close any legacy per-database connections left over from older HMR reloads
@@ -64,128 +31,40 @@ if (globalWithMongoose.__connections_v2) {
 	delete globalWithMongoose.__models_v4;
 }
 
-if (globalWithMongoose.__models_v5) {
-	delete globalWithMongoose.__models_v5;
-}
-if (globalWithMongoose.__models_v6) {
-	delete globalWithMongoose.__models_v6;
-}
-if (globalWithMongoose.__models_v7) {
-	delete globalWithMongoose.__models_v7;
-}
-if (globalWithMongoose.__models_v8) {
-	delete globalWithMongoose.__models_v8;
-}
-if (globalWithMongoose.__models_v9) {
-	delete globalWithMongoose.__models_v9;
-}
-if (globalWithMongoose.__models_v10) {
-	delete globalWithMongoose.__models_v10;
-}
-if (globalWithMongoose.__models_v11) {
-	delete globalWithMongoose.__models_v11;
-}
-if (globalWithMongoose.__models_v12) {
-	delete globalWithMongoose.__models_v12;
-}
-if (globalWithMongoose.__models_v13) {
-	delete globalWithMongoose.__models_v13;
-}
-if (globalWithMongoose.__models_v14) {
-	delete globalWithMongoose.__models_v14;
-}
-if (globalWithMongoose.__models_v15) {
-	delete globalWithMongoose.__models_v15;
-}
-if (globalWithMongoose.__models_v16) {
-	delete globalWithMongoose.__models_v16;
-}
-if (globalWithMongoose.__models_v17) {
-	delete globalWithMongoose.__models_v17;
-}
-if (globalWithMongoose.__models_v18) {
-	delete globalWithMongoose.__models_v18;
-}
-if (globalWithMongoose.__models_v19) {
-	delete globalWithMongoose.__models_v19;
-}
-if (globalWithMongoose.__models_v20) {
-	delete globalWithMongoose.__models_v20;
-}
-if (globalWithMongoose.__models_v21) {
-	delete globalWithMongoose.__models_v21;
-}
-if (globalWithMongoose.__models_v22) {
-	delete globalWithMongoose.__models_v22;
-}
-if (globalWithMongoose.__models_v23) {
-	delete globalWithMongoose.__models_v23;
-}
-if (globalWithMongoose.__models_v24) {
-	delete globalWithMongoose.__models_v24;
-}
-if (globalWithMongoose.__models_v25) {
-	delete globalWithMongoose.__models_v25;
-}
-if (globalWithMongoose.__models_v26) {
-	delete globalWithMongoose.__models_v26;
-}
-if (globalWithMongoose.__models_v27) {
-	delete globalWithMongoose.__models_v27;
-}
-if (globalWithMongoose.__models_v28) {
-	delete globalWithMongoose.__models_v28;
-}
-if (globalWithMongoose.__models_v29) {
-	delete globalWithMongoose.__models_v29;
-}
-if (globalWithMongoose.__models_v30) {
-	delete globalWithMongoose.__models_v30;
-}
-if (globalWithMongoose.__models_v31) {
-	delete globalWithMongoose.__models_v31;
-}
-if (globalWithMongoose.__models_v32) {
-	delete globalWithMongoose.__models_v32;
-}
-if (globalWithMongoose.__models_v33) {
-	delete globalWithMongoose.__models_v33;
-}
-if (globalWithMongoose.__models_v34) {
-	delete globalWithMongoose.__models_v34;
-}
-if (globalWithMongoose.__models_v35) {
-	delete globalWithMongoose.__models_v35;
-}
-if (globalWithMongoose.__models_v36) {
-	delete globalWithMongoose.__models_v36;
-}
-if (globalWithMongoose.__models_v37) {
-	delete globalWithMongoose.__models_v37;
-}
-if (globalWithMongoose.__models_v38) {
-	delete globalWithMongoose.__models_v38;
-}
-if (globalWithMongoose.__models_v39) {
-	delete globalWithMongoose.__models_v39;
+for (let v = 5; v <= 42; v++) {
+	const key = `__models_v${v}`;
+	if (globalWithMongoose[key]) {
+		delete globalWithMongoose[key];
+	}
 }
 
 const rootConnections = globalWithMongoose.__root_connections_v5 || {};
 const activeConnections = globalWithMongoose.__db_connections_v5 || {};
-const cachedModels = globalWithMongoose.__models_v40 || {};
-
-// Also close any orphaned top-level mongoose.connections not tracked in rootConnections
-const trackedRoots = new Set(Object.values(rootConnections));
-for (const conn of mongoose.connections) {
-	if (conn && conn !== mongoose.connection && !trackedRoots.has(conn) && conn.readyState !== 0) {
-		conn.close().catch(() => {});
-	}
-}
+const inFlightConnections = globalWithMongoose.__inflight_connections_v5 || {};
+const cachedModels = globalWithMongoose.__models_v43 || {};
 
 if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__root_connections_v5 = rootConnections;
 	globalWithMongoose.__db_connections_v5 = activeConnections;
-	globalWithMongoose.__models_v40 = cachedModels;
+	globalWithMongoose.__inflight_connections_v5 = inFlightConnections;
+	globalWithMongoose.__models_v43 = cachedModels;
+}
+
+function isConnectionHealthy(conn?: Connection | null): boolean {
+	if (!conn || conn.readyState !== 1 || typeof conn.useDb !== 'function') {
+		return false;
+	}
+	try {
+		const client: any = typeof conn.getClient === 'function' ? conn.getClient() : (conn as any).client;
+		if (!client) return false;
+		if (client.s?.hasBeenClosed) return false;
+		if (client.topology && typeof client.topology.isDestroyed === 'function' && client.topology.isDestroyed()) {
+			return false;
+		}
+	} catch {
+		return false;
+	}
+	return true;
 }
 
 const cleanEnvUri = (val?: string): string =>
@@ -224,7 +103,10 @@ export async function database(projectId: 'xernerx' | 'virtue' | 'haste' | 'your
 	if (!cachedModels[projectId]) cachedModels[projectId] = {};
 
 	let rootConn = rootConnections[projectId];
-	if (rootConn && (rootConn.readyState === 0 || typeof rootConn.useDb !== 'function')) {
+	if (rootConn && !isConnectionHealthy(rootConn)) {
+		try {
+			rootConn.close().catch(() => {});
+		} catch {}
 		delete rootConnections[projectId];
 		activeConnections[projectId] = {};
 		cachedModels[projectId] = {};
@@ -237,6 +119,7 @@ export async function database(projectId: 'xernerx' | 'virtue' | 'haste' | 'your
 			registry &&
 			Object.entries(registry).every(
 				([cat, models]: [string, any]) =>
+					activeConnections[projectId][cat]?.readyState === 1 &&
 					cachedModels[projectId][cat] &&
 					Object.entries(models).every(([m, def]: [string, any]) => {
 						const cached = cachedModels[projectId][cat][m];
@@ -259,29 +142,36 @@ export async function database(projectId: 'xernerx' | 'virtue' | 'haste' | 'your
 	if (!registry) throw new Error(`No registry found for ${projectId}.`);
 
 	if (!rootConn) {
-		// Strip any trailing slash/db path so the root pool connects cleanly to the cluster
-		let clusterUri = baseUri;
-		try {
-			const parsed = new URL(baseUri);
-			parsed.pathname = '/';
-			clusterUri = parsed.toString();
-		} catch {}
+		if (!inFlightConnections[projectId]) {
+			inFlightConnections[projectId] = (async () => {
+				let clusterUri = baseUri;
+				try {
+					const parsed = new URL(baseUri);
+					parsed.pathname = '/';
+					clusterUri = parsed.toString();
+				} catch {}
 
-		rootConn = mongoose.createConnection(clusterUri, {
-			maxPoolSize: 3,
-			minPoolSize: 0,
-			maxIdleTimeMS: 15000,
-			serverSelectionTimeoutMS: 5000,
-			socketTimeoutMS: 30000,
-		});
-		rootConn.on('error', (err) => dbLog.warn(`Mongoose connection error for ${projectId}: ${err?.message || err}`));
-		try {
-			await rootConn.asPromise();
-		} catch (connErr: any) {
-			rootConn.close().catch(() => {});
-			throw new Error(`MongoDB connection failed for ${projectId}: ${connErr?.message || connErr}`);
+				const created = mongoose.createConnection(clusterUri, {
+					maxPoolSize: 5,
+					minPoolSize: 0,
+					maxIdleTimeMS: 30000,
+					serverSelectionTimeoutMS: 5000,
+					socketTimeoutMS: 30000,
+				});
+				created.on('error', (err) => dbLog.warn(`Mongoose connection error for ${projectId}: ${err?.message || err}`));
+				try {
+					await created.asPromise();
+				} catch (connErr: any) {
+					created.close().catch(() => {});
+					throw new Error(`MongoDB connection failed for ${projectId}: ${connErr?.message || connErr}`, { cause: connErr });
+				}
+				rootConnections[projectId] = created;
+				return created;
+			})().finally(() => {
+				delete inFlightConnections[projectId];
+			});
 		}
-		rootConnections[projectId] = rootConn;
+		rootConn = await inFlightConnections[projectId]!;
 	}
 
 	const projectModels: Record<string, Record<string, Model<any>>> = {};
@@ -290,7 +180,7 @@ export async function database(projectId: 'xernerx' | 'virtue' | 'haste' | 'your
 		const cleanDbName = uriSuffix.replace(/^\/+/, '').replace(/\/+$/, '');
 
 		let conn: Connection | undefined = activeConnections[projectId][uriSuffix];
-		if (!conn || typeof conn.model !== 'function') {
+		if (!conn || typeof conn.model !== 'function' || conn.readyState !== 1) {
 			conn = rootConn.useDb(cleanDbName, { useCache: true });
 			activeConnections[projectId][uriSuffix] = conn;
 		}

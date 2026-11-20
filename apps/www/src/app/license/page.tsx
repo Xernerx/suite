@@ -16,8 +16,9 @@ Copyright (c) 2022-2026 Xernerx Studios. All rights reserved.
 This software, source code, documentation, visual design system, and associated
 services (collectively, the "Software"), including the Xernerx Suite, Virtue,
 YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot,
-Xernerx Blog, Xernerx Haste, Xernerx CDN, and the Xernerx Desktop and Mobile
-Clients, are the proprietary property of Xernerx Studios ("Licensor").
+Xernerx Blog, Xernerx Haste, Xernerx CDN, Xernerx Docs, Xernerx Examples, and
+the Xernerx Desktop and Mobile Clients, are the proprietary property of Xernerx
+Studios ("Licensor").
 
 1. GRANT OF LIMITED SAAS & CLIENT ACCESS
    Subject to your continuous compliance with this License and the Xernerx
@@ -65,13 +66,12 @@ Clients, are the proprietary property of Xernerx Studios ("Licensor").
    and commercialize your contribution as part of the Software.
 
 5. OPEN-SOURCE SDK CARVE-OUT
-   Standalone developer SDKs, starter examples, and package documentation
-   separately published by Xernerx Studios—specifically \`@xernerx/framework\`,
-   \`@xernerx/stats\`, \`@xernerx/commands\`, \`@xernerx/websocket\`,
-   \`@xernerx/hooks\`, \`@xernerx/terminal\`, \`@xernerx/extension-builder\`,
-   \`xernerx\`, \`Xernerx/examples\`, and \`Xernerx/docs\`—are licensed separately
-   under the Apache License, Version 2.0, and are not governed by the
-   proprietary restrictions of this License.
+   Standalone developer SDKs separately published by Xernerx Studios to the
+   public npm registry—specifically \`@xernerx/framework\`, \`@xernerx/stats\`,
+   \`@xernerx/commands\`, \`@xernerx/websocket\`, \`@xernerx/hooks\`,
+   \`@xernerx/terminal\`, \`@xernerx/extension-builder\`, and \`xernerx\`—are
+   licensed separately under the Apache License, Version 2.0, and are not
+   governed by the proprietary restrictions of this License.
 
 6. TERMINATION
    This License is effective until terminated. Your rights under this License
@@ -211,8 +211,10 @@ export default function LicensePage() {
 	});
 
 	const [active, setActive] = useState<string | null>(null);
+	const sectionIdsKey = sections.map((s) => s.id).join(',');
 
 	useEffect(() => {
+		if (typeof IntersectionObserver === 'undefined') return;
 		const observer = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry) => {
@@ -226,19 +228,19 @@ export default function LicensePage() {
 				rootMargin: '-40% 0px -50% 0px',
 			}
 		);
-		sections.forEach((s) => {
-			const el = document.getElementById(s.id);
+		sectionIdsKey.split(',').forEach((id) => {
+			const el = document.getElementById(id);
 			if (el) observer.observe(el);
 		});
 		return () => observer.disconnect();
-	}, [sections]);
+	}, [sectionIdsKey]);
 
 	return (
 		<div className="relative">
 			<motion.div
 				style={{
 					scaleX,
-					top: 'env(safe-area-inset-top, 0px)',
+					top: 'calc(50px + env(safe-area-inset-top, 0px))',
 				}}
 				className="fixed left-0 right-0 h-0.75 origin-left bg-(--accent) z-50"
 			/>

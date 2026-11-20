@@ -2,6 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { reconcileBotGuildProfiles, type GuildBotProfileSummary } from '@/lib/botEntityReconciliation';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,11 @@ export async function GET(req: Request) {
 		const db = await database('xernerx');
 		const GuildModel = db.models.guilds.Guild as any;
 
+		let botSummaryMap = new Map<string, GuildBotProfileSummary>();
+		if (all) {
+			botSummaryMap = await reconcileBotGuildProfiles(db);
+		}
+
 		let query: any = all ? {} : { privacy };
 
 		if (all) {
@@ -29,7 +35,7 @@ export async function GET(req: Request) {
 			}
 		} else if (idsParam) {
 			const ids = idsParam.split(',').map((id) => id.trim());
-			query = { id: { $in: ids } }; // If querying by explicit IDs, bypass privacy check
+			query = { id: { $in: ids } };
 		} else if (organization) {
 			let resolvedOrgId = organization;
 			if (!/^[0-9a-fA-F]{24}$/.test(organization)) {
@@ -39,7 +45,7 @@ export async function GET(req: Request) {
 					.catch(() => null);
 				if (orgDoc?._id) resolvedOrgId = String(orgDoc._id);
 			}
-			query = { organization: resolvedOrgId }; // If querying by organization, bypass privacy check
+			query = { organization: resolvedOrgId };
 		} else if (owner || organizationsParam) {
 			const orgList = organizationsParam
 				? organizationsParam
@@ -114,7 +120,7 @@ export async function GET(req: Request) {
 					boostedUntil: 1,
 					boostedBy: 1,
 					voteCount: '$computedVoteCount',
-					memberCount: { $ifNull: ['$statsData.members', 0] },
+					memberCount: { $cond: [{ $gt: ['$statsData.members', 0] }, '$statsData.members', { $ifNull: ['$memberCount', 0] }] },
 					botsCount: { $ifNull: ['$statsData.bots', 0] },
 					boostsCount: { $ifNull: ['$statsData.boosts', 0] },
 					messagesCount: { $ifNull: ['$statsData.messages', 0] },
@@ -125,7 +131,14 @@ export async function GET(req: Request) {
 			},
 		]);
 
-		return NextResponse.json(guilds, { status: 200 });
+		const enriched = all
+			? guilds.map((g: any) => ({
+					...g,
+					botProfiles: botSummaryMap.get(String(g.id)) || { bots: [], virtueMembers: 0, yourappsSubmissions: 0 },
+				}))
+			: guilds;
+
+		return NextResponse.json(enriched, { status: 200 });
 	} catch (error) {
 		console.error('Failed to fetch guilds list:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

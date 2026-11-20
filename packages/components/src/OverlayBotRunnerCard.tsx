@@ -387,6 +387,7 @@ export function OverlayBotRunnerCard({ bots = [], fixedBot, compact = false }: O
 							onChange={(e) => setProbePath(e.target.value)}
 							onKeyDown={(e) => {
 								if (e.key === 'Enter') {
+									if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 									e.preventDefault();
 									handleProbeApi();
 								}
@@ -414,7 +415,7 @@ export function OverlayBotRunnerCard({ bots = [], fixedBot, compact = false }: O
 								>
 									<div className="flex items-center justify-between gap-2">
 										<div className="flex items-center gap-1.5 min-w-0">
-											<span className="rounded-md bg-(--accent)/15 border border-(--accent)/30 px-1.5 py-0.5 font-mono text-[9px] font-extrabold text-(--accent) shrink-0">
+											<span className="rounded-full bg-(--accent)/15 border border-(--accent)/30 px-2 py-0.5 font-mono text-[9px] font-extrabold text-(--accent) shrink-0">
 												{req.method}
 											</span>
 											<span className="font-mono text-[11px] font-bold text-(--text) truncate">{req.path}</span>

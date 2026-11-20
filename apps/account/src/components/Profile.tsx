@@ -59,6 +59,9 @@ export default function Profile() {
 		}
 	};
 	const avatarUrl = activeUser?.image || (userId && activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${activeUser.avatar}.png` : null);
+	const appHost = getEnvUrl('https://app.xernerx.com')
+		.replace(/^https?:\/\//, '')
+		.replace(/\/$/, '');
 
 	const handleCopyId = () => {
 		if (!userId) return;
@@ -313,11 +316,13 @@ export default function Profile() {
 									</Badge>
 								)}
 							</div>
-							<span className="text-xs font-mono text-(--accent)">app.xernerx.com/users/{formData.vanitySlug || userId || 'slug'}</span>
+							<span className="text-xs font-mono text-(--accent)">
+								{appHost}/users/{formData.vanitySlug || userId || 'slug'}
+							</span>
 						</div>
 						{isVanityUnlocked ? (
 							<div className="flex flex-col sm:flex-row sm:items-center gap-2 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-2">
-								<span className="text-xs font-mono font-bold text-(--text-muted) px-2 shrink-0">app.xernerx.com/users/</span>
+								<span className="text-xs font-mono font-bold text-(--text-muted) px-2 shrink-0">{appHost}/users/</span>
 								<div className="flex-1">
 									<Input
 										type="text"
@@ -348,7 +353,7 @@ export default function Profile() {
 								</Button>
 							</div>
 						)}
-						<span className="text-xs text-(--text-muted)">{t('account.profile.vanitySlug.hint', { slug: formData.vanitySlug || userId || 'slug' })}</span>
+						<span className="text-xs text-(--text-muted)">{t('account.profile.vanitySlug.hint', { slug: formData.vanitySlug || userId || 'slug', host: appHost })}</span>
 					</div>
 
 					{/* Description */}

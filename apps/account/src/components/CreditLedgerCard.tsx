@@ -32,7 +32,7 @@ export function CreditLedgerCard({ transactions = [], streakShields = 0 }: Credi
 
 	const allSorted = useMemo(() => {
 		if (!Array.isArray(transactions)) return [];
-		return [...transactions].sort((a, b) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
+		return transactions.toSorted((a, b) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
 	}, [transactions]);
 
 	const totals = useMemo(() => {

@@ -5,7 +5,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 import { confirm, isCancel } from '@clack/prompts';
 import { Command } from 'commander';
-import { type ScopedProcessSpec, runScopedProcesses } from '../utils/run';
+import { type ScopedProcessSpec, runCommand, runScopedProcesses } from '../utils/run';
 import { terminal } from '../utils/terminal';
 import { generateLocalesCommand } from './generateLocales';
 import { initializeCommand } from './initialize';
@@ -22,7 +22,18 @@ function getServiceSpecs(rootDir: string): ScopedProcessSpec[] {
 }
 
 function getClientSpecs(rootDir: string): ScopedProcessSpec[] {
-	return [{ scope: 'DESKTOP', command: 'pnpm', args: ['--silent', 'run', 'dev'], cwd: path.join(rootDir, 'clients/desktop') }];
+	const specs: ScopedProcessSpec[] = [{ scope: 'DESKTOP', command: 'pnpm', args: ['--silent', 'run', 'dev'], cwd: path.join(rootDir, 'clients/desktop') }];
+	const mobileDir = path.join(rootDir, 'clients/mobile');
+	if (fs.existsSync(path.join(mobileDir, 'package.json'))) {
+		specs.push({
+			scope: 'MOBILE',
+			command: 'pnpm',
+			args: ['--silent', 'run', 'dev'],
+			cwd: mobileDir,
+			env: { REACT_NATIVE_PACKAGER_HOSTNAME: getLocalIp() },
+		});
+	}
+	return specs;
 }
 
 function getEagerAppSpecs(rootDir: string): ScopedProcessSpec[] {
@@ -47,7 +58,7 @@ export default function registerDev(program: Command) {
 	program
 		.command('dev')
 		.description('Start the development servers and conditionally run the tunnel')
-		.option('--only <type>', 'Run only a specific workspace type (apps, services, clients, tunnel)')
+		.option('--only <type>', 'Run only a specific workspace type (apps, services, clients, mobile, tunnel)')
 		.option('--prepare-only', 'Run only the environment preparation step and exit')
 		.option('--eager', 'Start all 13 web apps immediately instead of waiting for URL requests')
 		.option('--idle-timeout <seconds>', 'Seconds of inactivity before spinning down an awake app (0 to disable)', '300')
@@ -237,6 +248,15 @@ export default function registerDev(program: Command) {
 					runScopedProcesses(getServiceSpecs(process.cwd()));
 				} else if (type === 'clients') {
 					runScopedProcesses(getClientSpecs(process.cwd()));
+				} else if (type === 'mobile') {
+					const mobileDir = path.join(process.cwd(), 'clients/mobile');
+					const lanIp = getLocalIp();
+					process.env.REACT_NATIVE_PACKAGER_HOSTNAME = lanIp;
+					terminal.log(`Starting Xernerx Mobile interactive Expo server (exp://${lanIp}:8081)...`);
+					await new Promise<void>((resolve) => {
+						const child = runCommand('pnpm', ['run', 'dev'], undefined, mobileDir);
+						child.on('exit', () => resolve());
+					});
 				} else if (type === 'tunnel') {
 					runScopedProcesses([getTunnelSpec()]);
 				} else {
@@ -279,10 +299,12 @@ export default function registerDev(program: Command) {
 
 function printEndpointsBox(domain: string, isCustomDomain: boolean, isLazy = true, idleTimeoutSeconds = 60, delayMs = 8000) {
 	setTimeout(() => {
-		const lines = SUITE_APPS.map((app) => {
+		const appLines = SUITE_APPS.map((app) => {
 			const url = isCustomDomain ? `https://${app.id}.dev.${domain}` : `http://${domain}:${app.port}`;
 			return `\x1b[35m${app.label.padEnd(8)}\x1b[0m \x1b[90m→\x1b[0m  \x1b[36m${url}\x1b[0m`;
-		}).join('\n');
+		});
+		const mobileLanIp = getLocalIp();
+		const lines = [...appLines, `\x1b[35m${'MOBILE'.padEnd(8)}\x1b[0m \x1b[90m→\x1b[0m  \x1b[36mexp://${mobileLanIp}:8081\x1b[0m`].join('\n');
 
 		terminal.box(lines, {
 			title: isLazy ? 'XERNERX SUITE ENDPOINTS (ON-DEMAND)' : 'XERNERX SUITE ENDPOINTS',

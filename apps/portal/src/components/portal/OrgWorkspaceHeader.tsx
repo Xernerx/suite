@@ -2,11 +2,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, ExternalLink, Copy, Check } from 'lucide-react';
+import { ExternalLink, Copy, Check } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
-import Image from 'next/image';
 import Link from 'next/link';
+import { PortalSafeAvatar, PortalSafeBanner, portalButtonLinkClass } from '@/components/portal/PortalSafeAvatar';
 
 interface OrgWorkspaceHeaderProps {
 	organization: {
@@ -34,25 +33,19 @@ export default function OrgWorkspaceHeader({ organization }: OrgWorkspaceHeaderP
 	return (
 		<div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[2rem] border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8">
 			{organization.bannerUrl && (
-				<div className="absolute inset-0 z-0 opacity-20" style={{ backgroundImage: `url(${organization.bannerUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+				<div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+					<PortalSafeBanner src={getEnvUrl(organization.bannerUrl)} alt="" className="w-full h-full object-cover" />
+				</div>
 			)}
 			<div className="relative z-10 flex items-center gap-4">
-				{organization.iconUrl ? (
-					<Image
-						src={getEnvUrl(organization.iconUrl)}
-						alt={organization.name}
-						width={80}
-						height={80}
-						loading="eager"
-						priority
-						unoptimized
-						className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
-					/>
-				) : (
-					<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
-						<Building2 className="w-8 h-8 text-(--text-muted)" />
-					</div>
-				)}
+				<PortalSafeAvatar
+					src={organization.iconUrl ? getEnvUrl(organization.iconUrl) : null}
+					alt={organization.name}
+					fallbackKind="org"
+					className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
+					fallbackClassName="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10"
+					iconClassName="w-8 h-8 text-(--text-muted)"
+				/>
 				<div className="flex flex-col gap-1.5">
 					<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{organization.name}
@@ -68,11 +61,9 @@ export default function OrgWorkspaceHeader({ organization }: OrgWorkspaceHeaderP
 				</div>
 			</div>
 			<div className="relative z-10 flex items-center gap-2 shrink-0">
-				<Link href={getEnvUrl(`https://app.xernerx.com/organization/${organization._id}`)}>
-					<Button variant="secondary" className="gap-2">
-						<ExternalLink className="w-4 h-4" />
-						{t('app.portal.workspace.viewPublicProfile')}
-					</Button>
+				<Link href={getEnvUrl(`https://app.xernerx.com/organization/${organization._id}`)} className={portalButtonLinkClass('secondary', 'md', 'gap-2')}>
+					<ExternalLink className="w-4 h-4" />
+					{t('app.portal.workspace.viewPublicProfile')}
 				</Link>
 			</div>
 		</div>

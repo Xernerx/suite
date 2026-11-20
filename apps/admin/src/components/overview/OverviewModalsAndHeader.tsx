@@ -26,6 +26,7 @@ export interface IncidentModalState {
 }
 
 interface OverviewHeaderProps {
+	appsCount: number;
 	batchAuditState: { active: boolean; current: number; total: number } | null;
 	refreshing: boolean;
 	onBatchAudit: (targetEnv: 'prod' | 'canary') => void;
@@ -33,14 +34,15 @@ interface OverviewHeaderProps {
 	onRefresh: () => void;
 }
 
-export function OverviewHeader({ batchAuditState, refreshing, onBatchAudit, onOpenIncident, onRefresh }: OverviewHeaderProps) {
+export function OverviewHeader({ appsCount, batchAuditState, refreshing, onBatchAudit, onOpenIncident, onRefresh }: OverviewHeaderProps) {
 	const { t } = useDictionary();
+	const resolvedSubtitle = t('admin.dashboard.overview.subtitle', { count: appsCount }).replace(/\ball 9\b/, `all ${appsCount}`);
 
 	return (
 		<div className="flex flex-wrap justify-between items-center gap-4">
 			<div>
 				<h2 className="text-2xl font-bold text-(--text)">{t('admin.dashboard.overview.title')}</h2>
-				<p className="text-sm text-(--text-muted) mt-0.5">{t('admin.dashboard.overview.subtitle')}</p>
+				<p className="text-sm text-(--text-muted) mt-0.5">{resolvedSubtitle}</p>
 			</div>
 			<div className="flex flex-wrap items-center gap-2">
 				<Button variant="secondary" onClick={() => onBatchAudit('prod')} disabled={Boolean(batchAuditState?.active)} className="inline-flex items-center gap-2">

@@ -1,5 +1,9 @@
 /** @format */
 
+import { DEFAULT_STORE_CURRENCY, formatStorePrice } from './formatStorePrice';
+
+export { DEFAULT_STORE_CURRENCY, formatStorePrice };
+
 export interface UserSubscription {
 	stripeSubscriptionId: string;
 	priceId: string;
@@ -163,8 +167,8 @@ export const COSMETIC_PARENT_UNLOCKS: Record<string, string[]> = {
 export const CHILD_TO_BUNDLE: Record<string, string> = Object.fromEntries(Object.entries(COSMETIC_PARENT_UNLOCKS).map(([child, parents]) => [child, parents[0]]));
 
 export const FALLBACK_EUR_PRICES: Record<string, string> = {
-	'credits-500': '€5.00',
-	'credits-1200': '€10.00',
-	'credits-3250': '€25.00',
-	'credits-7000': '€50.00',
+	'credits-500': formatStorePrice(5, 'EUR'),
+	'credits-1200': formatStorePrice(10, 'EUR'),
+	'credits-3250': formatStorePrice(25, 'EUR'),
+	'credits-7000': formatStorePrice(50, 'EUR'),
 };

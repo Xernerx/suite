@@ -18,7 +18,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			if (!hasFullAccess && bot.privacy === 'private') {
 				return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403 });
 			}
-			const releases = (Array.isArray(bot.releases) ? bot.releases : []).slice().sort((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
+			const releases = (Array.isArray(bot.releases) ? bot.releases : []).toSorted((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
 			return NextResponse.json({ releases });
 		}
 
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403 });
 		}
 
-		const releases = (Array.isArray(bot.releases) ? bot.releases : []).slice().sort((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
+		const releases = (Array.isArray(bot.releases) ? bot.releases : []).toSorted((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
 
 		return NextResponse.json({ releases });
 	} catch (error) {

@@ -10,26 +10,42 @@ import { Sparkles } from 'lucide-react';
 export default function Home() {
 	const { hide } = useSidebar();
 	const { getEnvUrl } = useEnvironment();
-	const { t } = useDictionary();
+	const { t, dictionary } = useDictionary();
 	const { setBackgroundMode, setDotVariant } = useLoading();
 	const [fact, setFact] = useState<string>();
-
-	const rawFacts = t('api.facts') as any;
-	const uselessFacts = Array.isArray(rawFacts) ? rawFacts : (rawFacts || '').split(',');
 
 	useEffect(() => {
 		hide();
 		setBackgroundMode('sticky-ripple');
 		setDotVariant('icon');
 
-		const randomIndex = Math.floor(Math.random() * uselessFacts.length);
-		setFact(uselessFacts[randomIndex]?.trim());
+		const resolvedFacts: string[] = [];
+		const dictFacts = dictionary?.api?.facts;
+		if (Array.isArray(dictFacts)) {
+			for (const entry of dictFacts) {
+				if (typeof entry === 'string' && entry.trim()) {
+					resolvedFacts.push(entry.trim());
+				}
+			}
+		} else {
+			for (let i = 0; i < 20; i++) {
+				const key = `api.facts.${i}`;
+				const val = t(key);
+				if (!val || val === key) break;
+				resolvedFacts.push(val.trim());
+			}
+		}
+
+		if (resolvedFacts.length > 0) {
+			const randomIndex = Math.floor(Math.random() * resolvedFacts.length);
+			setFact(resolvedFacts[randomIndex]);
+		}
 
 		return () => {
 			setBackgroundMode(null);
 			setDotVariant(null);
 		};
-	}, [hide, setBackgroundMode, setDotVariant]);
+	}, [hide, setBackgroundMode, setDotVariant, dictionary, t]);
 
 	return (
 		<div className="flex flex-col selection:bg-(--accent) selection:text-white">

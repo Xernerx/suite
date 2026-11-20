@@ -273,6 +273,12 @@ export async function handleDeleteUserById(req: NextRequest, id: string): Promis
 			}
 		} catch {}
 
+		try {
+			const yourappsDb = await database('yourapps');
+			const yourappsModelsToDelete = [(yourappsDb.models.guilds as any)?.Submission, (yourappsDb.models.guilds as any)?.Draft].filter(Boolean);
+			await Promise.all(yourappsModelsToDelete.map((m: any) => m.deleteMany({ userId: resolvedId }).catch(() => null)));
+		} catch {}
+
 		if (wasBlacklisted || wasServicesOptOut) {
 			const tombstoneDoc: Record<string, any> = {
 				id: resolvedId,

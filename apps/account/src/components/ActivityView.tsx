@@ -4,8 +4,9 @@
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { Button, Input, Modal } from '@xernerx/ui';
-import { Loading } from '@xernerx/feedback';
 import { Activity, Bug, Clock, Download, ExternalLink, FileText, Inbox, RefreshCw, Star, Ticket } from 'lucide-react';
+import { AccountViewSkeleton } from './AccountViewSkeleton';
+import { ActivityMarkdown } from './ActivityMarkdown';
 
 type TabFilter = 'all' | 'applications' | 'issues' | 'suggestions' | 'reviews';
 
@@ -135,7 +136,7 @@ export default function ActivityView() {
 		toast({ type: 'success', title: t('account.activity.exportSuccess') });
 	};
 
-	if (loading) return <Loading />;
+	if (loading) return <AccountViewSkeleton variant="activity" />;
 
 	const allEntries = [
 		...(data?.applications || []).map((a) => {
@@ -359,7 +360,7 @@ export default function ActivityView() {
 														{item.status}
 													</span>
 												</div>
-												{item.subtitle && <p className="text-xs text-(--text-muted) line-clamp-2">{item.subtitle}</p>}
+												{item.subtitle && <ActivityMarkdown text={item.subtitle} inline />}
 											</div>
 										</div>
 
@@ -376,7 +377,7 @@ export default function ActivityView() {
 											{item.pairs.slice(0, 6).map((pair) => (
 												<div key={pair.id} className="flex flex-col gap-0.5 rounded-2xl bg-(--background)/50 border border-(--border)/10 px-3.5 py-2.5">
 													<span className="text-[11px] font-bold text-(--text-muted) truncate">{pair.label}</span>
-													<span className="text-xs font-medium text-(--text) line-clamp-2">{formatAnswerValue(pair.value, t('account.activity.noAnswerProvided'))}</span>
+													<ActivityMarkdown text={formatAnswerValue(pair.value, t('account.activity.noAnswerProvided'))} inline />
 												</div>
 											))}
 										</div>
@@ -404,7 +405,7 @@ export default function ActivityView() {
 											</span>
 											<span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusStyle(item.status)}`}>{item.status}</span>
 										</div>
-										{item.subtitle && <p className="text-xs text-(--text-muted) line-clamp-2">{item.subtitle}</p>}
+										{item.subtitle && <ActivityMarkdown text={item.subtitle} inline insideLink />}
 									</div>
 								</div>
 
@@ -445,7 +446,7 @@ export default function ActivityView() {
 						{selectedApp.reviewNote && (
 							<div className="flex flex-col gap-1 rounded-2xl bg-(--accent)/10 border border-(--accent)/25 p-4">
 								<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--accent)">{t('account.activity.reviewerNote')}</span>
-								<p className="text-xs text-(--text) whitespace-pre-wrap">{selectedApp.reviewNote}</p>
+								<ActivityMarkdown text={selectedApp.reviewNote} />
 							</div>
 						)}
 
@@ -457,7 +458,9 @@ export default function ActivityView() {
 										<span className="text-(--accent) mr-1.5">{idx + 1}.</span>
 										{pair.label}
 									</span>
-									<p className="text-xs text-(--text-muted) whitespace-pre-wrap pl-4">{formatAnswerValue(pair.value, t('account.activity.noAnswerProvided'))}</p>
+									<div className="pl-4">
+										<ActivityMarkdown text={formatAnswerValue(pair.value, t('account.activity.noAnswerProvided'))} />
+									</div>
 								</div>
 							))}
 						</div>

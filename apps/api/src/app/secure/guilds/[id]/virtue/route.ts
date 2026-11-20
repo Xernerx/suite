@@ -1,7 +1,8 @@
 /** @format */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { handleDeleteVirtueGuildSetup } from '@/lib/guildSetupDeleteAuth';
 
 function decodeBotIdFromToken(token?: string): string | null {
 	if (!token || !token.includes('.')) return null;
@@ -343,5 +344,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		return NextResponse.json(updated, { status: 200 });
 	} catch (error: unknown) {
 		return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+	}
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+	try {
+		const { id } = await params;
+		return await handleDeleteVirtueGuildSetup(req, id);
+	} catch (error: unknown) {
+		return NextResponse.json({ error: (error as Error).message || 'Internal Server Error' }, { status: 500 });
 	}
 }

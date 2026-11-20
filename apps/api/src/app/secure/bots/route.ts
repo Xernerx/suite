@@ -1,7 +1,10 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { applyLiveDiscordToBot, buildDiscordAvatarUrl, fetchLiveDiscordUser, isBotDiscordCacheStale, isDiscordManagedMediaValue } from '@/lib/botDiscordSync';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +18,7 @@ export async function GET(request: Request) {
 		const sortParam = url.searchParams.get('sort');
 		const owner = url.searchParams.get('owner');
 		const organization = url.searchParams.get('organization');
+		const publicOnly = url.searchParams.get('publicOnly') === 'true';
 		const all = url.searchParams.get('all') === 'true';
 		const limit = parseInt(url.searchParams.get('limit') || (all ? '500' : owner || organization ? '100' : '3'));
 		const now = new Date();
@@ -40,17 +44,37 @@ export async function GET(request: Request) {
 					await BotModel.updateMany({ id: { $in: tokenBotIds }, owners: { $ne: owner } }, { $addToSet: { owners: owner } }).catch(() => {});
 				}
 			}
+			const session = publicOnly ? null : ((await getServerSession(auth).catch(() => null)) as any);
+			const sessionUid = session?.user?.id ? String(session.user.id) : null;
+			const isAuthorizedOwner = Boolean(!publicOnly && sessionUid && (sessionUid === owner || session?.user?.admin));
 			matchStage = tokenBotIds.length > 0 ? { $or: [{ owners: owner }, { id: { $in: tokenBotIds } }] } : { owners: owner };
+			if (!isAuthorizedOwner) {
+				matchStage.privacy = 'public';
+			}
 		} else if (organization) {
 			let resolvedOrgId = organization;
+			let orgDoc: any = null;
 			if (!/^[0-9a-fA-F]{24}$/.test(organization)) {
-				const orgDoc = await (db.models.organizations as any)?.Organization?.findOne({ vanitySlug: organization.toLowerCase() })
-					.select('_id')
+				orgDoc = await (db.models.organizations as any)?.Organization?.findOne({ vanitySlug: organization.toLowerCase() })
+					.select('_id owner members')
 					.lean()
 					.catch(() => null);
 				if (orgDoc?._id) resolvedOrgId = String(orgDoc._id);
+			} else if (!publicOnly) {
+				orgDoc = await (db.models.organizations as any)?.Organization?.findById(organization)
+					.select('_id owner members')
+					.lean()
+					.catch(() => null);
 			}
+			const session = publicOnly ? null : ((await getServerSession(auth).catch(() => null)) as any);
+			const sessionUid = session?.user?.id ? String(session.user.id) : null;
+			const isAuthorizedOrgMember = Boolean(
+				!publicOnly && sessionUid && (session?.user?.admin || (orgDoc && (orgDoc.owner === sessionUid || (Array.isArray(orgDoc.members) && orgDoc.members.includes(sessionUid)))))
+			);
 			matchStage = { organization: resolvedOrgId };
+			if (!isAuthorizedOrgMember) {
+				matchStage.privacy = 'public';
+			}
 		} else {
 			matchStage.privacy = 'public';
 			if (category === 'promoted') {
@@ -169,6 +193,23 @@ export async function GET(request: Request) {
 				},
 			},
 		]);
+
+		const staleBots = bots.filter((b: any) => b?.id && isBotDiscordCacheStale(b)).slice(0, 25);
+		if (staleBots.length > 0) {
+			await Promise.all(
+				staleBots.map(async (b: any) => {
+					const discordUser = await fetchLiveDiscordUser(String(b.id));
+					if (discordUser) {
+						applyLiveDiscordToBot(b, String(b.id), discordUser, BotModel, 512);
+					} else if (b.discord && isDiscordManagedMediaValue(b.avatar)) {
+						b.avatar = b.discord.avatar || '';
+						if (!b.discord.avatarUrl && b.discord.avatar) {
+							b.discord.avatarUrl = buildDiscordAvatarUrl(String(b.id), b.discord.avatar, 512);
+						}
+					}
+				})
+			);
+		}
 
 		return NextResponse.json(bots, { status: 200 });
 	} catch (error) {

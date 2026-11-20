@@ -68,7 +68,7 @@ export function Releases({ bot, id }: ReleasesProps) {
 		);
 	}
 
-	const sortedReleases = [...releases].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+	const sortedReleases = releases.toSorted((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
 
 	return (
 		<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>

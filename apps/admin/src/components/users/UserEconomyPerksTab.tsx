@@ -203,8 +203,8 @@ export function UserEconomyPerksTab({
 					<p className="text-xs text-(--text-muted) italic">{t('admin.users.fields.noTransactions')}</p>
 				) : (
 					<div className="flex flex-col gap-1.5 max-h-40 overflow-y-auto pr-1">
-						{[...transactions]
-							.reverse()
+						{transactions
+							.toReversed()
 							.slice(0, 20)
 							.map((tx, idx) => (
 								<div key={tx.id || idx} className="flex items-center justify-between text-xs px-3 py-1.5 rounded-xl bg-(--foreground)/30 border border-(--border)/10">

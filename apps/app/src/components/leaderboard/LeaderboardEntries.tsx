@@ -2,10 +2,10 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Server, Users, Flame, Coins, ShieldCheck, ChevronUp, Crown, Medal, Award, Sparkles, MessageSquare, Headphones } from 'lucide-react';
 import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary } from '@xernerx/providers';
+import SafeAvatar from '@/components/SafeAvatar';
 
 export type LeaderboardTab = 'bots' | 'servers' | 'streaks' | 'levels';
 
@@ -31,7 +31,6 @@ const PODIUM_STYLES = [
 		badge: 'bg-[color-mix(in_srgb,#eab308_22%,var(--background))] text-amber-400 border border-amber-400/45 shadow-[0_0_20px_rgba(234,179,8,0.35)] backdrop-blur-md',
 		banner: 'from-amber-500/25 via-(--foreground) to-(--background)',
 		ring: 'h-24 w-24 ring-2 ring-amber-400/50',
-		pedestal: 'py-2.5 from-amber-500/25 via-amber-500/10 to-transparent border-t border-amber-400/35 text-amber-400',
 	},
 	{
 		order: 'order-2 md:order-1 md:mb-2',
@@ -39,7 +38,6 @@ const PODIUM_STYLES = [
 		badge: 'bg-[color-mix(in_srgb,#cbd5e1_20%,var(--background))] text-slate-300 border border-slate-300/40 shadow-[0_0_15px_rgba(203,213,225,0.2)] backdrop-blur-md',
 		banner: 'from-slate-400/20 via-(--foreground) to-(--background)',
 		ring: 'h-20 w-20 ring-2 ring-slate-300/35',
-		pedestal: 'py-2 from-slate-300/20 via-slate-300/5 to-transparent border-t border-slate-300/30 text-slate-300',
 	},
 	{
 		order: 'order-3 md:order-3',
@@ -47,7 +45,6 @@ const PODIUM_STYLES = [
 		badge: 'bg-[color-mix(in_srgb,#d97706_22%,var(--background))] text-amber-500 border border-amber-600/40 shadow-[0_0_15px_rgba(217,119,6,0.25)] backdrop-blur-md',
 		banner: 'from-amber-700/25 via-(--foreground) to-(--background)',
 		ring: 'h-20 w-20 ring-2 ring-amber-600/35',
-		pedestal: 'py-1.5 from-amber-600/20 via-amber-600/5 to-transparent border-t border-amber-600/30 text-amber-500',
 	},
 ] as const;
 
@@ -93,6 +90,8 @@ export function LeaderboardMetricBadges({ entry, activeTab }: { entry: any; acti
 		</span>
 	);
 
+	const streakVal = Math.max(0, Number(entry.streak || 0) || 0);
+
 	return (
 		<div className="flex flex-wrap items-center gap-2">
 			{activeTab === 'bots' && (
@@ -110,7 +109,7 @@ export function LeaderboardMetricBadges({ entry, activeTab }: { entry: any; acti
 			)}
 			{activeTab === 'streaks' && (
 				<>
-					{badge(<Flame size={13} />, t('app.users.profile.days', { count: entry.streak || 0 }), true)}
+					{badge(<Flame size={13} />, streakVal === 1 ? t('app.users.profile.daySingular', { count: 1 }) : t('app.users.profile.days', { count: streakVal.toLocaleString() }), true)}
 					{badge(<Coins size={13} className="text-(--accent)" />, (entry.balance || 0).toLocaleString())}
 				</>
 			)}
@@ -143,7 +142,7 @@ export function LeaderboardPodium({ podiumEntries, activeTab, resolveEntryDispla
 				const cardContent = (
 					<>
 						<div className={`${isFirst ? 'h-36' : 'h-28'} w-full relative bg-gradient-to-br ${pStyle.banner} overflow-hidden shrink-0`}>
-							{bannerUrl && <Image src={bannerUrl} alt={name} fill unoptimized className="object-cover group-hover:scale-105 transition-transform duration-500" />}
+							<SafeAvatar src={bannerUrl} alt={name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
 							<div className="absolute inset-0 bg-gradient-to-t from-(--foreground) via-transparent to-black/25" />
 							<div className={`absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${pStyle.badge}`}>
 								<RankIcon size={14} />
@@ -151,13 +150,16 @@ export function LeaderboardPodium({ podiumEntries, activeTab, resolveEntryDispla
 							</div>
 						</div>
 
-						<div className="flex flex-col items-center text-center px-6 pb-5 -mt-11 relative z-10 flex-1">
+						<div className="flex flex-col items-center text-center px-6 pb-6 -mt-11 relative z-10 flex-1">
 							<div className={`${pStyle.ring} rounded-2xl border-4 border-(--foreground) bg-(--background) overflow-hidden shadow-xl flex items-center justify-center shrink-0`}>
-								{avatarUrl ? (
-									<Image src={avatarUrl} alt={name} width={isFirst ? 96 : 80} height={isFirst ? 96 : 80} unoptimized className="h-full w-full object-cover" />
-								) : (
-									<span className="text-2xl font-bold text-(--text-muted)">{name.charAt(0).toUpperCase()}</span>
-								)}
+								<SafeAvatar
+									src={avatarUrl}
+									alt={name}
+									width={isFirst ? 96 : 80}
+									height={isFirst ? 96 : 80}
+									className="h-full w-full object-cover"
+									fallback={<span className="text-2xl font-bold text-(--text-muted)">{name.charAt(0).toUpperCase()}</span>}
+								/>
 							</div>
 
 							<div className="mt-3 flex flex-col items-center flex-1 w-full">
@@ -176,11 +178,6 @@ export function LeaderboardPodium({ podiumEntries, activeTab, resolveEntryDispla
 									<LeaderboardMetricBadges entry={entry} activeTab={activeTab} />
 								</div>
 							</div>
-						</div>
-
-						<div className={`flex items-center justify-center gap-1.5 bg-gradient-to-t text-xs font-black tracking-widest uppercase ${pStyle.pedestal}`}>
-							<RankIcon size={13} />
-							<span>#{index + 1}</span>
 						</div>
 					</>
 				);
@@ -224,13 +221,18 @@ export function LeaderboardRowList({
 							<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-(--border)/15 bg-(--background)/80 text-sm font-black text-(--text-muted) group-hover:text-(--accent) group-hover:border-(--accent)/30 transition-colors shrink-0">
 								#{rank}
 							</div>
-							{avatarUrl ? (
-								<Image src={avatarUrl} alt={name} width={48} height={48} unoptimized className="h-12 w-12 rounded-2xl border border-(--border)/15 object-cover shrink-0" />
-							) : (
-								<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--background) border border-(--border)/15 text-sm font-bold text-(--text-muted) shrink-0">
-									{name.charAt(0).toUpperCase()}
-								</div>
-							)}
+							<SafeAvatar
+								src={avatarUrl}
+								alt={name}
+								width={48}
+								height={48}
+								className="h-12 w-12 rounded-2xl border border-(--border)/15 object-cover shrink-0"
+								fallback={
+									<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--background) border border-(--border)/15 text-sm font-bold text-(--text-muted) shrink-0">
+										{name.charAt(0).toUpperCase()}
+									</div>
+								}
+							/>
 							<div className="min-w-0">
 								<div className="flex items-center gap-2">
 									<h2 className="text-base font-bold text-(--text) group-hover:text-(--accent) transition-colors truncate">{name}</h2>

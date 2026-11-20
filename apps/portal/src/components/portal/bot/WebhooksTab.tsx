@@ -7,6 +7,7 @@ import { AlertTriangle, Check, Copy, ExternalLink, Eye, EyeOff, KeyRound, Link2,
 import { Badge, Button, Confirm, Input, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 import WebhookDeliveriesCard, { WebhookDeliveryItem } from '@/components/portal/WebhookDeliveriesCard';
+import { portalButtonLinkClass } from '@/components/portal/PortalSafeAvatar';
 
 const STANDARD_WEBHOOK_EVENTS = ['POST vote', 'POST tip', 'POST stat', 'PATCH stat', 'DELETE stat', 'WARN shard', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review', 'POST release'];
 const API_TIER_WEBHOOK_EVENTS = ['POST online', 'POST offline'];
@@ -356,17 +357,23 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 											<p className="text-xs text-(--text-muted)">{t('app.portal.bot.webhooks.apiTierCalloutDesc')}</p>
 										</div>
 										<div className="flex flex-wrap items-center gap-2 shrink-0">
-											<Link href={getEnvUrl('https://www.xernerx.com/invites')} target="_blank">
-												<Button type="button" variant="secondary" size="sm" className="flex items-center gap-1.5 text-xs">
-													<span>{t('app.portal.bot.webhooks.inviteXernerxBotBtn')}</span>
-													<ExternalLink size={12} />
-												</Button>
+											<Link
+												href={getEnvUrl('https://www.xernerx.com/invites')}
+												target="_blank"
+												rel="noopener noreferrer"
+												className={portalButtonLinkClass('secondary', 'sm', 'text-xs')}
+											>
+												<span>{t('app.portal.bot.webhooks.inviteXernerxBotBtn')}</span>
+												<ExternalLink size={12} />
 											</Link>
-											<Link href={getEnvUrl('https://store.xernerx.com?category=developers')} target="_blank">
-												<Button type="button" variant="primary" size="sm" className="flex items-center gap-1.5 text-xs">
-													<span>{t('app.portal.bot.webhooks.apiTierUpgradeBtn')}</span>
-													<ExternalLink size={12} />
-												</Button>
+											<Link
+												href={getEnvUrl('https://store.xernerx.com?category=developers')}
+												target="_blank"
+												rel="noopener noreferrer"
+												className={portalButtonLinkClass('primary', 'sm', 'text-xs')}
+											>
+												<span>{t('app.portal.bot.webhooks.apiTierUpgradeBtn')}</span>
+												<ExternalLink size={12} />
 											</Link>
 										</div>
 									</div>
@@ -379,11 +386,14 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 											</span>
 											<p className="text-xs text-(--text-muted)">{t('app.portal.bot.webhooks.sharedServerDesc')}</p>
 										</div>
-										<Link href={getEnvUrl('https://www.xernerx.com/invites')} target="_blank" className="shrink-0">
-											<Button type="button" variant="secondary" size="sm" className="flex items-center gap-1.5 text-xs">
-												<span>{t('app.portal.bot.webhooks.inviteXernerxBotBtn')}</span>
-												<ExternalLink size={12} />
-											</Button>
+										<Link
+											href={getEnvUrl('https://www.xernerx.com/invites')}
+											target="_blank"
+											rel="noopener noreferrer"
+											className={portalButtonLinkClass('secondary', 'sm', 'shrink-0 text-xs')}
+										>
+											<span>{t('app.portal.bot.webhooks.inviteXernerxBotBtn')}</span>
+											<ExternalLink size={12} />
 										</Link>
 									</div>
 								)}

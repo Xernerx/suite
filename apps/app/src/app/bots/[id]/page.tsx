@@ -4,11 +4,11 @@
 import { Suspense, useEffect, useState, use } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useSession } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button } from '@xernerx/ui';
 import { User, Activity, Terminal, ArrowLeft, Star, Settings, Trophy, Tag, LayoutDashboard, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 import Header from '@/components/bots/Header';
 import Profile from '@/components/bots/Profile';
 import Stats from '@/components/bots/Stats';
@@ -169,8 +169,8 @@ function BotPageContent({ id }: { id: string }) {
 					{t('app.bots.id.text1')}
 				</h1>
 				<p className="text-(--text-muted) mb-8">{t('app.bots.id.text2')}</p>
-				<Link href="/bots">
-					<Button variant="primary">{t('app.bots.id.text3')}</Button>
+				<Link href="/bots" className={getButtonLinkClasses('primary')}>
+					{t('app.bots.id.text3')}
 				</Link>
 			</div>
 		);
@@ -210,17 +210,13 @@ function BotPageContent({ id }: { id: string }) {
 						</div>
 					</div>
 					<div className="flex flex-wrap items-center gap-2 shrink-0">
-						<Link href={`/bots/${bot.vanitySlug || id}/onboarding`}>
-							<Button variant="secondary" className="gap-1.5 text-xs">
-								<Sparkles className="w-3.5 h-3.5 text-(--accent)" />
-								<span>{t('app.bots.onboarding.banner.setupGuideBtn')}</span>
-							</Button>
+						<Link href={`/bots/${bot.vanitySlug || id}/onboarding`} className={getButtonLinkClasses('secondary', 'md', 'gap-1.5 text-xs')}>
+							<Sparkles className="w-3.5 h-3.5 text-(--accent)" />
+							<span>{t('app.bots.onboarding.banner.setupGuideBtn')}</span>
 						</Link>
-						<Link href={dashboardHref}>
-							<Button variant="primary" className="gap-1.5 text-xs">
-								<LayoutDashboard className="w-3.5 h-3.5" />
-								<span>{t('app.bots.onboarding.banner.openDashboardBtn')}</span>
-							</Button>
+						<Link href={dashboardHref} className={getButtonLinkClasses('primary', 'md', 'gap-1.5 text-xs')}>
+							<LayoutDashboard className="w-3.5 h-3.5" />
+							<span>{t('app.bots.onboarding.banner.openDashboardBtn')}</span>
 						</Link>
 					</div>
 				</div>

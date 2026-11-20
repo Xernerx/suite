@@ -5,7 +5,7 @@
 import { Bot, Check, PackageSearch } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDictionary } from '@xernerx/providers';
-import { CatalogCategory, CatalogItem, UserSubscription } from './types';
+import { CatalogCategory, CatalogItem, formatStorePrice, UserSubscription } from './types';
 import { DynamicFeaturedCard } from './DynamicFeaturedCard';
 import { DynamicItemCard } from './DynamicItemCard';
 
@@ -88,7 +88,7 @@ export function DynamicCategoryView({
 							</div>
 
 							<div className="mb-6 flex items-baseline gap-1">
-								<span className="text-5xl font-bold">€0</span>
+								<span className="text-5xl font-bold">{formatStorePrice(0)}</span>
 								<span className="text-(--text-muted) font-medium">
 									{billingInterval === 'month' ? t('account.store.pricing.monthlySuffix') : t('account.store.pricing.yearlySuffix')}
 								</span>

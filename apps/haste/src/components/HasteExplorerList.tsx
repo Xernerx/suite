@@ -3,6 +3,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Clock, Code2, Copy, ExternalLink, Eye, FileCode2, FolderGit2, Globe, Link2, Lock, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
@@ -16,6 +17,7 @@ export function HasteExplorerList() {
 	const { user } = useUser();
 	const { data: session } = useSession();
 	const { setView } = useSidebar();
+	const router = useRouter();
 
 	const effectiveUserId = user?.userId || (session?.user as any)?.id || '';
 
@@ -259,16 +261,14 @@ export function HasteExplorerList() {
 								</div>
 
 								<div className="flex items-center gap-1.5">
-									<Button variant="secondary" size="sm" className="rounded-xl px-2.5 py-1.5" onClick={() => handleCopyLink(doc.id)}>
+									<Button type="button" variant="secondary" size="sm" className="rounded-xl px-2.5 py-1.5" onClick={() => handleCopyLink(doc.id)}>
 										<Copy className="w-3.5 h-3.5" />
 									</Button>
-									<Link href={`/${doc.id}`}>
-										<Button variant="primary" size="sm" className="rounded-xl px-3 py-1.5">
-											<ExternalLink className="w-3.5 h-3.5 mr-1" />
-											{t('haste.actions.open')}
-										</Button>
-									</Link>
-									<Button variant="danger" size="sm" className="rounded-xl px-2.5 py-1.5" onClick={() => setDeletingId(doc.id)}>
+									<Button type="button" variant="primary" size="sm" className="rounded-xl px-3 py-1.5" onClick={() => router.push(`/${doc.id}`)}>
+										<ExternalLink className="w-3.5 h-3.5 mr-1" />
+										{t('haste.actions.open')}
+									</Button>
+									<Button type="button" variant="danger" size="sm" className="rounded-xl px-2.5 py-1.5" onClick={() => setDeletingId(doc.id)}>
 										<Trash2 className="w-3.5 h-3.5" />
 									</Button>
 								</div>

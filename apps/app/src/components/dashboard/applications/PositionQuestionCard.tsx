@@ -1,16 +1,17 @@
 /** @format */
 'use client';
 
-import { ArrowDown, ArrowUp, Check, Plus, Trash2, X } from 'lucide-react';
-import { Button, Input, Selector, Toggle } from '@xernerx/ui';
+import { ArrowDown, ArrowUp, Check, GitBranch, Plus, SlidersHorizontal, Trash2, X } from 'lucide-react';
+import { Badge, Button, Input, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import { useState } from 'react';
-import type { QuestionType, YourAppsQuestion } from './types';
+import type { ConditionOperator, QuestionType, ValidationPattern, YourAppsQuestion } from './types';
 
 interface PositionQuestionCardProps {
 	question: YourAppsQuestion;
 	index: number;
 	total: number;
+	priorQuestions: YourAppsQuestion[];
 	questionTypeOptions: { label: string; value: QuestionType }[];
 	onUpdate: (patch: Partial<YourAppsQuestion>) => void;
 	onMove: (direction: -1 | 1) => void;
@@ -19,9 +20,10 @@ interface PositionQuestionCardProps {
 
 const isChoiceListType = (type: QuestionType): boolean => type === 'select' || type === 'radio' || type === 'multiselect';
 
-export default function PositionQuestionCard({ question: q, index: idx, total, questionTypeOptions, onUpdate, onMove, onDelete }: PositionQuestionCardProps) {
+export default function PositionQuestionCard({ question: q, index: idx, total, priorQuestions, questionTypeOptions, onUpdate, onMove, onDelete }: PositionQuestionCardProps) {
 	const { t } = useDictionary();
 	const [choiceDraft, setChoiceDraft] = useState('');
+	const [showRules, setShowRules] = useState(Boolean(q.condition?.questionId || (q.validationPattern && q.validationPattern !== 'none') || q.minValue != null || q.maxValue != null));
 
 	const options = Array.isArray(q.options) ? q.options : [];
 	const maxChoices = q.type === 'select' ? 25 : 10;
@@ -78,11 +80,50 @@ export default function PositionQuestionCard({ question: q, index: idx, total, q
 		}
 	};
 
+	const activeConditionRef = q.condition?.questionId ? priorQuestions.find((pq) => pq.id === q.condition?.questionId) : null;
+	const refSuggestions: string[] = activeConditionRef
+		? activeConditionRef.type === 'boolean'
+			? [activeConditionRef.options?.[0]?.trim() || 'Yes', activeConditionRef.options?.[1]?.trim() || 'No']
+			: activeConditionRef.type === 'checkbox'
+				? ['Yes', 'No']
+				: Array.isArray(activeConditionRef.options)
+					? activeConditionRef.options.filter(Boolean)
+					: []
+		: [];
+
+	const actionControls = (
+		<div className="flex items-center gap-1.5 ml-auto">
+			<Button type="button" variant={showRules ? 'primary' : 'ghost'} size="sm" onClick={() => setShowRules((prev) => !prev)}>
+				<SlidersHorizontal className="w-3.5 h-3.5" />
+				<span className="hidden sm:inline">{t('app.dashboard.applications.positions.modal.advancedRulesBtn')}</span>
+			</Button>
+			<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.positions.modal.requiredToggle')}</span>
+			<Toggle checked={q.required} onChange={(e) => onUpdate({ required: e.target.checked })} size="sm" />
+			<Button type="button" variant="ghost" size="sm" disabled={idx === 0} onClick={() => onMove(-1)}>
+				<ArrowUp className="w-3.5 h-3.5" />
+			</Button>
+			<Button type="button" variant="ghost" size="sm" disabled={idx === total - 1} onClick={() => onMove(1)}>
+				<ArrowDown className="w-3.5 h-3.5" />
+			</Button>
+			<Button type="button" variant="danger" size="sm" disabled={total <= 1} onClick={onDelete}>
+				<Trash2 className="w-3.5 h-3.5" />
+			</Button>
+		</div>
+	);
+
 	return (
 		<div className="flex flex-col gap-2.5 p-3.5 rounded-2xl bg-(--background)/60 border border-(--border)/10">
 			{/* Top Row: #Index + Question Prompt + Question Type Selector */}
 			<div className="flex flex-col sm:flex-row sm:items-center gap-2">
-				<span className="text-xs font-mono font-bold text-(--accent) shrink-0">#{idx + 1}</span>
+				<div className="flex items-center gap-1.5 shrink-0">
+					<span className="text-xs font-mono font-bold text-(--accent)">#{idx + 1}</span>
+					{q.condition?.questionId && (
+						<Badge variant="accent">
+							<GitBranch className="w-3 h-3 mr-1" />
+							{t('app.servers.applications.conditionalBadge')}
+						</Badge>
+					)}
+				</div>
 				<div className="flex-1 min-w-0">
 					<Input value={q.question} onChange={(e) => onUpdate({ question: e.target.value })} placeholder={t('app.dashboard.applications.positions.modal.questionPlaceholder')} />
 				</div>
@@ -125,7 +166,7 @@ export default function PositionQuestionCard({ question: q, index: idx, total, q
 						</div>
 					)}
 
-					<div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+					<div className="flex flex-wrap items-center justify-between gap-2">
 						<div className="flex flex-1 items-center gap-2 min-w-[220px]">
 							<Input
 								value={choiceDraft}
@@ -133,6 +174,7 @@ export default function PositionQuestionCard({ question: q, index: idx, total, q
 								onChange={(e) => setChoiceDraft(e.target.value)}
 								onKeyDown={(e) => {
 									if (e.key === 'Enter') {
+										if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 										e.preventDefault();
 										commitDraftChoice();
 									}
@@ -156,19 +198,7 @@ export default function PositionQuestionCard({ question: q, index: idx, total, q
 							</Button>
 						</div>
 
-						<div className="flex items-center gap-2 ml-auto">
-							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.positions.modal.requiredToggle')}</span>
-							<Toggle checked={q.required} onChange={(e) => onUpdate({ required: e.target.checked })} size="sm" />
-							<Button variant="ghost" size="sm" disabled={idx === 0} onClick={() => onMove(-1)}>
-								<ArrowUp className="w-3.5 h-3.5" />
-							</Button>
-							<Button variant="ghost" size="sm" disabled={idx === total - 1} onClick={() => onMove(1)}>
-								<ArrowDown className="w-3.5 h-3.5" />
-							</Button>
-							<Button variant="danger" size="sm" disabled={total <= 1} onClick={onDelete}>
-								<Trash2 className="w-3.5 h-3.5" />
-							</Button>
-						</div>
+						{actionControls}
 					</div>
 				</div>
 			) : q.type === 'boolean' ? (
@@ -200,19 +230,7 @@ export default function PositionQuestionCard({ question: q, index: idx, total, q
 							</div>
 						</div>
 
-						<div className="flex items-center gap-2 ml-auto">
-							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.positions.modal.requiredToggle')}</span>
-							<Toggle checked={q.required} onChange={(e) => onUpdate({ required: e.target.checked })} size="sm" />
-							<Button variant="ghost" size="sm" disabled={idx === 0} onClick={() => onMove(-1)}>
-								<ArrowUp className="w-3.5 h-3.5" />
-							</Button>
-							<Button variant="ghost" size="sm" disabled={idx === total - 1} onClick={() => onMove(1)}>
-								<ArrowDown className="w-3.5 h-3.5" />
-							</Button>
-							<Button variant="danger" size="sm" disabled={total <= 1} onClick={onDelete}>
-								<Trash2 className="w-3.5 h-3.5" />
-							</Button>
-						</div>
+						{actionControls}
 					</div>
 				</div>
 			) : (
@@ -220,19 +238,163 @@ export default function PositionQuestionCard({ question: q, index: idx, total, q
 					<div className="flex-1 min-w-[200px]">
 						<Input value={q.placeholder || ''} onChange={(e) => onUpdate({ placeholder: e.target.value })} placeholder={t('app.dashboard.applications.positions.modal.inputPlaceholder')} />
 					</div>
-					<div className="flex items-center gap-2 ml-auto">
-						<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.positions.modal.requiredToggle')}</span>
-						<Toggle checked={q.required} onChange={(e) => onUpdate({ required: e.target.checked })} size="sm" />
-						<Button variant="ghost" size="sm" disabled={idx === 0} onClick={() => onMove(-1)}>
-							<ArrowUp className="w-3.5 h-3.5" />
-						</Button>
-						<Button variant="ghost" size="sm" disabled={idx === total - 1} onClick={() => onMove(1)}>
-							<ArrowDown className="w-3.5 h-3.5" />
-						</Button>
-						<Button variant="danger" size="sm" disabled={total <= 1} onClick={onDelete}>
-							<Trash2 className="w-3.5 h-3.5" />
-						</Button>
-					</div>
+					{actionControls}
+				</div>
+			)}
+
+			{/* Collapsible Rules, Validation & Conditional Skip Logic Drawer */}
+			{showRules && (
+				<div className="flex flex-col gap-3 rounded-2xl bg-(--foreground)/25 border border-(--border)/10 p-3 pt-2.5">
+					{priorQuestions.length > 0 && (
+						<div className="flex flex-col gap-1.5">
+							<label className="text-[11px] font-bold text-(--text)">{t('app.dashboard.applications.positions.modal.conditionLabel')}</label>
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+								<Selector
+									value={q.condition?.questionId || ''}
+									onChange={(refId: string) => {
+										if (!refId) {
+											onUpdate({ condition: null });
+										} else {
+											onUpdate({
+												condition: {
+													questionId: refId,
+													operator: q.condition?.operator || 'equals',
+													value: q.condition?.value || '',
+												},
+											});
+										}
+									}}
+									options={[
+										{ value: '', label: t('app.dashboard.applications.positions.modal.conditionNone') },
+										...priorQuestions.map((pq, pIdx) => ({
+											value: pq.id,
+											label: t('app.dashboard.applications.positions.modal.conditionIfQuestion', {
+												num: pIdx + 1,
+												text: (pq.question || '...').slice(0, 36),
+											}),
+										})),
+									]}
+								/>
+								{q.condition?.questionId && (
+									<>
+										<Selector
+											value={q.condition.operator || 'equals'}
+											onChange={(op: string) =>
+												onUpdate({
+													condition: {
+														questionId: q.condition!.questionId,
+														operator: op as ConditionOperator,
+														value: q.condition?.value || '',
+													},
+												})
+											}
+											options={[
+												{ value: 'equals', label: t('app.dashboard.applications.positions.modal.conditionOpEquals') },
+												{ value: 'not_equals', label: t('app.dashboard.applications.positions.modal.conditionOpNotEquals') },
+												{ value: 'contains', label: t('app.dashboard.applications.positions.modal.conditionOpContains') },
+											]}
+										/>
+										{refSuggestions.length > 0 ? (
+											<Selector
+												value={q.condition.value || ''}
+												onChange={(val: string) =>
+													onUpdate({
+														condition: {
+															questionId: q.condition!.questionId,
+															operator: q.condition?.operator || 'equals',
+															value: val,
+														},
+													})
+												}
+												options={refSuggestions.map((s) => ({ value: s, label: s }))}
+												placeholder={t('app.dashboard.applications.positions.modal.conditionValPlaceholder')}
+											/>
+										) : (
+											<Input
+												value={q.condition.value || ''}
+												onChange={(e) =>
+													onUpdate({
+														condition: {
+															questionId: q.condition!.questionId,
+															operator: q.condition?.operator || 'equals',
+															value: e.target.value,
+														},
+													})
+												}
+												placeholder={t('app.dashboard.applications.positions.modal.conditionValPlaceholder')}
+											/>
+										)}
+									</>
+								)}
+							</div>
+						</div>
+					)}
+
+					{(q.type === 'short' || q.type === 'paragraph') && (
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+							<div className="flex flex-col gap-1">
+								<label className="text-[11px] font-bold text-(--text-muted)">{t('app.dashboard.applications.positions.modal.minLengthLabel')}</label>
+								<Input
+									type="number"
+									min={0}
+									max={q.type === 'short' ? 256 : 1000}
+									value={String(q.minLength ?? 0)}
+									onChange={(e) => onUpdate({ minLength: Math.max(0, Number(e.target.value) || 0) })}
+								/>
+							</div>
+							<div className="flex flex-col gap-1">
+								<label className="text-[11px] font-bold text-(--text-muted)">{t('app.dashboard.applications.positions.modal.maxLengthLabel')}</label>
+								<Input
+									type="number"
+									min={1}
+									max={q.type === 'short' ? 256 : 1000}
+									value={String(q.maxLength ?? (q.type === 'short' ? 256 : 1000))}
+									onChange={(e) => onUpdate({ maxLength: Math.max(1, Number(e.target.value) || (q.type === 'short' ? 256 : 1000)) })}
+								/>
+							</div>
+							<div className="flex flex-col gap-1">
+								<label className="text-[11px] font-bold text-(--text-muted)">{t('app.dashboard.applications.positions.modal.validationLabel')}</label>
+								<Selector
+									value={q.validationPattern || 'none'}
+									onChange={(pat: string) => onUpdate({ validationPattern: pat as ValidationPattern })}
+									options={(['none', 'url', 'email', 'discord_id', 'regex'] as const).map((pat) => ({
+										value: pat,
+										label: t(`app.dashboard.applications.positions.modal.validation.${pat}`),
+									}))}
+								/>
+							</div>
+							{q.validationPattern === 'regex' && (
+								<div className="sm:col-span-3">
+									<Input
+										value={q.validationRegex || ''}
+										onChange={(e) => onUpdate({ validationRegex: e.target.value })}
+										placeholder={t('app.dashboard.applications.positions.modal.regexPlaceholder')}
+									/>
+								</div>
+							)}
+						</div>
+					)}
+
+					{q.type === 'number' && (
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+							<div className="flex flex-col gap-1">
+								<label className="text-[11px] font-bold text-(--text-muted)">{t('app.dashboard.applications.positions.modal.minValueLabel')}</label>
+								<Input
+									type="number"
+									value={q.minValue !== null && q.minValue !== undefined ? String(q.minValue) : ''}
+									onChange={(e) => onUpdate({ minValue: e.target.value === '' ? null : Number(e.target.value) })}
+								/>
+							</div>
+							<div className="flex flex-col gap-1">
+								<label className="text-[11px] font-bold text-(--text-muted)">{t('app.dashboard.applications.positions.modal.maxValueLabel')}</label>
+								<Input
+									type="number"
+									value={q.maxValue !== null && q.maxValue !== undefined ? String(q.maxValue) : ''}
+									onChange={(e) => onUpdate({ maxValue: e.target.value === '' ? null : Number(e.target.value) })}
+								/>
+							</div>
+						</div>
+					)}
 				</div>
 			)}
 		</div>

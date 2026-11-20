@@ -2,6 +2,52 @@
 
 # @xernerx/lib
 
+## 1.29.1
+
+### Patch Changes
+
+- ## Exclude Dev Dictionary Reads from Bundle Tracing
+  
+  Marked development-only dictionary hot-reloading filesystem calls with `turbopackIgnore` so Next.js Turbopack does not trace monorepo directories during compilation.
+  
+  ### Changed
+  
+  - **Dictionary Loader**: Added `turbopackIgnore` hints to development-only `fs.existsSync` and `fs.readFileSync` calls in the locale dictionary loader.
+
+## 1.29.0
+
+### Minor Changes
+
+- ## Mobile Auth, Error Log & YourApps Models + Dictionary Updates
+  
+  Added new Mongoose models for mobile authentication and error tracking, expanded YourApps models, and updated localization dictionaries.
+  
+  ### Added
+  
+  - **New Core & User Models**: Added `ErrorLog`, `AuthApprovalRequest`, and `MobileSession` models and registered them in the central model registry.
+  
+  ### Changed
+  
+  - **Expanded YourApps Models**: Extended YourApps `Form`, `Profile`, and `Submission` schemas to support polls, anonymous responses, scheduled windows, follow-up clarifications, and consensus reviews.
+  - **Database Error Chaining & Dictionaries**: Attached `{ cause: connErr }` when re-throwing MongoDB connection errors, updated `en-GB.json` with YourApps, mobile, hosting, and timeline strings, and pruned empty parent objects from `ru.json`.
+
+## 1.28.0
+
+### Minor Changes
+
+- ## HMR Mongo Connection Health, `BungieTricornIcon` & Localization Sync
+  
+  Hardened Mongoose child `useDb()` connection pooling across HMR reloads, exported `BungieTricornIcon`, differentiated the `Gauge` Dashboard icon, and updated `en-GB` dictionaries.
+  
+  ### Added
+  
+  - **`BungieTricornIcon` Export**: Exported the reusable `BungieTricornIcon` SVG component from `@xernerx/lib`.
+  
+  ### Changed
+  
+  - **Mongoose HMR Connection Stability (`database.ts`)**: Preserved healthy `useDb()` child connections and deduplicated in-flight connection promises during Next.js HMR reloads.
+  - **Navigation & Localization**: Updated Dashboard navigation metadata to `Gauge` and synced `en-GB.json` + regenerated `i18n.config.ts`.
+
 ## 1.27.1
 
 ### Patch Changes

@@ -10,10 +10,11 @@ import type { ShowcasePackage } from '@/components/HomeClient';
 
 interface HomeHeroAndFeaturesProps {
 	pageReady: boolean;
+	reducedMotion?: boolean;
 	publicPackages: ShowcasePackage[];
 }
 
-export function HomeHeroAndFeatures({ pageReady, publicPackages }: HomeHeroAndFeaturesProps) {
+export function HomeHeroAndFeatures({ pageReady, reducedMotion = false, publicPackages }: HomeHeroAndFeaturesProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 
@@ -23,9 +24,9 @@ export function HomeHeroAndFeatures({ pageReady, publicPackages }: HomeHeroAndFe
 			<section className="min-h-dvh flex flex-col items-center justify-start px-6 pt-[52dvh] sm:pt-[54dvh] pb-12 relative z-30">
 				<div className="w-full max-w-(--page-width) mx-auto flex flex-col items-center text-center relative z-10">
 					<motion.div
-						initial={{ opacity: 0, y: 36 }}
-						animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
-						transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+						initial={false}
+						animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+						transition={{ duration: reducedMotion ? 0 : 0.65, ease: [0.22, 1, 0.36, 1] }}
 						className="w-full flex flex-col items-center text-center bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 rounded-[2.75rem] px-8 py-8 sm:px-12 sm:py-10 lg:px-16 lg:py-11 shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_18%,transparent)] relative"
 					>
 						<div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2.75rem]">
@@ -131,10 +132,10 @@ export function HomeHeroAndFeatures({ pageReady, publicPackages }: HomeHeroAndFe
 					].map((point, i) => (
 						<motion.div
 							key={point.title}
-							initial={{ opacity: 0, y: 40 }}
-							animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+							initial={false}
+							animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
 							whileHover={{ y: -8, scale: 1.015 }}
-							transition={{ duration: 1.6, delay: 0.25 + i * 0.16, ease: [0.22, 1, 0.36, 1] }}
+							transition={{ duration: reducedMotion ? 0 : 0.65, delay: reducedMotion ? 0 : 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
 							className="bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/45 rounded-3xl p-8 lg:p-10 shadow-xl hover:shadow-[0_16px_44px_-12px_color-mix(in_srgb,var(--accent)_32%,transparent)] relative overflow-hidden group transition-colors"
 						>
 							<div

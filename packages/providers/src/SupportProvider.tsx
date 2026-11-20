@@ -319,6 +319,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 									<button
 										type="button"
 										onClick={() => setPopoverOpen(false)}
+										aria-label={t('common.buttons.close')}
 										className="p-1.5 rounded-lg text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition cursor-pointer"
 									>
 										<X size={14} />
@@ -389,7 +390,10 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 						<button
 							type="button"
 							onClick={() => setPopoverOpen((prev) => !prev)}
-							className="group flex h-14 w-14 hover:w-auto cursor-pointer items-center overflow-hidden rounded-full border-none bg-(--accent) text-white shadow-xl transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-(--background)"
+							aria-label={t('common.supportprovider.description')}
+							title={t('common.supportprovider.description')}
+							aria-expanded={isPopoverOpen}
+							className="group flex h-14 w-14 hover:w-auto cursor-pointer items-center overflow-hidden rounded-full border-none bg-(--accent) text-white shadow-xl transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--background)"
 						>
 							<div className="flex h-14 w-14 shrink-0 items-center justify-center">
 								<MessageCircle size={24} className="transition-transform duration-500 ease-in-out group-hover:-rotate-360" />
@@ -434,6 +438,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 									type="button"
 									onClick={() => setJoinModalOpen(false)}
 									disabled={isJoining}
+									aria-label={t('common.buttons.close')}
 									className="rounded-lg p-1.5 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition cursor-pointer"
 								>
 									<X size={18} />

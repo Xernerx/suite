@@ -1,11 +1,12 @@
 /** @format */
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Settings as SettingsIcon, Building2, AlertTriangle, Trash2, Globe, Coins, Sparkles, Lock, Copy, Check, ExternalLink, Download, Upload } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 import WidgetSettingsCard from '@/components/WidgetSettingsCard';
+import { ServerBotSetupDangerCards } from './ServerBotSetupDangerCards';
 
 interface SettingsProps {
 	guildConfig: any;
@@ -23,9 +24,13 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 	const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 	const [unlockingVanity, setUnlockingVanity] = useState(false);
 	const [copiedVanity, setCopiedVanity] = useState(false);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const isVanityUnlocked = Boolean(guildConfig.vanityUnlocked || guildConfig.verified);
 	const extraVanitySlots = Number(user?.credits?.extraVanitySlots) || 0;
+	const appDisplayHost = getEnvUrl('https://app.xernerx.com')
+		.replace(/^https?:\/\//, '')
+		.replace(/\/$/, '');
 	const publicServerUrl = getEnvUrl(`https://app.xernerx.com/servers/${guildConfig.vanitySlug || guildConfig.id}`);
 
 	const handleCopyVanityUrl = () => {
@@ -159,7 +164,9 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 					</div>
 					<div className="flex flex-wrap items-center gap-2 text-xs text-(--text-muted)">
 						<span>{t('app.dashboard.settings.vanitySlugDesc')}</span>
-						<span className="font-mono text-(--accent)">app.xernerx.com/servers/{guildConfig.vanitySlug || guildConfig.id}</span>
+						<span className="font-mono text-(--accent)">
+							{appDisplayHost}/servers/{guildConfig.vanitySlug || guildConfig.id}
+						</span>
 						<button
 							type="button"
 							onClick={handleCopyVanityUrl}
@@ -237,8 +244,8 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 						<span>{t('app.dashboard.settings.exportJson')}</span>
 					</Button>
 					<input
+						ref={fileInputRef}
 						type="file"
-						id="server-profile-json-import"
 						accept="application/json,.json"
 						className="hidden"
 						onChange={(e) => {
@@ -247,12 +254,10 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 							e.target.value = '';
 						}}
 					/>
-					<label htmlFor="server-profile-json-import" className="cursor-pointer">
-						<Button variant="secondary" className="gap-2" style={{ pointerEvents: 'none' }}>
-							<Upload size={15} />
-							<span>{t('app.dashboard.settings.importJson')}</span>
-						</Button>
-					</label>
+					<Button type="button" variant="secondary" onClick={() => fileInputRef.current?.click()} className="gap-2">
+						<Upload size={15} />
+						<span>{t('app.dashboard.settings.importJson')}</span>
+					</Button>
 				</div>
 			</div>
 
@@ -298,7 +303,7 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 				<button
 					type="button"
 					onClick={() => setIsResetConfirmOpen(true)}
-					className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
+					className="flex items-center justify-center rounded-2xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm cursor-pointer"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
 						gap: 'calc(var(--ui-gap) * 0.5)',
@@ -308,6 +313,8 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 					<span>{t('app.dashboard.text17')}</span>
 				</button>
 			</div>
+
+			<ServerBotSetupDangerCards guildId={guildConfig.id} mode="both" />
 
 			{/* Delete Server Data Card */}
 			<div
@@ -324,7 +331,7 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 				<button
 					type="button"
 					onClick={handleDeleteGuild}
-					className="flex items-center justify-center rounded-xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm"
+					className="flex items-center justify-center rounded-2xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm cursor-pointer"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
 						gap: 'calc(var(--ui-gap) * 0.5)',

@@ -2,6 +2,34 @@
 
 # @xernerx/cli
 
+## 2.8.0
+
+### Minor Changes
+
+- ## Canary Soak Promotion & 5-Gate Verification CLI
+  
+  Added automated Canary verification and promotion tooling alongside local dev networking updates.
+  
+  ### Added
+  
+  - **`suite promote` Command & 5-Gate Verifier**: Added `pnpm suite promote` and `.xernerx/cli/verify-canary.mjs` checking dictionary integrity, GitHub CI & all-13-app Vercel deployment statuses, 23h Vercel HTTP `5xx` and fatal runtime soak logs, 13-app canary smoke health, and a 24-request concurrent stress gate.
+  
+  ### Changed
+  
+  - **Dev & Network Helpers**: Updated local dev orchestration and LAN IP detection utilities.
+
+## 2.7.4
+
+### Patch Changes
+
+- ## Suite CLI Toolchain & Prompt Alignment
+  
+  Updated `@clack/prompts`, `commander`, and `pnpm@12.21.0` / Node `>=24` engine metadata for the internal `suite` CLI.
+  
+  ### Changed
+  
+  - **CLI Dependencies**: Upgraded `@clack/prompts` and `commander` and aligned `pnpm@12.21.0` / Node `>=24` package metadata.
+
 ## 2.7.3
 
 ### Patch Changes

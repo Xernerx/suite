@@ -2,6 +2,34 @@
 
 # bot
 
+## 2.4.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+
+## 2.4.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.0
+
+## 2.4.3
+
+### Patch Changes
+
+- ## Framework & Discord.js Runtime Alignment
+  
+  Updated `@xernerx/framework`, `discord.js`, `mongoose`, and Node `>=24` / `pnpm@12.21.0` workspace metadata for the Xernerx Bot daemon.
+  
+  ### Changed
+  
+  - **Runtime Dependencies**: Upgraded `@xernerx/framework`, `discord.js`, and `mongoose` alongside `pnpm@12.21.0` / Node `>=24` engine fields.
+- Updated dependencies
+  - @xernerx/lib@1.28.0
+
 ## 2.4.2
 
 ### Patch Changes

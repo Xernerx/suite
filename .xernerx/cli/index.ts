@@ -13,6 +13,7 @@ import registerBuild from './commands/build';
 import registerLint from './commands/lint';
 import registerCommit from './commands/commit';
 import registerShip from './commands/ship';
+import registerPromote from './commands/promote';
 import registerGenerateLocales from './commands/generateLocales';
 import registerInitialize from './commands/initialize';
 import registerClean from './commands/clean';
@@ -22,7 +23,7 @@ async function main() {
 	let envInitialized = false;
 
 	const isCI = process.env.CI === 'true' || process.env.CI === '1';
-	const skipInitCommands = ['build', 'lint', 'clean', 'commit', 'ship', 'initialize'];
+	const skipInitCommands = ['build', 'lint', 'clean', 'commit', 'ship', 'promote', 'initialize'];
 	const isSkippedCommand = process.argv.some((arg) => skipInitCommands.includes(arg));
 
 	if (!fs.existsSync(rootEnvPath) && !isCI && !isSkippedCommand) {
@@ -44,6 +45,7 @@ async function main() {
 	registerGenerateLocales(program);
 	registerCommit(program);
 	registerShip(program);
+	registerPromote(program);
 	registerInitialize(program);
 	registerClean(program);
 

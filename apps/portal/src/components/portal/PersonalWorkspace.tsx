@@ -6,8 +6,9 @@ import { BookOpen, Bot, Check, ChevronUp, Copy, ExternalLink, KeyRound, Plus, Se
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { BotRow } from '@xernerx/components';
 import { Button } from '@xernerx/ui';
-import Image from 'next/image';
 import Link from 'next/link';
+import { PortalSafeAvatar, portalButtonLinkClass } from '@/components/portal/PortalSafeAvatar';
+import { resolveGuildIconUrl } from '@/lib/portalHelpers';
 
 interface PersonalWorkspaceProps {
 	session: any;
@@ -77,22 +78,14 @@ export default function PersonalWorkspace({ session, bots, organizations, guilds
 				className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8 transition-all duration-300"
 			>
 				<div className="relative z-10 flex items-center gap-4">
-					{session?.user?.image ? (
-						<Image
-							src={session.user.image}
-							alt="Avatar"
-							width={80}
-							height={80}
-							loading="eager"
-							priority
-							unoptimized
-							className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
-						/>
-					) : (
-						<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
-							<User className="w-8 h-8 text-(--text-muted)" />
-						</div>
-					)}
+					<PortalSafeAvatar
+						src={session?.user?.image || null}
+						alt={session?.user?.name || 'Avatar'}
+						fallbackKind="user"
+						className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
+						fallbackClassName="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10"
+						iconClassName="w-8 h-8 text-(--text-muted)"
+					/>
 					<div className="flex flex-col gap-1.5">
 						<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{session?.user?.name || t('app.portal.nav.personal')}
@@ -119,24 +112,18 @@ export default function PersonalWorkspace({ session, bots, organizations, guilds
 							{t('app.portal.workspace.createOrgBtn')}
 						</Button>
 					)}
-					<Link href={getEnvUrl('https://account.xernerx.com/?view=tokens')}>
-						<Button variant="secondary" className="gap-2">
-							<KeyRound className="w-4 h-4 text-(--accent)" />
-							{t('app.portal.workspace.manageTokensBtn')}
-						</Button>
+					<Link href={getEnvUrl('https://account.xernerx.com/?view=tokens')} className={portalButtonLinkClass('secondary', 'md', 'gap-2')}>
+						<KeyRound className="w-4 h-4 text-(--accent)" />
+						{t('app.portal.workspace.manageTokensBtn')}
 					</Link>
-					<Link href={getEnvUrl('https://docs.xernerx.com')}>
-						<Button variant="secondary" className="gap-2">
-							<BookOpen className="w-4 h-4 text-(--accent)" />
-							{t('app.portal.workspace.openDocsBtn')}
-						</Button>
+					<Link href={getEnvUrl('https://docs.xernerx.com')} className={portalButtonLinkClass('secondary', 'md', 'gap-2')}>
+						<BookOpen className="w-4 h-4 text-(--accent)" />
+						{t('app.portal.workspace.openDocsBtn')}
 					</Link>
 					{userId && (
-						<Link href={getEnvUrl(`https://app.xernerx.com/users/${userId}`)}>
-							<Button variant="secondary" className="gap-2">
-								<ExternalLink className="w-4 h-4" />
-								{t('app.portal.workspace.viewPublicProfile')}
-							</Button>
+						<Link href={getEnvUrl(`https://app.xernerx.com/users/${userId}`)} className={portalButtonLinkClass('secondary', 'md', 'gap-2')}>
+							<ExternalLink className="w-4 h-4" />
+							{t('app.portal.workspace.viewPublicProfile')}
 						</Link>
 					)}
 				</div>
@@ -215,27 +202,21 @@ export default function PersonalWorkspace({ session, bots, organizations, guilds
 				{guilds.length > 0 ? (
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 						{guilds.map((guild) => {
-							const iconUrl = guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=128` : null;
+							const iconUrl = resolveGuildIconUrl(guild, 128);
 							return (
 								<div
 									key={guild.id}
 									className="flex flex-col justify-between gap-4 p-4 rounded-2xl bg-(--background)/50 hover:bg-(--background)/80 border border-(--border)/10 hover:border-(--accent)/35 transition-all"
 								>
 									<div className="flex items-center gap-3 min-w-0">
-										{iconUrl ? (
-											<Image
-												src={iconUrl}
-												alt={guild.name}
-												width={44}
-												height={44}
-												unoptimized
-												className="w-11 h-11 rounded-2xl object-cover border border-(--border)/15 shrink-0"
-											/>
-										) : (
-											<div className="w-11 h-11 rounded-2xl bg-(--foreground) border border-(--border)/15 flex items-center justify-center font-bold text-(--text-muted) shrink-0">
-												{String(guild.name || 'S').charAt(0)}
-											</div>
-										)}
+										<PortalSafeAvatar
+											src={iconUrl}
+											alt={guild.name || 'Server'}
+											fallbackKind="initial"
+											initial={String(guild.name || 'S')}
+											className="w-11 h-11 rounded-2xl object-cover border border-(--border)/15 shrink-0"
+											fallbackClassName="w-11 h-11 rounded-2xl bg-(--foreground) border border-(--border)/15 flex items-center justify-center font-bold text-(--text-muted) shrink-0"
+										/>
 										<div className="min-w-0 flex-1">
 											<div className="font-bold text-sm text-(--text) truncate" style={{ fontFamily: 'var(--font-fredoka)' }}>
 												{guild.name}
@@ -245,17 +226,19 @@ export default function PersonalWorkspace({ session, bots, organizations, guilds
 									</div>
 
 									<div className="flex items-center gap-2 pt-2 border-t border-(--border)/10">
-										<Link href={getEnvUrl(`https://app.xernerx.com/dashboard?guild=${encodeURIComponent(guild.id)}`)} className="flex-1">
-											<Button variant="primary" className="w-full justify-center text-xs gap-1.5">
-												<Settings className="w-3.5 h-3.5" />
-												{t('app.portal.workspace.manageInDashboard')}
-											</Button>
+										<Link
+											href={getEnvUrl(`https://app.xernerx.com/dashboard?guild=${encodeURIComponent(guild.id)}`)}
+											className={portalButtonLinkClass('primary', 'md', 'flex-1 justify-center text-xs gap-1.5')}
+										>
+											<Settings className="w-3.5 h-3.5" />
+											{t('app.portal.workspace.manageInDashboard')}
 										</Link>
-										<Link href={getEnvUrl(`https://app.xernerx.com/servers/${encodeURIComponent(guild.id)}`)}>
-											<Button variant="secondary" className="text-xs gap-1.5">
-												<ExternalLink className="w-3.5 h-3.5" />
-												{t('app.portal.workspace.viewServerListing')}
-											</Button>
+										<Link
+											href={getEnvUrl(`https://app.xernerx.com/servers/${encodeURIComponent(guild.id)}`)}
+											className={portalButtonLinkClass('secondary', 'md', 'text-xs gap-1.5')}
+										>
+											<ExternalLink className="w-3.5 h-3.5" />
+											{t('app.portal.workspace.viewServerListing')}
 										</Link>
 									</div>
 								</div>

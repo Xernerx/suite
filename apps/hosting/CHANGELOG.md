@@ -2,6 +2,62 @@
 
 # Changelog
 
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
+## 1.4.0
+
+### Minor Changes
+
+- ## Staff Error Logs Console & Health Probe Cleanup
+  
+  Added a dedicated error log viewer to the staff hosting portal and simplified node reachability timeouts.
+  
+  ### Added
+  
+  - **Error Logs View**: Added `/errors` with the interactive `HostingErrorLogsPanel` for inspecting and filtering suite runtime error logs across services.
+  
+  ### Changed
+  
+  - **Node Reachability Probes**: Replaced manual `AbortController` timers in `HostingConsole` with `AbortSignal.timeout()`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
+## 1.3.16
+
+### Patch Changes
+
+- ## Hosting Console Shimmer Skeletons
+  
+  Added loading skeletons during initial cluster and Vercel deployment hydration in the staff Hosting console.
+  
+  ### Added
+  
+  - **Hosting Skeleton (`HostingSkeleton`)**: Replaced blank loading states with glassmorphic shimmer skeletons across the Hosting console and Vercel panel.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 1.3.15
 
 ### Patch Changes

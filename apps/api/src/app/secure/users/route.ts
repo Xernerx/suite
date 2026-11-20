@@ -1,146 +1,8 @@
 /** @format */
 
-import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-
-const SIGN_IN_BONUS_AMOUNT = 1000;
-
-async function reconcileVirtueAndOrphanUsers(xernerxDb: any) {
-	try {
-		const UserModel = xernerxDb.models.users?.User;
-		const LevelModel = xernerxDb.models.users?.Level;
-		const CreditModel = xernerxDb.models.users?.Credit;
-		const SettingModel = xernerxDb.models.core?.Setting;
-		if (!UserModel) return;
-
-		const virtueDb = await database('virtue').catch(() => null);
-		const VUser = (virtueDb?.models?.profiles as any)?.User;
-		const LLevel = (virtueDb?.models?.levels as any)?.Level;
-		const LText = (virtueDb?.models?.levels as any)?.Text;
-		const LVoice = (virtueDb?.models?.levels as any)?.Voice;
-		const PLevel = (virtueDb?.models?.profiles as any)?.Level;
-		const PText = (virtueDb?.models?.profiles as any)?.Text;
-		const PVoice = (virtueDb?.models?.profiles as any)?.Voice;
-
-		const [existingUserIds, optOutUserDocs, existingCreditOwnerIds, existingLevelOwnerIds, vUserIds, optOutVUserDocs, lLevelIds, lTextIds, lVoiceIds, pLevelIds, pTextIds, pVoiceIds] =
-			await Promise.all([
-				UserModel.distinct('id').catch(() => []),
-				UserModel.find({ $or: [{ services: false }, { blacklisted: true }] })
-					.select('id')
-					.lean()
-					.catch(() => []),
-				CreditModel ? CreditModel.distinct('ownerId').catch(() => []) : Promise.resolve([]),
-				LevelModel ? LevelModel.distinct('ownerId').catch(() => []) : Promise.resolve([]),
-				VUser ? VUser.distinct('id').catch(() => []) : Promise.resolve([]),
-				VUser
-					? VUser.find({ $or: [{ services: false }, { blacklisted: true }] })
-							.select('id')
-							.lean()
-							.catch(() => [])
-					: Promise.resolve([]),
-				LLevel ? LLevel.distinct('id').catch(() => []) : Promise.resolve([]),
-				LText ? LText.distinct('id').catch(() => []) : Promise.resolve([]),
-				LVoice ? LVoice.distinct('id').catch(() => []) : Promise.resolve([]),
-				PLevel ? PLevel.distinct('id').catch(() => []) : Promise.resolve([]),
-				PText ? PText.distinct('id').catch(() => []) : Promise.resolve([]),
-				PVoice ? PVoice.distinct('id').catch(() => []) : Promise.resolve([]),
-			]);
-
-		const existingUserSet = new Set((existingUserIds || []).map((id: any) => String(id)));
-		const existingCreditSet = new Set((existingCreditOwnerIds || []).map((id: any) => String(id)));
-		const existingLevelSet = new Set((existingLevelOwnerIds || []).map((id: any) => String(id)));
-		const optOutSet = new Set([...(optOutUserDocs || []).map((d: any) => String(d?.id || '')), ...(optOutVUserDocs || []).map((d: any) => String(d?.id || ''))]);
-
-		const candidateIds = new Set<string>();
-		for (const list of [existingUserIds, existingCreditOwnerIds, existingLevelOwnerIds, vUserIds, lLevelIds, lTextIds, lVoiceIds, pLevelIds, pTextIds, pVoiceIds]) {
-			for (const rawId of list || []) {
-				const uid = String(rawId || '').trim();
-				if (/^\d{15,22}$/.test(uid) && !optOutSet.has(uid)) {
-					candidateIds.add(uid);
-				}
-			}
-		}
-
-		const missingUsers: string[] = [];
-		const missingCredits: string[] = [];
-		const missingLevels: string[] = [];
-
-		for (const uid of candidateIds) {
-			if (!existingUserSet.has(uid)) missingUsers.push(uid);
-			if (!existingCreditSet.has(uid)) missingCredits.push(uid);
-			if (!existingLevelSet.has(uid)) missingLevels.push(uid);
-		}
-
-		if (missingUsers.length === 0 && missingCredits.length === 0 && missingLevels.length === 0) {
-			return;
-		}
-
-		let candidateRoles: string[] = [];
-		if (SettingModel) {
-			const joinRolesSetting = await SettingModel.findOne({ id: 'join_roles' })
-				.lean()
-				.catch(() => null);
-			if (joinRolesSetting?.value) {
-				try {
-					const parsed = JSON.parse(joinRolesSetting.value);
-					if (Array.isArray(parsed)) {
-						candidateRoles = Array.from(new Set(parsed.filter((r): r is string => typeof r === 'string' && r.trim().length > 0)));
-					}
-				} catch {}
-			}
-		}
-
-		const RoleModel = xernerxDb.models.core?.Role;
-		let defaultRoles: string[] = [];
-		if (RoleModel && candidateRoles.length > 0) {
-			const existingRoleDocs = await RoleModel.find({ id: { $in: candidateRoles } })
-				.select('id')
-				.lean()
-				.catch(() => []);
-			defaultRoles = (existingRoleDocs || []).map((r: any) => String(r.id)).filter(Boolean);
-		}
-
-		await Promise.all([
-			...missingUsers.map((uid) =>
-				UserModel.create({
-					id: uid,
-					roles: defaultRoles,
-				}).catch(() => {})
-			),
-			...(CreditModel
-				? missingCredits.map((uid) =>
-						CreditModel.create({
-							ownerId: uid,
-							balance: SIGN_IN_BONUS_AMOUNT,
-							signInBonusClaimed: true,
-							transactions: [
-								{
-									id: crypto.randomUUID(),
-									type: 'earn',
-									amount: SIGN_IN_BONUS_AMOUNT,
-									multiplierPercent: 100,
-									itemId: 'signin_bonus',
-									itemName: 'Welcome Sign-In Bonus',
-									createdAt: new Date(),
-								},
-							],
-						}).catch(() => {})
-					)
-				: []),
-			...(LevelModel
-				? missingLevels.map((uid) =>
-						LevelModel.create({
-							id: crypto.randomUUID(),
-							ownerId: uid,
-							level: 1,
-							xp: 0,
-						}).catch(() => {})
-					)
-				: []),
-		]);
-	} catch {}
-}
+import { reconcileBotAndOrphanUsers, type UserBotProfileSummary } from '@/lib/botEntityReconciliation';
 
 export async function GET(req: Request) {
 	try {
@@ -150,8 +12,9 @@ export async function GET(req: Request) {
 		const db = xernerxDb.models.users as any;
 
 		const isPublicOnly = privacy === 'public' || url.searchParams.get('public') === 'true';
+		let botSummaryMap = new Map<string, UserBotProfileSummary>();
 		if (!isPublicOnly) {
-			await reconcileVirtueAndOrphanUsers(xernerxDb);
+			botSummaryMap = await reconcileBotAndOrphanUsers(xernerxDb);
 		}
 
 		const query: Record<string, any> = {};
@@ -212,26 +75,34 @@ export async function GET(req: Request) {
 			}
 		}
 
-		const normalized = users.map((u: any) => ({
-			...u,
-			verified: Boolean(u.verified || (u.agreedTerms && u.agreedPrivacy)),
-			blacklisted: Boolean(u.blacklisted),
-			shadowban: Boolean(u.shadowban),
-			services: u.services !== false,
-			discord: u.discordCache?.username ? u.discordCache : undefined,
-			onboarding: u.onboarding || {
-				persona: 'user',
-				suiteIntroCompleted: false,
-				dashboardTourCompleted: false,
-				supportPromptCompleted: false,
-				tourPostponed: false,
-				tourPostponedPhase: null,
-				completedAt: null,
-				onboardedBots: [],
-			},
-			level: levelMap.get(String(u.id)) || { level: 1, xp: 0 },
-			credits: creditMap.get(String(u.id)) || { balance: 0, streak: 0 },
-		}));
+		const normalized = users.map((u: any) => {
+			const uid = String(u.id);
+			return {
+				...u,
+				verified: Boolean(u.verified || (u.agreedTerms && u.agreedPrivacy)),
+				blacklisted: Boolean(u.blacklisted),
+				shadowban: Boolean(u.shadowban),
+				services: u.services !== false,
+				discord: u.discordCache?.username ? u.discordCache : undefined,
+				onboarding: u.onboarding || {
+					persona: 'user',
+					suiteIntroCompleted: false,
+					dashboardTourCompleted: false,
+					supportPromptCompleted: false,
+					tourPostponed: false,
+					tourPostponedPhase: null,
+					completedAt: null,
+					onboardedBots: [],
+				},
+				level: levelMap.get(uid) || { level: 1, xp: 0 },
+				credits: creditMap.get(uid) || { balance: 0, streak: 0 },
+				...(!isPublicOnly
+					? {
+							botProfiles: botSummaryMap.get(uid) || { bots: [], serverCount: 0 },
+						}
+					: {}),
+			};
+		});
 
 		return NextResponse.json(normalized, { status: 200 });
 	} catch (error) {

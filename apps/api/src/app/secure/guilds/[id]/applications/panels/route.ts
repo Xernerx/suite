@@ -3,7 +3,7 @@
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-import { publishDiscordApplyPanel } from '@/lib/yourappsDiscord';
+import { publishDiscordApplyPanel, publishDiscordNativePoll, syncGuildApplyPanels } from '@/lib/yourappsDiscord';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -18,32 +18,53 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 		}
 
 		const channelId = String(body?.channelId || '').trim();
-		const positionIds = Array.isArray(body?.positionIds) ? body.positionIds.map(String).filter(Boolean) : [];
 		if (!channelId) {
 			return NextResponse.json({ error: 'Target channel is required.' }, { status: 400 });
 		}
 
-		const query: Record<string, any> = { guild: id };
-		if (positionIds.length > 0) {
-			query.id = { $in: positionIds };
-		} else {
-			query.state = 'open';
+		if (body?.mode === 'poll') {
+			const question = String(body?.question || '').trim();
+			const options: string[] = Array.isArray(body?.options) ? body.options.map((o: any) => String(o || '').trim()).filter(Boolean) : [];
+			const durationHours = Math.max(1, Math.min(168, Number(body?.durationHours) || 48));
+			const allowMultiselect = Boolean(body?.allowMultiselect);
+
+			const publishedPoll = await publishDiscordNativePoll({
+				channelId,
+				question,
+				options,
+				durationHours,
+				allowMultiselect,
+			});
+
+			if (!publishedPoll.ok) {
+				return NextResponse.json({ error: publishedPoll.error || 'Failed to publish native Discord poll.' }, { status: 400 });
+			}
+
+			return NextResponse.json({ ok: true, messageId: publishedPoll.messageId }, { status: 201 });
 		}
 
-		const positions = await FormModel.find(query).sort({ createdAt: 1 }).lean();
+		const positionIds = Array.isArray(body?.positionIds) ? body.positionIds.map(String).filter(Boolean) : [];
+		const allGuildPositions = await FormModel.find({ guild: id }).sort({ createdAt: 1 }).lean();
+		let positions = positionIds.length > 0 ? allGuildPositions.filter((p: any) => positionIds.includes(String(p.id))) : allGuildPositions.filter((p: any) => p.state === 'open');
+
+		if (positionIds.length === 0 && positions.length === 0 && allGuildPositions.length > 0) {
+			positions = allGuildPositions;
+		}
+
 		if (!positions || positions.length === 0) {
-			return NextResponse.json({ error: 'No matching positions found to include on the panel.' }, { status: 400 });
+			return NextResponse.json({ error: 'Create at least one position before publishing an Apply Panel.' }, { status: 400 });
 		}
 
 		const title = String(body?.title || 'Server Applications')
 			.trim()
 			.slice(0, 256);
-		const description = String(body?.description || 'Select a position below to fill out and submit your application directly inside Discord.')
+		const description = String(body?.description || 'Select a position below to fill out and submit your application directly inside Discord or on the web.')
 			.trim()
 			.slice(0, 2000);
 		const buttonLabel = String(body?.buttonLabel || (positions.length === 1 ? `Apply for ${positions[0].name}` : 'Select a position to apply...'))
 			.trim()
 			.slice(0, 80);
+		const autoSync = body?.autoSync !== false;
 
 		const published = await publishDiscordApplyPanel({
 			guildId: id,
@@ -65,19 +86,44 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 			title,
 			description,
 			buttonLabel,
-			positionIds: positions.map((p: any) => String(p.id)),
+			positionIds: positionIds.length > 0 ? positions.map((p: any) => String(p.id)) : [],
+			autoSync,
 			createdAt: new Date(),
+			updatedAt: new Date(),
 		};
+
+		const existingProfile: any = await ProfileModel.findOne({ id }).select('panels').lean();
+		const existingPanels = Array.isArray(existingProfile?.panels) ? existingProfile.panels : [];
+		const nextPanels = [...existingPanels, panelEntry].slice(-20);
 
 		await ProfileModel.findOneAndUpdate(
 			{ id },
 			{
-				$set: { panelChannel: channelId },
-				$push: { panels: { $each: [panelEntry], $slice: -20 } },
-			}
+				$set: {
+					panelChannel: channelId,
+					panels: nextPanels,
+				},
+			},
+			{ upsert: true, setDefaultsOnInsert: true }
 		);
 
 		return NextResponse.json({ ok: true, panel: panelEntry }, { status: 201 });
+	} catch (error: unknown) {
+		return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+	}
+}
+
+export async function PUT(_: Request, { params }: { params: Promise<{ id: string }> }) {
+	try {
+		const { id } = await params;
+		const syncRes = await syncGuildApplyPanels(id);
+		const db = await database('yourapps');
+		const ProfileModel = (db.models.guilds as any)?.Profile;
+		const profile: any = ProfileModel ? await ProfileModel.findOne({ id }).select('panels').lean() : null;
+		if (!syncRes.ok && syncRes.error) {
+			return NextResponse.json({ error: syncRes.error, panels: profile?.panels || [] }, { status: 400 });
+		}
+		return NextResponse.json({ ok: true, panels: profile?.panels || [] }, { status: 200 });
 	} catch (error: unknown) {
 		return NextResponse.json({ error: (error as Error).message }, { status: 500 });
 	}

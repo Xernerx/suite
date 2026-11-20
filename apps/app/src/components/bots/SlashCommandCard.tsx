@@ -118,12 +118,12 @@ export function SlashCommandCard({
 							<h2 className="text-lg font-extrabold font-mono text-(--text) truncate">/{cmd.name}</h2>
 							{subcommands.length > 0 ? (
 								<span className="px-2.5 py-0.5 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-[11px] font-bold text-(--accent)">
-									{t('app.bots.commands.subcommandsCount', { count: subcommands.length })}
+									{subcommands.length === 1 ? t('app.bots.commands.subcommandCountSingular', { count: 1 }) : t('app.bots.commands.subcommandsCount', { count: subcommands.length })}
 								</span>
 							) : (
 								parameters.length > 0 && (
 									<span className="px-2.5 py-0.5 rounded-full bg-(--background)/70 border border-(--border)/10 text-[11px] font-bold text-(--text-muted)">
-										{t('app.bots.commands.optionsCount', { count: parameters.length })}
+										{parameters.length === 1 ? t('app.bots.commands.optionCountSingular', { count: 1 }) : t('app.bots.commands.optionsCount', { count: parameters.length })}
 									</span>
 								)
 							)}
@@ -278,7 +278,10 @@ export function SlashCommandCard({
 												)}
 												{choices.length > 0 && (
 													<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent) text-[10px] font-bold">
-														<ListFilter size={10} /> {t('app.bots.commands.choicesBadge', { count: choices.length })}
+														<ListFilter size={10} />{' '}
+														{choices.length === 1
+															? t('app.bots.commands.choiceBadgeSingular', { count: 1 })
+															: t('app.bots.commands.choicesBadge', { count: choices.length })}
 													</span>
 												)}
 											</div>

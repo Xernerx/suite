@@ -5,22 +5,22 @@ import { put } from '@vercel/blob';
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
-import { getCdnCorsHeaders } from '@/lib/cors';
+import { getCdnCorsHeaders, resolveCdnBaseUrl } from '@/lib/cors';
 
-function getCorsHeaders(origin: string | null) {
-	return getCdnCorsHeaders(origin, 'GET, POST, PUT, DELETE, OPTIONS', 'Content-Type, Authorization, x-upload-name');
+function getCorsHeaders(req: Request) {
+	return getCdnCorsHeaders(req.headers.get('origin'), 'GET, POST, PUT, DELETE, OPTIONS', 'Content-Type, Authorization, Cookie, x-upload-name', req.headers.get('access-control-request-headers'));
 }
 
 export async function OPTIONS(req: Request) {
 	return new Response(null, {
 		status: 204,
-		headers: getCorsHeaders(req.headers.get('origin')),
+		headers: getCorsHeaders(req),
 	});
 }
 
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
 	const origin = req.headers.get('origin');
-	const corsHeaders = getCorsHeaders(origin);
+	const corsHeaders = getCorsHeaders(req);
 
 	try {
 		const session = await getServerSession(auth);
@@ -149,9 +149,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 			tags,
 		});
 
-		const domain = process.env.DOMAIN || 'xernerx.com';
-		const isDev = process.env.ENVIRONMENT === 'DEVELOPMENT';
-		const baseUrl = isDev ? `https://cdn.dev.${domain}` : `https://cdn.${domain}`;
+		const baseUrl = resolveCdnBaseUrl(req);
 
 		return NextResponse.json(
 			{

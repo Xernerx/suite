@@ -23,6 +23,7 @@ import CoreAuditLogSchema from './models/xernerx/core/AuditLog';
 import CoreSupportChannelSchema from './models/xernerx/core/SupportChannel';
 import CoreSupportBotSchema from './models/xernerx/core/SupportBot';
 import CoreSupportTicketSchema from './models/xernerx/core/SupportTicket';
+import CoreErrorLogSchema from './models/xernerx/core/ErrorLog';
 
 import StoreCategorySchema from './models/xernerx/store/Category';
 import StoreItemSchema from './models/xernerx/store/Item';
@@ -44,8 +45,10 @@ import OrgProfileSchema from './models/xernerx/organizations/Profile';
 import OrgRoleSchema from './models/xernerx/organizations/Role';
 
 import UserAppearanceSchema from './models/xernerx/users/Appearance';
+import UserAuthApprovalRequestSchema from './models/xernerx/users/AuthApprovalRequest';
 import UserCreditSchema from './models/xernerx/users/Credit';
 import UserLevelSchema from './models/xernerx/users/Level';
+import UserMobileSessionSchema from './models/xernerx/users/MobileSession';
 import UserProfileSchema from './models/xernerx/users/Profile';
 import UserSubscriptionSchema from './models/xernerx/users/Subscription';
 import UserTokenSchema from './models/xernerx/users/Token';
@@ -75,6 +78,7 @@ export const xernerxModels = {
 		SupportChannel: { schema: CoreSupportChannelSchema, modelName: 'SupportChannel', collection: 'support_channels' },
 		SupportBot: { schema: CoreSupportBotSchema, modelName: 'SupportBot', collection: 'support_bots' },
 		SupportTicket: { schema: CoreSupportTicketSchema, modelName: 'SupportTicket', collection: 'support_tickets' },
+		ErrorLog: { schema: CoreErrorLogSchema, modelName: 'ErrorLog', collection: 'error_logs' },
 	},
 	store: {
 		Category: { schema: StoreCategorySchema, modelName: 'Category', collection: 'categories' },
@@ -101,8 +105,10 @@ export const xernerxModels = {
 	},
 	users: {
 		Appearance: { schema: UserAppearanceSchema, modelName: 'Appearance' },
+		AuthApprovalRequest: { schema: UserAuthApprovalRequestSchema, modelName: 'AuthApprovalRequest', collection: 'auth_approval_requests' },
 		Credit: { schema: UserCreditSchema, modelName: 'Credit' },
 		Level: { schema: UserLevelSchema, modelName: 'Level' },
+		MobileSession: { schema: UserMobileSessionSchema, modelName: 'MobileSession', collection: 'mobile_sessions' },
 		User: { schema: UserProfileSchema, modelName: 'User', collection: 'profiles' },
 		Subscription: { schema: UserSubscriptionSchema, modelName: 'Subscription' },
 		Token: { schema: UserTokenSchema, modelName: 'Token' },

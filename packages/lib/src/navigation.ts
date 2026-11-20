@@ -1,6 +1,30 @@
 /** @format */
 
-import { BookOpen, Cloud, FileCode2, Globe, LayoutDashboard, Newspaper, Server, ShieldAlert, Terminal, UserCircle, Compass, Building2, LifeBuoy, Store } from 'lucide-react';
+import React from 'react';
+import { BookOpen, Cloud, FileCode2, Gauge, Globe, Newspaper, Server, ShieldAlert, Terminal, UserCircle, Compass, Building2, LifeBuoy, Store } from 'lucide-react';
+
+export function BungieTricornIcon({ size = 24, strokeWidth = 2, className, ...props }: React.SVGProps<SVGSVGElement> & { size?: number | string; strokeWidth?: number | string }) {
+	return React.createElement(
+		'svg',
+		{
+			xmlns: 'http://www.w3.org/2000/svg',
+			width: size,
+			height: size,
+			viewBox: '0 0 24 24',
+			fill: 'none',
+			stroke: 'currentColor',
+			strokeWidth,
+			strokeLinecap: 'round',
+			strokeLinejoin: 'round',
+			className,
+			...props,
+		},
+		React.createElement('rect', { width: '4.096', height: '7.51', x: '9.952', y: '4.382', rx: '2.048' }),
+		React.createElement('path', {
+			d: 'M10.449 5.105a12.85 12.85 0 0 1-3.273-1.247c-.097-.068-.437-.248-.437-.248a2.811 2.811 0 0 0-2.775 4.865c2.714 2.048 5.22 5.692 5.22 9.362a2.816 2.816 0 0 0 5.632 0c0-3.67 2.506-7.314 5.22-9.361a2.81 2.81 0 0 0-2.775-4.866s-.34.18-.437.247a12.85 12.85 0 0 1-3.273 1.247',
+		})
+	);
+}
 
 export type NavigationItem = {
 	label: string;
@@ -14,7 +38,7 @@ export type NavigationItem = {
 export const navigation: NavigationItem[] = [
 	// User
 	{ label: 'lib.navigation.items.explore', href: 'https://app.xernerx.com', icon: Compass, category: 'lib.navigation.categories.user' },
-	{ label: 'lib.navigation.items.dashboard', href: 'https://app.xernerx.com/dashboard', icon: LayoutDashboard, category: 'lib.navigation.categories.user' },
+	{ label: 'lib.navigation.items.dashboard', href: 'https://app.xernerx.com/dashboard', icon: Gauge, category: 'lib.navigation.categories.user' },
 	{ label: 'lib.navigation.items.account', href: 'https://account.xernerx.com', icon: UserCircle, category: 'lib.navigation.categories.user' },
 	{ label: 'lib.navigation.items.store', href: 'https://store.xernerx.com', icon: Store, category: 'lib.navigation.categories.user' },
 
@@ -47,7 +71,7 @@ export type HeaderSubdomainItem = {
 
 export const headerSubdomainsCatalog: HeaderSubdomainItem[] = [
 	{ id: 'app', label: 'lib.navigation.items.explore', host: 'app.xernerx.com', href: 'https://app.xernerx.com', icon: Compass },
-	{ id: 'dashboard', label: 'lib.navigation.items.dashboard', host: 'app.xernerx.com/dashboard', href: 'https://app.xernerx.com/dashboard', icon: LayoutDashboard },
+	{ id: 'dashboard', label: 'lib.navigation.items.dashboard', host: 'app.xernerx.com/dashboard', href: 'https://app.xernerx.com/dashboard', icon: Gauge },
 	{ id: 'portal', label: 'lib.navigation.items.portal', host: 'portal.xernerx.com', href: 'https://portal.xernerx.com', icon: Building2 },
 	{ id: 'store', label: 'lib.navigation.items.store', host: 'store.xernerx.com', href: 'https://store.xernerx.com', icon: Store },
 	{ id: 'account', label: 'lib.navigation.items.account', host: 'account.xernerx.com', href: 'https://account.xernerx.com', icon: UserCircle },

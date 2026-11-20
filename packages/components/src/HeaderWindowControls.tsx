@@ -63,6 +63,7 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 	const { t } = useDictionary();
 	const [maximized, setMaximized] = useState(false);
 	const [dockedSide, setDockedSide] = useState<'left' | 'right' | null>(null);
+	const [hasBridge, setHasBridge] = useState(false);
 
 	async function toggleMaximize() {
 		const electron = (window as any).electron;
@@ -81,6 +82,9 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 
 	useEffect(() => {
 		const electronBridge = (window as any).electron;
+		const validBridge = Boolean(electronBridge && (electronBridge.isXernerxDesktop || typeof electronBridge.minimize === 'function' || typeof electronBridge.close === 'function'));
+		setHasBridge(validBridge);
+		if (!validBridge) return;
 		electronBridge?.isMaximized?.()?.then?.((val: boolean) => setMaximized(Boolean(val)));
 		electronBridge?.getDockedState?.()?.then?.((st: any) => {
 			if (st && typeof st === 'object') setDockedSide(st.side || null);
@@ -93,6 +97,8 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 		};
 	}, []);
 
+	if (!isApp && !hasBridge) return null;
+
 	const dockTitle = dockedSide ? t('account.preferences.desktop.dockRestore') : t('account.preferences.desktop.dockToggle');
 	const DockIcon = dockedSide === 'left' ? PanelLeft : dockedSide === 'right' ? PanelRight : Columns2;
 	const isGlassPill = effectiveControls === 'xernerx' || effectiveControls === 'capsule' || effectiveControls === 'squircle';
@@ -101,7 +107,7 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 
 	return (
 		<div
-			className={`${isApp ? 'flex' : 'hidden [.is-electron_&]:flex'} group/controls items-center ${
+			className={`flex group/controls items-center ${
 				effectiveControls === 'windows' ? 'gap-4' : effectiveControls === 'capsule' ? 'gap-1 rounded-full bg-(--foreground)/50 border border-(--border)/15 px-1.5 py-0.5' : 'gap-2'
 			}`}
 		>

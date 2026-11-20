@@ -19,6 +19,7 @@ jobs:
               with:
                   ref: canary
                   fetch-depth: 0
+                  token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
 
             - name: Setup Git Identity
               run: |

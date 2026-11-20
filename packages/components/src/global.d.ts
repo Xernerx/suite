@@ -7,6 +7,7 @@ export {};
 declare global {
 	interface Window {
 		electron?: {
+			isXernerxDesktop?: boolean;
 			minimize: () => void;
 			maximize: () => void;
 			close: () => void;

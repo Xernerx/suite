@@ -54,14 +54,11 @@ export function compareSemver(a?: string | null, b?: string | null): number {
 async function fetchRemoteVersion(url: string, timeoutMs = 6000): Promise<{ version: string | null; latencyMs: number | null }> {
 	const start = Date.now();
 	try {
-		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), timeoutMs);
 		const res = await fetch(url, {
 			headers: FETCH_HEADERS,
-			signal: controller.signal,
+			signal: AbortSignal.timeout(timeoutMs),
 			cache: 'no-store',
 		});
-		clearTimeout(timeout);
 		const latencyMs = Date.now() - start;
 		if (!res.ok) return { version: null, latencyMs: null };
 		const data = await res.json();
@@ -76,14 +73,11 @@ async function fetchRemoteVersion(url: string, timeoutMs = 6000): Promise<{ vers
 
 async function fetchRemoteChangelogVersions(url: string, timeoutMs = 5000): Promise<string[]> {
 	try {
-		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), timeoutMs);
 		const res = await fetch(url, {
 			headers: FETCH_HEADERS,
-			signal: controller.signal,
+			signal: AbortSignal.timeout(timeoutMs),
 			cache: 'no-store',
 		});
-		clearTimeout(timeout);
 		if (!res.ok) return [];
 		const data = await res.json();
 		if (Array.isArray(data?.versions)) {

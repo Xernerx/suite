@@ -53,8 +53,20 @@ export function pruneOldBuckets(map: Record<string, Record<string, { status: str
 	}
 }
 
-export async function recordAndGetStatusHistory(options?: { forceRefresh?: boolean }) {
+export function formatServiceDomainForEnv(appId: string, defaultDomain: string, targetEnv?: 'dev' | 'canary' | 'public'): string {
+	const baseDomain = (process.env.DOMAIN || 'xernerx.com').toLowerCase();
+	if (targetEnv === 'dev') {
+		return appId === 'www' ? `www.dev.${baseDomain}` : `${appId}.dev.${baseDomain}`;
+	}
+	if (targetEnv === 'canary') {
+		return appId === 'www' ? `www.canary.${baseDomain}` : `${appId}.canary.${baseDomain}`;
+	}
+	return defaultDomain;
+}
+
+export async function recordAndGetStatusHistory(options?: { forceRefresh?: boolean; targetEnv?: 'dev' | 'canary' | 'public' }) {
 	const forceRefresh = Boolean(options?.forceRefresh);
+	const targetEnv = options?.targetEnv;
 	const { models } = await database('xernerx');
 	const SettingModel = (models.core as any).Setting;
 	const BotModel = (models.bots as any).Bot;
@@ -104,15 +116,27 @@ export async function recordAndGetStatusHistory(options?: { forceRefresh?: boole
 		const existingKeys = Object.keys(existingSeries).sort((a, b) => Number(b) - Number(a));
 		const latestStored = existingKeys.length > 0 ? existingSeries[existingKeys[0]] : null;
 
-		const ping = info ? (info.devLatencyMs ?? info.prodLatencyMs ?? info.canaryLatencyMs ?? latestStored?.ping ?? null) : (latestStored?.ping ?? null);
-		const version = info ? (info.localVersion ?? info.devVersion ?? info.prodVersion ?? info.canaryVersion ?? null) : null;
+		const ping = info
+			? targetEnv === 'dev'
+				? (info.devLatencyMs ?? info.canaryLatencyMs ?? info.prodLatencyMs ?? latestStored?.ping ?? null)
+				: targetEnv === 'canary'
+					? (info.canaryLatencyMs ?? info.prodLatencyMs ?? info.devLatencyMs ?? latestStored?.ping ?? null)
+					: (info.prodLatencyMs ?? info.canaryLatencyMs ?? info.devLatencyMs ?? latestStored?.ping ?? null)
+			: (latestStored?.ping ?? null);
+		const version = info
+			? targetEnv === 'dev'
+				? (info.devVersion ?? info.localVersion ?? info.canaryVersion ?? info.prodVersion ?? null)
+				: targetEnv === 'canary'
+					? (info.canaryVersion ?? info.prodVersion ?? info.localVersion ?? null)
+					: (info.prodVersion ?? info.localVersion ?? info.canaryVersion ?? null)
+			: null;
 		const isUp = Boolean(version || (latestStored?.status && latestStored.status !== 'down') || daemonRecordedBuckets.size > 0);
 		const status: 'operational' | 'degraded' | 'down' = !isUp ? 'down' : ping && ping > 1200 ? 'degraded' : 'operational';
 
 		liveServices[app.id] = {
 			id: app.id,
 			name: app.name,
-			domain: app.domain,
+			domain: formatServiceDomainForEnv(app.id, app.domain, targetEnv),
 			status,
 			version,
 			ping,

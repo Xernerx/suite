@@ -79,7 +79,7 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 
 	const isDirty = token
 		? name !== token.name ||
-			[...owners].sort().join(',') !== [...(token.owners || [])].sort().join(',') ||
+			owners.toSorted().join(',') !== (token.owners || []).toSorted().join(',') ||
 			status !== token.status ||
 			ttlOption !== initialTtlOption ||
 			normalizedAllowedIps.join(',') !== originalAllowedIps.join(',')

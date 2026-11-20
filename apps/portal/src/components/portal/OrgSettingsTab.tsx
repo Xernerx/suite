@@ -133,7 +133,9 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, onVanityUnlock
 					</div>
 					<div className="flex flex-wrap items-center gap-2 text-xs text-(--text-muted)">
 						<span>{t('app.portal.settings.vanitySlugDesc')}</span>
-						<span className="font-mono text-(--accent)">app.xernerx.com/organization/{orgConfig.vanitySlug || orgConfig._id}</span>
+						<span className="font-mono text-(--accent)">
+							{getEnvUrl('https://app.xernerx.com').replace(/^https?:\/\//, '')}/organization/{orgConfig.vanitySlug || orgConfig._id}
+						</span>
 						<button
 							type="button"
 							onClick={handleCopyVanityUrl}

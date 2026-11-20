@@ -257,7 +257,7 @@ export default function RoadmapPage() {
 				</div>
 
 				<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
-					<div className="w-full sm:w-72 xl:w-80">
+					<div className="w-full sm:w-96 xl:w-[26rem]">
 						<Input variant="search" shortcut={true} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('info.roadmap.searchPlaceholder')} />
 					</div>
 

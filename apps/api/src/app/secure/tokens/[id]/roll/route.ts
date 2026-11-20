@@ -2,17 +2,16 @@
 
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
-export async function POST(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
-		const session = await getServerSession(auth);
-		const userId = (session?.user as any)?.id;
+		const caller = await resolveCallerAuth(req, ['tokens']);
+		const userId = caller.userId;
 
-		if (!userId) {
+		if (!caller.authenticated || !userId) {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
@@ -25,7 +24,7 @@ export async function POST(_: NextRequest, { params }: { params: Promise<{ id: s
 		}
 
 		const owners: string[] = Array.isArray(existing.owners) ? existing.owners : [];
-		if (owners.length > 0 && !owners.includes(userId)) {
+		if (!caller.authorized && owners.length > 0 && !owners.includes(userId)) {
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 		}
 

@@ -407,7 +407,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 			)}
 			<div
 				className={`transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] shrink-0 z-[60] ${
-					isHeaderMovedOffScreen ? '-translate-y-full opacity-0 pointer-events-none max-h-0 overflow-hidden' : 'translate-y-0 opacity-100 max-h-24'
+					isHeaderMovedOffScreen ? '-translate-y-full opacity-0 pointer-events-none max-h-0 overflow-hidden' : 'translate-y-0 opacity-100 max-h-32 overflow-visible'
 				}`}
 			>
 				<Header />
@@ -432,7 +432,15 @@ export function Page({ children }: { children: React.ReactNode }) {
 					}}
 				>
 					<div className="sticky top-0 left-0 w-full h-0 overflow-visible pointer-events-none z-0">
-						<div className="relative flex flex-col items-center justify-center w-full" style={{ height: 'calc(100dvh / var(--ui-zoom, 1) - 3.5rem - env(safe-area-inset-top, 0px))' }}>
+						<div
+							className="relative flex flex-col items-center justify-center w-full transition-[height] duration-500"
+							style={{
+								height:
+									isHeaderMovedOffScreen || introStage.active
+										? 'calc(100dvh / var(--ui-zoom, 1) - env(safe-area-inset-top, 0px))'
+										: 'calc(100dvh / var(--ui-zoom, 1) - 3.5rem - env(safe-area-inset-top, 0px))',
+							}}
+						>
 							<div className="absolute inset-0 pointer-events-none">
 								<AmbientStageCanvas scene={isFixedWatermarkApp || isBatterySaverActive || isSystemIdle || privacyShieldLocked ? 'default' : uiPreferences?.ambientScene || 'default'} />
 							</div>
@@ -450,7 +458,15 @@ export function Page({ children }: { children: React.ReactNode }) {
 					</div>
 
 					<div className="sticky top-0 left-0 w-full h-0 overflow-visible pointer-events-none z-30">
-						<div className="relative w-full pointer-events-none" style={{ height: 'calc(100dvh / var(--ui-zoom, 1) - 50px - env(safe-area-inset-top, 0px))' }}>
+						<div
+							className="relative w-full pointer-events-none transition-[height] duration-500"
+							style={{
+								height:
+									isHeaderMovedOffScreen || introStage.active
+										? 'calc(100dvh / var(--ui-zoom, 1) - env(safe-area-inset-top, 0px))'
+										: 'calc(100dvh / var(--ui-zoom, 1) - 50px - env(safe-area-inset-top, 0px))',
+							}}
+						>
 							<FirstSignInOnboarding />
 						</div>
 					</div>
@@ -478,10 +494,12 @@ export function Page({ children }: { children: React.ReactNode }) {
 									className="max-w-(--page-width) mx-auto w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-(--accent)/15 border border-(--accent)/30 backdrop-blur-md text-xs text-(--text) shadow-sm"
 									style={{ marginBottom: 'var(--ui-gap)' }}
 								>
-									<div className="flex items-center gap-2 min-w-0">
+									<div className="flex items-center gap-2 min-w-0 flex-1">
 										<Megaphone size={14} className="text-(--accent) shrink-0" />
-										<span className="font-bold truncate">{activeAnnouncement.title}</span>
-										{activeAnnouncement.message?.content && <span className="text-(--text-muted) truncate hidden sm:inline">— {activeAnnouncement.message.content}</span>}
+										<span className="font-bold shrink-0 max-w-[65%] truncate">{activeAnnouncement.title}</span>
+										{activeAnnouncement.message?.content && (
+											<span className="text-(--text-muted) min-w-0 flex-1 truncate hidden sm:inline">— {activeAnnouncement.message.content}</span>
+										)}
 										{(activeAnnouncement.link || activeAnnouncement.blogSlug) && (
 											<Link
 												href={getEnvUrl(activeAnnouncement.link || `https://blog.xernerx.com/${activeAnnouncement.blogSlug}`)}

@@ -8,8 +8,9 @@ import { useDictionary, useEnvironment, useSession, useSidebar, useToast, useUse
 import { useEffect, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
+import { PortalSafeAvatar, portalButtonLinkClass } from '@/components/portal/PortalSafeAvatar';
+import { populateBotsWithFreshDiscord, resolveBotAvatarUrl } from '@/lib/portalHelpers';
 
 import GeneralTab from '@/components/portal/bot/GeneralTab';
 import CommandsTab from '@/components/portal/bot/CommandsTab';
@@ -116,13 +117,11 @@ export default function PortalBotPage() {
 						hooks: hooksData,
 					});
 					setOriginalBotConfig(
-						JSON.parse(
-							JSON.stringify({
-								...data,
-								links: data.links || {},
-								hooks: hooksData,
-							})
-						)
+						structuredClone({
+							...data,
+							links: data.links || {},
+							hooks: hooksData,
+						})
 					);
 				} else {
 					router.push('/');
@@ -154,20 +153,7 @@ export default function PortalBotPage() {
 						}
 					}
 
-					const botsWithDiscord = await Promise.all(
-						relatedBots.map(async (b: any) => {
-							if (b.discord?.username || b.discord?.global_name) return b;
-							try {
-								const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${b.id}/discord`));
-								if (res.ok) {
-									b.discord = await res.json();
-								}
-							} catch (e) {
-								console.error(`Failed to fetch discord user for ${b.id}`, e);
-							}
-							return b;
-						})
-					);
+					const botsWithDiscord = await populateBotsWithFreshDiscord(relatedBots, getEnvUrl);
 
 					const staticItems = [
 						{ label: t('app.portal.nav.explore'), href: getEnvUrl('https://app.xernerx.com'), icon: Compass as any, category: t('app.portal.categories.navigation') },
@@ -177,28 +163,29 @@ export default function PortalBotPage() {
 
 					setNavItems([
 						...staticItems,
-						...botsWithDiscord.map((b: any) => ({
-							label: b.discord?.global_name || b.discord?.username || b.name,
-							onClick: () => router.push(`/bots/${b.id}`, { scroll: false }),
-							category:
-								currentBotData.organization && currentBotData.organization !== 'null' && currentBotData.organization !== 'undefined'
-									? t('app.portal.bot.categories.orgBots')
-									: t('app.portal.bot.categories.personalBots'),
-							icon: b.discord?.avatar
-								? () => (
-										<Image
-											src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png`}
-											alt={b.name}
-											width={20}
-											height={20}
-											loading="eager"
-											unoptimized
-											className="w-5 h-5 rounded-xl object-cover"
-										/>
-									)
-								: () => <div className="w-5 h-5 rounded-xl bg-(--foreground) flex items-center justify-center text-[10px]">{(b.name || 'B').charAt(0)}</div>,
-							view: `bot-${b.id}`,
-						})),
+						...botsWithDiscord.map((b: any) => {
+							const sideAvatarUrl = resolveBotAvatarUrl(b, 64);
+							const sideLabel = b.discord?.global_name || b.discord?.username || b.name || b.id;
+							return {
+								label: sideLabel,
+								onClick: () => router.push(`/bots/${b.id}`, { scroll: false }),
+								category:
+									currentBotData.organization && currentBotData.organization !== 'null' && currentBotData.organization !== 'undefined'
+										? t('app.portal.bot.categories.orgBots')
+										: t('app.portal.bot.categories.personalBots'),
+								icon: () => (
+									<PortalSafeAvatar
+										src={sideAvatarUrl}
+										alt={sideLabel}
+										fallbackKind="initial"
+										initial={sideLabel}
+										className="w-5 h-5 rounded-xl object-cover shrink-0"
+										fallbackClassName="w-5 h-5 rounded-xl bg-(--foreground) flex items-center justify-center text-[10px] font-bold shrink-0"
+									/>
+								),
+								view: `bot-${b.id}`,
+							};
+						}),
 					]);
 				}
 			} catch (error) {
@@ -265,7 +252,7 @@ export default function PortalBotPage() {
 							window.location.reload();
 						} else {
 							setBotConfig(nextBotConfig);
-							setOriginalBotConfig(JSON.parse(JSON.stringify(nextBotConfig)));
+							setOriginalBotConfig(structuredClone(nextBotConfig));
 						}
 					} else {
 						let errorMessage = t('common.toast.saveFailed');
@@ -286,7 +273,7 @@ export default function PortalBotPage() {
 			};
 
 			const handleReset = () => {
-				setBotConfig(JSON.parse(JSON.stringify(originalBotConfig)));
+				setBotConfig(structuredClone(originalBotConfig));
 			};
 
 			remind(true, handleSave, handleReset, saving);
@@ -339,22 +326,14 @@ export default function PortalBotPage() {
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[2rem] border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8">
 					<div className="relative z-10 flex items-center gap-4">
-						{botConfig.discord?.avatar ? (
-							<Image
-								src={`https://cdn.discordapp.com/avatars/${botConfig.id}/${botConfig.discord.avatar}.png`}
-								alt={botConfig.name}
-								width={80}
-								height={80}
-								loading="eager"
-								priority
-								unoptimized
-								className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
-							/>
-						) : (
-							<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
-								<Bot className="w-8 h-8 text-(--text-muted)" />
-							</div>
-						)}
+						<PortalSafeAvatar
+							src={resolveBotAvatarUrl(botConfig, 256)}
+							alt={botConfig.discord?.global_name || botConfig.discord?.username || botConfig.name || 'Bot'}
+							fallbackKind="bot"
+							className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
+							fallbackClassName="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10"
+							iconClassName="w-8 h-8 text-(--text-muted)"
+						/>
 						<div className="flex flex-col gap-1.5">
 							<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 								{botConfig.discord?.global_name || botConfig.discord?.username || botConfig.name}
@@ -374,11 +353,9 @@ export default function PortalBotPage() {
 							<Rocket className="w-4 h-4" />
 							{t('app.boost.boostBotBtn')}
 						</Button>
-						<Link href={getEnvUrl(`https://app.xernerx.com/bots/${botConfig.vanitySlug || botConfig.id}`)}>
-							<Button variant="secondary" className="gap-2">
-								<ExternalLink className="w-4 h-4" />
-								{t('app.portal.workspace.viewPublicProfile')}
-							</Button>
+						<Link href={getEnvUrl(`https://app.xernerx.com/bots/${botConfig.vanitySlug || botConfig.id}`)} className={portalButtonLinkClass('secondary', 'md', 'gap-2')}>
+							<ExternalLink className="w-4 h-4" />
+							{t('app.portal.workspace.viewPublicProfile')}
 						</Link>
 					</div>
 				</div>

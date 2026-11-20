@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, Ban, CheckCircle2, Download, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Ban, Bot, CheckCircle2, Download, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, Input, MultiSelector, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
@@ -35,6 +35,7 @@ export default function Users({
 	const [verifiedOnly, setVerifiedOnly] = useState(false);
 	const [blacklistedOnly, setBlacklistedOnly] = useState(false);
 	const [missingRolesOnly, setMissingRolesOnly] = useState(false);
+	const [botProfilesOnly, setBotProfilesOnly] = useState(false);
 	const [limit, setLimit] = useState(30);
 
 	useEffect(() => {
@@ -49,7 +50,7 @@ export default function Users({
 	// Reset limit when filters change
 	useEffect(() => {
 		setLimit(30);
-	}, [search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly, missingRolesOnly]);
+	}, [search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly, missingRolesOnly, botProfilesOnly]);
 
 	const fetchData = useCallback(
 		async (isManual = false) => {
@@ -174,7 +175,8 @@ export default function Users({
 				const matchesVerified = !verifiedOnly || Boolean(user.verified);
 				const matchesBlacklisted = !blacklistedOnly || Boolean(user.blacklisted);
 				const matchesMissingRoles = !missingRolesOnly || hasMissing;
-				return matchesSearch && matchesRoles && matchesVerified && matchesBlacklisted && matchesMissingRoles;
+				const matchesBotProfiles = !botProfilesOnly || (user.botProfiles?.bots?.length ?? 0) > 0 || (user.botProfiles?.serverCount ?? 0) > 0;
+				return matchesSearch && matchesRoles && matchesVerified && matchesBlacklisted && matchesMissingRoles && matchesBotProfiles;
 			})
 			.sort((a, b) => {
 				if (sortBy === 'level_desc') {
@@ -201,7 +203,7 @@ export default function Users({
 					return nameB.localeCompare(nameA);
 				}
 			});
-	}, [users, search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly, missingRolesOnly, existingRoleIdSet]);
+	}, [users, search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly, missingRolesOnly, botProfilesOnly, existingRoleIdSet]);
 
 	const renderedUsers = filteredUsers.slice(0, limit);
 	const loadMoreRef = useInfiniteScroll(filteredUsers.length > limit, loading, () => setLimit((prev) => prev + 30));
@@ -357,6 +359,16 @@ export default function Users({
 				>
 					<CheckCircle2 size={16} />
 					<span>{t('admin.users.fields.verifiedFilter')}</span>
+				</button>
+				<button
+					type="button"
+					onClick={() => setBotProfilesOnly((prev) => !prev)}
+					className={`flex items-center justify-center gap-2 rounded-full border backdrop-blur-md text-sm font-medium transition-colors shrink-0 w-full sm:w-auto h-[56px] px-5 shadow-sm cursor-pointer ${
+						botProfilesOnly ? 'border-(--accent)/40 bg-(--accent)/15 text-(--accent)' : 'border-(--border)/10 bg-(--foreground)/30 text-(--text) hover:bg-(--foreground)/50'
+					}`}
+				>
+					<Bot size={16} />
+					<span>{t('admin.users.botProfiles.filterLabel')}</span>
 				</button>
 				<button
 					type="button"

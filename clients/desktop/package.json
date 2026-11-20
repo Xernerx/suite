@@ -1,7 +1,7 @@
 {
 	"name": "desktop",
 	"productName": "Xernerx App",
-	"version": "2.6.4",
+	"version": "2.6.6",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
 	"type": "module",
@@ -13,14 +13,17 @@
 	},
 	"author": "Xernerx Studios",
 	"license": "SEE LICENSE IN LICENSE",
-	"packageManager": "pnpm@11.24.0",
+	"packageManager": "pnpm@12.21.0",
+	"engines": {
+		"node": ">=24"
+	},
 	"dependencies": {
 		"@xernerx/terminal": "^1.2.0",
 		"electron-store": "^12.0.0",
 		"electron-updater": "^6.8.11"
 	},
 	"devDependencies": {
-		"electron": "45.2.1",
+		"electron": "45.3.3",
 		"electron-builder": "^26.18.0",
 		"typescript": "^6.0.3"
 	},

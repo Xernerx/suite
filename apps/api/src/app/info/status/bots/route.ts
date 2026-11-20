@@ -2,6 +2,7 @@
 
 import { database, dispatchBotStatusWebhooks } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { applyLiveDiscordToBot, buildDiscordAvatarUrl, fetchLiveDiscordUser, isDiscordManagedMediaValue } from '@/lib/botDiscordSync';
 
 export const dynamic = 'force-dynamic';
 
@@ -172,18 +173,13 @@ export async function GET(req: NextRequest) {
 		const needsLiveSync = forceRefresh || orgBots.some((b: any) => !b.statusUpdatedAt || now - new Date(b.statusUpdatedAt).getTime() > 90_000);
 
 		const livePresences = needsLiveSync ? await queryXernerxBotGatewayPresences(botIds, adminServerId) : {};
-		const token = process.env.DISCORD_CLIENT_TOKEN;
 
 		const bots = await Promise.all(
 			orgBots.map(async (bot: any) => {
 				const botId = String(bot.id);
 				let name = bot.name || botId;
-				let avatarUrl: string | null =
-					bot.avatar && String(bot.avatar).startsWith('http')
-						? bot.avatar
-						: bot.avatar
-							? `https://cdn.discordapp.com/avatars/${botId}/${bot.avatar}.${String(bot.avatar).startsWith('a_') ? 'gif' : 'png'}?size=256`
-							: null;
+				let avatarUrl: string | null = !isDiscordManagedMediaValue(bot.avatar) ? String(bot.avatar) : null;
+				let bannerUrl: string | null = !isDiscordManagedMediaValue(bot.banner) ? String(bot.banner) : null;
 
 				const [latestStat, discordUser] = await Promise.all([
 					StatModel
@@ -192,21 +188,19 @@ export async function GET(req: NextRequest) {
 								.lean()
 								.catch(() => null)
 						: Promise.resolve(null),
-					token
-						? fetch(`https://discord.com/api/v10/users/${botId}`, {
-								headers: { Authorization: `Bot ${token}` },
-								next: { revalidate: 3600 },
-							})
-								.then((r) => (r.ok ? r.json() : null))
-								.catch(() => null)
-						: Promise.resolve(null),
+					fetchLiveDiscordUser(botId),
 				]);
 
 				if (discordUser) {
 					name = discordUser.global_name || discordUser.username || name;
-					if (discordUser.avatar) {
-						avatarUrl = `https://cdn.discordapp.com/avatars/${botId}/${discordUser.avatar}.${discordUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`;
-					}
+					const synced = applyLiveDiscordToBot(bot, botId, discordUser, BotModel, 512);
+					avatarUrl = synced.avatarUrl;
+					bannerUrl = synced.bannerUrl;
+				} else {
+					const dc = bot.discordCache;
+					name = dc?.globalName || dc?.username || name;
+					avatarUrl = avatarUrl || dc?.avatarUrl || buildDiscordAvatarUrl(botId, dc?.avatar || bot.avatar, 256);
+					bannerUrl = bannerUrl || dc?.bannerUrl || null;
 				}
 
 				const liveInfo = livePresences[botId];
@@ -220,7 +214,7 @@ export async function GET(req: NextRequest) {
 						{
 							$set: {
 								name,
-								...(discordUser?.avatar ? { avatar: discordUser.avatar } : {}),
+								...(discordUser ? { avatar: discordUser.avatar || '' } : {}),
 								status: resolvedStatus,
 								activity: resolvedActivity,
 								statusUpdatedAt: resolvedUpdatedAt,
@@ -240,6 +234,7 @@ export async function GET(req: NextRequest) {
 					id: botId,
 					name,
 					avatarUrl,
+					bannerUrl,
 					verified: Boolean(bot.verified),
 					status: resolvedStatus,
 					activity: resolvedActivity || null,

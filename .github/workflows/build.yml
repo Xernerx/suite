@@ -2,6 +2,12 @@ name: Shared Build Test
 
 on:
     workflow_call:
+        inputs:
+            ref:
+                description: 'Git ref to check out and build (defaults to triggering ref)'
+                required: false
+                type: string
+                default: ''
     pull_request:
 
 env:
@@ -13,11 +19,16 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.ref }}
 
             - name: Setup Node
               uses: actions/setup-node@v4
               with:
                   node-version: 24
+
+            - name: Verify Dictionary JSON & Placeholder Integrity
+              run: node .xernerx/cli/verify-canary.mjs --local-only
 
             - name: Install pnpm
               run: npm install -g pnpm

@@ -113,12 +113,12 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 				let updated = false;
 				if (params.has('view')) {
 					params.delete('view');
-					if (newView) {
+					if (newView && !newView.startsWith('server-')) {
 						params.set('tab', newView);
 					}
 					updated = true;
 				}
-				if (params.has('tab')) {
+				if (params.has('tab') && (!newView || !newView.startsWith('server-'))) {
 					if (newView) {
 						params.set('tab', newView);
 					} else {

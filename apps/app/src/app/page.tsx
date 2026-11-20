@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Flame, LayoutDashboard, Scale, Sparkles, Trophy, Users, ChevronUp } from 'lucide-react';
+import { Flame, Gauge, Scale, Sparkles, Trophy, Users, ChevronUp } from 'lucide-react';
 import { Loading } from '@xernerx/feedback';
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, usePlatform, useSidebar } from '@xernerx/providers';
@@ -263,7 +263,7 @@ export default function Home() {
 							href="/dashboard"
 							className="flex items-center justify-center gap-2 px-5 h-12 rounded-xl bg-(--background) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 hover:bg-(--accent)/10 transition-all flex-1 md:flex-none group shadow-sm"
 						>
-							<LayoutDashboard className="w-4 h-4 group-hover:scale-110 transition-transform" />
+							<Gauge className="w-4 h-4 group-hover:scale-110 transition-transform" />
 							<span className="text-sm font-bold">{t('app.home.text6')}</span>
 						</Link>
 						<Link

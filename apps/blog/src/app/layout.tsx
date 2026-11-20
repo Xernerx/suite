@@ -8,7 +8,7 @@ import { AppLayout } from '@xernerx/components';
 import type { Metadata, Viewport } from 'next';
 import { SessionProvider, PermissionProvider } from '@xernerx/providers';
 import { auth } from '@xernerx/lib';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const viewport: Viewport = {
@@ -75,19 +75,32 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const session = await getServerSession(auth);
+	const [headersList, cookieStore, themeProps] = await Promise.all([
+		headers(),
+		cookies(),
+		getThemeLayoutProps().catch(() => ({ className: 'dark', style: { '--accent': '#8b7cf6', '--page-width': '90%' } as React.CSSProperties })),
+	]);
 
-	const cookieStore = await cookies();
-	const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en';
-	const dict = await dictionary(locale as Locale);
+	const host = headersList.get('host') || '';
+	const initialEnv: 'dev' | 'canary' | 'public' =
+		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development'
+			? 'dev'
+			: host.includes('.canary.') || process.env.ENVIRONMENT?.toLowerCase() === 'canary'
+				? 'canary'
+				: 'public';
 
-	const themeProps = await getThemeLayoutProps();
+	const locale = cookieStore.get('NEXT_LOCALE')?.value || headersList.get('x-locale') || 'en-GB';
+	const hasSessionCookie = Boolean(cookieStore.get('__Secure-next-auth.session-token') || cookieStore.get('next-auth.session-token'));
+
+	const sessionPromise = hasSessionCookie ? Promise.race([getServerSession(auth).catch(() => null), new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500))]) : Promise.resolve(null);
+
+	const [session, dict] = await Promise.all([sessionPromise, dictionary(locale as Locale).catch(() => dictionary('en-GB' as Locale))]);
 
 	return (
 		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>
 			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict} enableAds>
+					<AppLayout dictionary={dict} initialEnvironment={initialEnv} enableAds>
 						<PermissionProvider>{children}</PermissionProvider>
 					</AppLayout>
 				</SessionProvider>

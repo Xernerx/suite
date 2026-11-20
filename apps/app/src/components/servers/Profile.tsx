@@ -51,7 +51,7 @@ export function ServerProfile({ server, organizationData }: { server: any; organ
 
 	const reviewCount = reviews.length;
 	const avgRating = reviewCount > 0 ? reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / reviewCount : 0;
-	const recentReviews = [...reviews].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 2);
+	const recentReviews = reviews.toSorted((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 2);
 
 	useEffect(() => {
 		if (!isReady || !serverId) return;

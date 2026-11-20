@@ -4,9 +4,9 @@
 import { use, useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useSession, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button } from '@xernerx/ui';
 import { Activity, ArrowLeft, Server, Settings, Star, Trophy } from 'lucide-react';
 import Link from 'next/link';
+import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 import { ServerHeader } from '@/components/servers/Header';
 import { ServerLeaderboard } from '@/components/servers/Leaderboard';
 import { ServerProfile } from '@/components/servers/Profile';
@@ -197,8 +197,8 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 					{t('app.servers.notFoundTitle')}
 				</h1>
 				<p className="text-(--text-muted) mb-8">{t('app.servers.notFoundDesc')}</p>
-				<Link href="/servers">
-					<Button variant="primary">{t('app.servers.backToExplore')}</Button>
+				<Link href="/servers" className={getButtonLinkClasses('primary')}>
+					{t('app.servers.backToExplore')}
 				</Link>
 			</div>
 		);

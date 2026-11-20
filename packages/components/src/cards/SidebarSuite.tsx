@@ -19,13 +19,13 @@ export default function SidebarSuite({ isCollapsed, onClose }: { isCollapsed: bo
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: 8 }}
 			transition={{ duration: 0.15, ease: 'easeOut' }}
-			className={`absolute bottom-full mb-2 z-50 flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl
+			className={`absolute bottom-full mb-2 z-50 flex flex-col max-h-[min(78dvh,540px)] rounded-3xl border border-(--border)/10 bg-(--foreground)/85 backdrop-blur-xl shadow-2xl
                 ${isCollapsed ? 'left-1 w-56 origin-bottom-left' : 'left-0 right-0 origin-bottom'}
             `}
 			style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)', fontSize: 'var(--text-scale, 14px)' }}
 		>
 			<div
-				className="flex items-center text-(--text-muted)"
+				className="flex items-center text-(--text-muted) shrink-0"
 				style={{
 					gap: 'calc(var(--ui-gap) * 0.5)',
 					paddingLeft: 'calc(var(--ui-gap) * 0.75)',
@@ -40,7 +40,7 @@ export default function SidebarSuite({ isCollapsed, onClose }: { isCollapsed: bo
 
 			<Divider />
 
-			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+			<div className="flex flex-col min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 				{navigation
 					.filter((service) => !service.adminOnly || hasPermission(service.requiredPermission || 'access'))
 					.map((service, sIdx) => {

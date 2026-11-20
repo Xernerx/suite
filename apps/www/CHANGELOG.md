@@ -2,6 +2,73 @@
 
 # www
 
+## 0.29.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
+## 0.29.0
+
+### Minor Changes
+
+- ## Scroll-Driven Showcases & YourApps Timeline Story
+  
+  Restored the smooth scroll-driven horizontal showcase tracks on the landing page and completed the YourApps story in the company timeline.
+  
+  ### Added
+  
+  - **YourApps Timeline Milestones**: Added the November 2023 YourApps hiatus and November 2026 Xernerx Suite relaunch milestones to the company timeline.
+  
+  ### Changed
+  
+  - **Scroll-Driven Horizontal Showcases**: Restored smooth vertical-scroll-linked horizontal sliding for Consumer Services and Developer Software with zero visible scrollbars.
+  - **LLM Site Indexes**: Updated `/llms.txt` and `/llms-full.txt` to reflect the latest platform capabilities.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
+## 0.28.0
+
+### Minor Changes
+
+- ## Landing Carousels, Desktop Preview Sync & Self-Service Security Controls
+  
+  Refined the landing page experience, interactive desktop preview, official invites, and security documentation.
+  
+  ### Added
+  
+  - **YourApps Ecosystem Coverage**: Added YourApps across studio overview blurbs, service cards, and security documentation.
+  - **Self-Service YourApps & Server Setup Controls**: Documented self-service YourApps data deletion and per-server bot setup deletion on the Security, Privacy, and Terms pages.
+  
+  ### Changed
+  
+  - **Consumer & Developer Carousels**: Updated horizontal service and software carousels with Previous/Next controls while allowing vertical mouse-wheel scrolling to pass through naturally.
+  - **Interactive Desktop Preview**: Updated the simulated titlebar Dashboard shortcut icon and inline URL Omnibar preview on the Download page.
+  - **Official Invites & License Reliability**: Hardened `/invites` and `/license` loading and avatar fallbacks for instant availability.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 0.27.1
 
 ### Patch Changes

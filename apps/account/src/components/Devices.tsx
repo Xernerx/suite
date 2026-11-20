@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { signOut, useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { Button, Confirm } from '@xernerx/ui';
-import { Loading } from '@xernerx/feedback';
+import { AccountViewSkeleton } from './AccountViewSkeleton';
 import { Computer, Smartphone, ShieldCheck, Trash2, Clock, CheckCircle2, LogOut } from 'lucide-react';
 import { DevicePairingCard } from './DevicePairingCard';
 
@@ -159,7 +159,7 @@ export default function Devices() {
 		}
 	};
 
-	if (loading) return <Loading />;
+	if (loading) return <AccountViewSkeleton variant="list" />;
 
 	return (
 		<div className="flex flex-col max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>

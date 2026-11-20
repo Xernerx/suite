@@ -252,7 +252,7 @@ export default function SuggestionsPage() {
 			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, prodName);
 		});
 
-		return [...filtered].sort((a, b) => {
+		return filtered.toSorted((a, b) => {
 			if (sortBy === 'newest') {
 				const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
 				const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -285,7 +285,7 @@ export default function SuggestionsPage() {
 
 				<div className="flex flex-col gap-1.5 w-full lg:w-auto">
 					<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
-						<div className="w-full sm:w-80 xl:w-96">
+						<div className="w-full sm:w-96 xl:w-[26rem]">
 							<Input variant="search" shortcut={true} placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 						</div>
 						<MultiSelector

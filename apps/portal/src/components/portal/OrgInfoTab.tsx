@@ -1,12 +1,12 @@
 /** @format */
 'use client';
 
-import Image from 'next/image';
 import { Building2, Upload } from 'lucide-react';
 import { Input, Markdown, Selector } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { CircleFlag } from 'react-circle-flags';
+import { PortalSafeAvatar, PortalSafeBanner } from '@/components/portal/PortalSafeAvatar';
 
 const getFlagCode = (localeCode: string) => {
 	switch (localeCode) {
@@ -42,20 +42,15 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 			<div className="flex flex-col gap-5">
 				<div className="relative mb-14">
 					<div className="relative h-48 w-full rounded-[2rem] overflow-hidden border border-(--border)/10 shadow-sm bg-(--background)/50 group/banner">
-						{pendingUploads.bannerUrl || orgConfig.bannerUrl ? (
-							<Image
-								src={pendingUploads.bannerUrl ? URL.createObjectURL(pendingUploads.bannerUrl) : getEnvUrl(orgConfig.bannerUrl as string)}
-								alt="Banner"
-								fill
-								unoptimized
-								className="w-full h-full object-cover"
-							/>
-						) : (
-							<div className="w-full h-full bg-(--foreground)/30" />
-						)}
-						<label className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 group-hover/banner:opacity-100 transition-opacity cursor-pointer">
-							{uploadingMedia === 'bannerUrl' ? <Loading variant="small" /> : <Upload className="w-6 h-6 text-white" />}
-							<span className="text-white font-medium text-sm">
+						<PortalSafeBanner
+							src={pendingUploads.bannerUrl ? URL.createObjectURL(pendingUploads.bannerUrl) : orgConfig.bannerUrl ? getEnvUrl(orgConfig.bannerUrl as string) : null}
+							alt="Banner"
+							className="w-full h-full object-cover"
+							fallbackClassName="w-full h-full bg-(--foreground)/30"
+						/>
+						<label className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-(--background)/75 backdrop-blur-sm opacity-0 group-hover/banner:opacity-100 transition-opacity cursor-pointer">
+							{uploadingMedia === 'bannerUrl' ? <Loading variant="small" /> : <Upload className="w-6 h-6 text-(--text)" />}
+							<span className="text-(--text) font-medium text-sm">
 								{pendingUploads.bannerUrl || orgConfig.bannerUrl ? t('app.portal.info.changeBanner') : t('app.portal.info.uploadBanner')}
 							</span>
 							<input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'bannerUrl')} disabled={uploadingMedia !== null} />
@@ -64,22 +59,17 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 
 					<div className="absolute left-8 -bottom-10 rounded-full border-4 border-(--background) shadow-lg bg-(--background) group/avatar z-10">
 						<div className="relative w-24 h-24 rounded-full overflow-hidden bg-(--background)">
-							{pendingUploads.iconUrl || orgConfig.iconUrl ? (
-								<Image
-									src={pendingUploads.iconUrl ? URL.createObjectURL(pendingUploads.iconUrl) : getEnvUrl(orgConfig.iconUrl as string)}
-									alt="Avatar"
-									fill
-									unoptimized
-									className="w-full h-full object-cover"
-								/>
-							) : (
-								<div className="w-full h-full bg-(--foreground)/50 flex items-center justify-center">
-									<Building2 className="w-10 h-10 text-(--text-muted)" />
-								</div>
-							)}
-							<label className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer">
-								{uploadingMedia === 'iconUrl' ? <Loading variant="small" /> : <Upload className="w-5 h-5 text-white" />}
-								<span className="text-white font-medium text-[10px]">{t('app.portal.info.editAvatar')}</span>
+							<PortalSafeAvatar
+								src={pendingUploads.iconUrl ? URL.createObjectURL(pendingUploads.iconUrl) : orgConfig.iconUrl ? getEnvUrl(orgConfig.iconUrl as string) : null}
+								alt={orgConfig.name || 'Avatar'}
+								fallbackKind="org"
+								className="w-full h-full object-cover"
+								fallbackClassName="w-full h-full bg-(--foreground)/50 flex items-center justify-center"
+								iconClassName="w-10 h-10 text-(--text-muted)"
+							/>
+							<label className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-(--background)/75 backdrop-blur-sm opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer">
+								{uploadingMedia === 'iconUrl' ? <Loading variant="small" /> : <Upload className="w-5 h-5 text-(--text)" />}
+								<span className="text-(--text) font-medium text-[10px]">{t('app.portal.info.editAvatar')}</span>
 								<input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'iconUrl')} disabled={uploadingMedia !== null} />
 							</label>
 						</div>

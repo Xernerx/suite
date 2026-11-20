@@ -2,75 +2,11 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Bot, Building2, Check, Coins, Compass, Copy, FileCode2, Home, Moon, RotateCw, Server, Sun, User, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, Building2, Check, ChevronDown, Coins, Compass, Copy, FileCode2, Home, Moon, RotateCw, Server, Sun, User, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDictionary, useEnvironment, useTheme, useToast, useUser } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
-
-const SUBDOMAIN_ROUTES: Record<string, { path: string; label: string }[]> = {
-	app: [
-		{ path: '/', label: 'Explore Hub' },
-		{ path: '/bots', label: 'Bot Directory' },
-		{ path: '/servers', label: 'Server Directory' },
-		{ path: '/leaderboard', label: 'Global Leaderboards' },
-		{ path: '/compare', label: 'Compare Bots & Servers' },
-		{ path: '/dashboard', label: 'Server & Bot Dashboard' },
-		{ path: '/dashboard?tab=applications', label: 'Server Applications Studio (YourApps)' },
-		{ path: '/overlay', label: 'Live Companion Overlay' },
-	],
-	portal: [
-		{ path: '/', label: 'Developer Portal Studio' },
-		{ path: '/?org=personal', label: 'Personal Developer Workspace' },
-	],
-	account: [
-		{ path: '/', label: 'Profile & Identity' },
-		{ path: '/?view=appearance', label: 'Theme & Appearance' },
-		{ path: '/?view=tokens', label: 'Developer API Tokens' },
-		{ path: '/?view=billing', label: 'Subscriptions & Billing' },
-		{ path: '/?view=devices', label: 'Trusted Devices & QR Login' },
-	],
-	store: [
-		{ path: '/', label: 'Store & Subscriptions' },
-		{ path: '/?item=bot-virtue', label: 'Virtue — Premium User Pass' },
-		{ path: '/?tab=credits', label: 'Virtual Credits & Daily Gift' },
-	],
-	info: [
-		{ path: '/', label: 'System Status & Uptime' },
-		{ path: '/roadmap', label: 'Public Roadmap' },
-		{ path: '/suggestions', label: 'Feature Suggestions' },
-		{ path: '/issues', label: 'Bug Tracker' },
-		{ path: '/faq', label: 'Frequently Asked Questions' },
-		{ path: '/changelog', label: 'Suite Changelog' },
-	],
-	docs: [
-		{ path: '/', label: 'Documentation Home' },
-		{ path: '/api/v1', label: 'v1 REST API Reference' },
-		{ path: '/cdn', label: 'CDN Media Reference' },
-		{ path: '/websocket', label: 'WebSocket Gateway Reference' },
-		{ path: '/packages', label: 'TypeScript SDK Packages' },
-	],
-	haste: [
-		{ path: '/', label: 'New Code Paste' },
-		{ path: '/?view=mine', label: 'My Saved Pastes' },
-	],
-	blog: [
-		{ path: '/', label: 'Blog Home & Latest Articles' },
-		{ path: '/platform-and-bot-security-architecture', label: 'Platform & Bot Security Architecture' },
-		{ path: '/the-customization-update-stage-render-forms-and-cosmetics-studio', label: 'The Customization Update' },
-		{ path: '/rss.xml', label: 'RSS 2.0 Syndication Feed' },
-	],
-	www: [
-		{ path: '/', label: 'Xernerx Showcase' },
-		{ path: '/invites', label: 'Official Bot Invites Hub' },
-		{ path: '/download', label: 'Download Desktop App' },
-		{ path: '/applications', label: 'Team Applications' },
-		{ path: '/security', label: 'Platform & Bot Security' },
-		{ path: '/license', label: 'Software & Ecosystem License' },
-		{ path: '/terms', label: 'Terms of Service' },
-		{ path: '/privacy', label: 'Privacy Policy' },
-		{ path: '/cookies', label: 'Cookie Policy' },
-	],
-};
+import { SUBDOMAIN_ROUTES } from './omnibarRoutes';
 
 export function SubSelector({ name, options, defaultValue, onSelectOption }: { name: string; options: string[]; defaultValue: string; onSelectOption?: (val: string) => void }) {
 	const [isOpen, setIsOpen] = useState(false);
@@ -89,31 +25,40 @@ export function SubSelector({ name, options, defaultValue, onSelectOption }: { n
 	}, [isOpen]);
 
 	return (
-		<div ref={ref} className="relative flex items-center" data-name={name}>
-			<div className="text-sm font-medium text-(--text) cursor-pointer hover:text-(--accent) transition-colors flex items-center select-none" onClick={() => setIsOpen(!isOpen)}>
-				{value}
-			</div>
+		<div ref={ref} className="relative flex items-center shrink-0" data-name={name}>
+			<button
+				type="button"
+				onClick={() => setIsOpen(!isOpen)}
+				className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-lg bg-(--accent)/12 hover:bg-(--accent)/22 text-xs font-mono font-bold text-(--accent) transition-colors cursor-pointer select-none"
+			>
+				<span>{value}</span>
+				<ChevronDown size={11} className={`transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`} />
+			</button>
 			<AnimatePresence>
 				{isOpen && (
 					<motion.div
-						initial={{ opacity: 0, y: -5, scale: 0.95 }}
+						initial={{ opacity: 0, y: -5, scale: 0.96 }}
 						animate={{ opacity: 1, y: 0, scale: 1 }}
-						exit={{ opacity: 0, y: -5, scale: 0.95 }}
-						transition={{ duration: 0.15 }}
-						className="absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-(--background) border border-(--border)/10 rounded-xl shadow-xl overflow-hidden min-w-[120px] z-[9999] flex flex-col p-1"
+						exit={{ opacity: 0, y: -5, scale: 0.96 }}
+						transition={{ duration: 0.14 }}
+						className="absolute top-[calc(100%+8px)] left-0 bg-(--foreground)/40 backdrop-blur-md border border-(--border)/15 rounded-2xl shadow-xl overflow-hidden min-w-[132px] z-[9999] flex flex-col p-1.5 gap-0.5"
 					>
 						{options.map((option) => (
-							<div
+							<button
 								key={option}
-								className={`px-3 py-1.5 text-sm font-medium rounded-xl cursor-pointer transition-colors ${value === option ? 'bg-(--accent)/10 text-(--accent)' : 'text-(--text) hover:bg-(--foreground)'}`}
+								type="button"
+								className={`flex items-center justify-between px-3 py-1.5 text-xs font-mono font-semibold rounded-xl cursor-pointer transition-colors text-left ${
+									value === option ? 'bg-(--accent) text-(--accent-contrast)' : 'text-(--text) hover:bg-(--background)/60'
+								}`}
 								onClick={() => {
 									setValue(option);
 									onSelectOption?.(option);
 									setIsOpen(false);
 								}}
 							>
-								{option}
-							</div>
+								<span>{option}</span>
+								{value === option && <Check size={12} />}
+							</button>
 						))}
 					</motion.div>
 				)}
@@ -144,6 +89,7 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 	const [selectedPre, setSelectedPre] = useState(urlState.pre);
 	const [selectedEnv, setSelectedEnv] = useState(urlState.env);
 	const [pathInput, setPathInput] = useState(urlState.path);
+	const [hasTyped, setHasTyped] = useState(false);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const [liveMatches, setLiveMatches] = useState<{ type: 'bot' | 'server' | 'org'; id: string; name: string; href: string }[]>([]);
 
@@ -151,6 +97,7 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 		setSelectedPre(urlState.pre);
 		setSelectedEnv(urlState.env);
 		setPathInput(urlState.path);
+		setHasTyped(false);
 	}, [urlState.pre, urlState.env, urlState.path, isOpen]);
 
 	useEffect(() => {
@@ -162,7 +109,7 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 		return () => window.removeEventListener('mousedown', handleClickOutside);
 	}, [dropdownOpen]);
 
-	const cleanQuery = useMemo(() => pathInput.replace(/^\/+/, '').trim(), [pathInput]);
+	const cleanQuery = useMemo(() => (hasTyped ? pathInput.replace(/^\/+/, '').trim() : ''), [pathInput, hasTyped]);
 
 	useEffect(() => {
 		if (!isOpen || cleanQuery.length < 2) {
@@ -228,9 +175,9 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 
 	const filteredRoutes = useMemo(() => {
 		const routes = SUBDOMAIN_ROUTES[selectedPre] || [{ path: '/', label: 'Home' }];
-		if (!cleanQuery) return routes.slice(0, 5);
+		if (!cleanQuery) return routes.slice(0, 6);
 		const q = cleanQuery.toLowerCase();
-		return routes.filter((r) => r.path.toLowerCase().includes(q) || r.label.toLowerCase().includes(q)).slice(0, 5);
+		return routes.filter((r) => r.path.toLowerCase().includes(q) || r.label.toLowerCase().includes(q)).slice(0, 6);
 	}, [selectedPre, cleanQuery]);
 
 	const subdomainOptions = [
@@ -250,89 +197,78 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 	];
 	if (!subdomainOptions.includes(urlState.pre)) subdomainOptions.push(urlState.pre);
 
+	const navIconBtnClass =
+		'h-8 w-8 rounded-full bg-(--foreground)/35 hover:bg-(--accent)/15 border border-(--border)/10 hover:border-(--accent)/35 flex items-center justify-center text-(--text-muted) hover:text-(--accent) transition-all cursor-pointer shrink-0';
+
 	return (
 		<AnimatePresence>
 			{isOpen && (
 				<motion.div
 					ref={containerRef}
-					initial={{ height: 0, opacity: 0, overflow: 'hidden' }}
-					animate={{ height: 44, opacity: 1, transitionEnd: { overflow: 'visible' } }}
+					initial={{ height: 0, opacity: 0 }}
+					animate={{ height: 48, opacity: 1 }}
 					exit={{ height: 0, opacity: 0, overflow: 'hidden' }}
 					transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-					className="flex items-center w-full shrink-0 bg-(--background) gap-3 relative z-[999]"
+					className="flex items-center w-full shrink-0 bg-(--background) border-b border-(--border)/10 gap-2.5 relative z-[999] overflow-visible"
 					style={{
-						paddingLeft: 'calc(1rem + env(safe-area-inset-left, 0px))',
-						paddingRight: 'calc(1rem + env(safe-area-inset-right, 0px))',
+						paddingLeft: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))',
+						paddingRight: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))',
 					}}
 				>
-					<div className="flex items-center gap-1">
-						<button
-							type="button"
-							aria-label={t('common.navigation.back')}
-							title={t('common.navigation.back')}
-							onClick={() => window.history.back()}
-							className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-xl transition-all"
-						>
-							<ArrowLeft size={16} strokeWidth={2.5} />
+					<div className="hidden sm:flex items-center gap-1.5 shrink-0">
+						<button type="button" aria-label={t('common.navigation.back')} title={t('common.navigation.back')} onClick={() => window.history.back()} className={navIconBtnClass}>
+							<ArrowLeft size={15} strokeWidth={2.5} />
 						</button>
-						<button
-							type="button"
-							aria-label={t('common.navigation.forward')}
-							title={t('common.navigation.forward')}
-							onClick={() => window.history.forward()}
-							className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-xl transition-all"
-						>
-							<ArrowRight size={16} strokeWidth={2.5} />
+						<button type="button" aria-label={t('common.navigation.forward')} title={t('common.navigation.forward')} onClick={() => window.history.forward()} className={navIconBtnClass}>
+							<ArrowRight size={15} strokeWidth={2.5} />
 						</button>
-						<button
-							type="button"
-							aria-label={t('common.navigation.reload')}
-							title={t('common.navigation.reload')}
-							onClick={() => window.location.reload()}
-							className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-xl transition-all"
-						>
-							<RotateCw size={16} strokeWidth={2.5} />
+						<button type="button" aria-label={t('common.navigation.reload')} title={t('common.navigation.reload')} onClick={() => window.location.reload()} className={navIconBtnClass}>
+							<RotateCw size={15} strokeWidth={2.5} />
 						</button>
-						<button
-							type="button"
-							aria-label={t('common.navigation.home')}
-							title={t('common.navigation.home')}
-							onClick={() => (window.location.href = '/')}
-							className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-xl transition-all ml-1"
-						>
-							<Home size={16} strokeWidth={2.5} />
+						<button type="button" aria-label={t('common.navigation.home')} title={t('common.navigation.home')} onClick={() => (window.location.href = '/')} className={navIconBtnClass}>
+							<Home size={15} strokeWidth={2.5} />
 						</button>
 					</div>
 
-					<div className="relative flex-1 ml-1">
+					<div className="relative flex-1 min-w-0">
 						<form
 							ref={urlFormRef}
-							className="flex w-full items-center bg-(--foreground) rounded-full h-[30px] px-3 border border-(--border)/10 focus-within:ring-2 focus-within:ring-(--accent)/20 focus-within:border-(--accent) transition-all shadow-sm"
+							className="flex w-full items-center bg-(--foreground)/40 backdrop-blur-md rounded-full h-9 px-3.5 border border-(--border)/15 focus-within:border-(--accent)/60 focus-within:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] transition-all shadow-sm gap-1"
 							onSubmit={(e) => {
 								e.preventDefault();
-								const pre = (e.currentTarget.elements.namedItem('pre') as HTMLSelectElement)?.value || selectedPre;
-								const env = (e.currentTarget.elements.namedItem('env') as HTMLSelectElement)?.value || selectedEnv;
-								const path = (e.currentTarget.elements.namedItem('path') as HTMLInputElement)?.value || pathInput;
+								const path = (e.currentTarget.elements.namedItem('path') as HTMLInputElement)?.value ?? pathInput;
 								setDropdownOpen(false);
-								window.location.href = resolveOmnibarUrl(pre, env, path);
+								window.location.href = resolveOmnibarUrl(selectedPre, selectedEnv, path);
 							}}
 						>
-							<span className="text-(--text-muted) select-none text-sm font-medium pr-1">https://</span>
-							<SubSelector name="pre" options={subdomainOptions} defaultValue={urlState.pre} onSelectOption={(val) => setSelectedPre(val)} />
-							<span className="text-(--text-muted) select-none text-sm font-medium px-0.5">.</span>
-							<SubSelector name="env" options={['public', 'canary', 'dev']} defaultValue={urlState.env} onSelectOption={(val) => setSelectedEnv(val)} />
-							<span className="text-(--text-muted) select-none text-sm font-medium pl-0.5 pr-2">.xernerx.com</span>
+							<div className="inline-flex items-center gap-1 shrink-0 font-mono text-xs select-none pr-1.5 border-r border-(--border)/15">
+								<span className="text-(--text-muted)">https://</span>
+								<SubSelector
+									name="pre"
+									options={subdomainOptions}
+									defaultValue={urlState.pre}
+									onSelectOption={(val) => {
+										setSelectedPre(val);
+										setDropdownOpen(true);
+									}}
+								/>
+								<span className="text-(--text-muted)">.</span>
+								<SubSelector name="env" options={['public', 'canary', 'dev']} defaultValue={urlState.env} onSelectOption={(val) => setSelectedEnv(val)} />
+								<span className="text-(--text-muted)">.xernerx.com</span>
+							</div>
 							<Input
+								variant="inline"
 								name="path"
 								type="text"
 								value={pathInput}
 								onChange={(e) => {
 									setPathInput(e.target.value);
+									setHasTyped(true);
 									setDropdownOpen(true);
 								}}
 								onFocus={() => setDropdownOpen(true)}
 								placeholder={t('components.header.omnibar.placeholder')}
-								className="!bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none text-sm font-medium w-full text-(--text) placeholder:text-(--text-muted)/70"
+								className="h-full pl-1 font-mono text-xs font-medium text-(--text) placeholder:text-(--text-muted)/70"
 								autoFocus
 							/>
 						</form>
@@ -344,82 +280,95 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 									animate={{ opacity: 1, y: 0, scale: 1 }}
 									exit={{ opacity: 0, y: -4, scale: 0.99 }}
 									transition={{ duration: 0.14 }}
-									className="absolute top-[calc(100%+8px)] left-0 right-0 rounded-2xl bg-(--background)/95 backdrop-blur-xl border border-(--border)/15 shadow-2xl p-2 z-[9998] flex flex-col gap-2 max-h-[360px] overflow-y-auto"
+									className="xrx-overlay-surface absolute top-[calc(100%+8px)] left-0 w-full max-w-3xl rounded-3xl bg-(--foreground)/40 backdrop-blur-md border border-(--border)/15 shadow-2xl p-3 z-[9998] flex flex-col gap-2.5 max-h-[380px] overflow-y-auto"
 								>
 									{filteredRoutes.length > 0 && (
 										<div className="flex flex-col gap-1">
-											<span className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-(--text-muted)">
+											<span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-(--text-muted)">
 												{t('components.header.omnibar.routesHeading', { app: selectedPre })}
 											</span>
-											{filteredRoutes.map((route) => (
-												<button
-													key={`${selectedPre}-${route.path}`}
-													type="button"
-													onClick={() => {
-														setDropdownOpen(false);
-														window.location.href = resolveOmnibarUrl(selectedPre, selectedEnv, route.path);
-													}}
-													className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl hover:bg-(--foreground) text-left transition-colors cursor-pointer group"
-												>
-													<span className="flex items-center gap-2 min-w-0">
-														<Compass className="w-3.5 h-3.5 text-(--accent) shrink-0" />
-														<span className="text-xs font-bold text-(--text) group-hover:text-(--accent) truncate">{route.label}</span>
-														<span className="text-[11px] font-mono text-(--text-muted) truncate">{route.path}</span>
-													</span>
-													<span className="px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent) text-[10px] font-bold">{t('components.header.omnibar.badgeRoute')}</span>
-												</button>
-											))}
+											<div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+												{filteredRoutes.map((route) => {
+													const isCurrentRoute = selectedPre === urlState.pre && route.path === urlState.path;
+													return (
+														<button
+															key={`${selectedPre}-${route.path}`}
+															type="button"
+															onClick={() => {
+																setDropdownOpen(false);
+																window.location.href = resolveOmnibarUrl(selectedPre, selectedEnv, route.path);
+															}}
+															className={`flex items-center justify-between gap-2 px-3 py-2 rounded-2xl border text-left transition-all cursor-pointer group ${
+																isCurrentRoute
+																	? 'bg-(--accent)/12 border-(--accent)/35'
+																	: 'bg-(--background)/50 hover:bg-(--accent)/10 border-(--border)/10 hover:border-(--accent)/30'
+															}`}
+														>
+															<span className="flex items-center gap-2 min-w-0">
+																<Compass className="w-3.5 h-3.5 text-(--accent) shrink-0" />
+																<span className="text-xs font-bold text-(--text) group-hover:text-(--accent) truncate">{route.label}</span>
+																<span className="text-[11px] font-mono text-(--text-muted) truncate">{route.path}</span>
+															</span>
+															<span className="px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) text-[10px] font-bold shrink-0">
+																{t('components.header.omnibar.badgeRoute')}
+															</span>
+														</button>
+													);
+												})}
+											</div>
 										</div>
 									)}
 
 									{liveMatches.length > 0 && (
-										<div className="flex flex-col gap-1 pt-1 border-t border-(--border)/10">
-											<span className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-(--text-muted)">
+										<div className="flex flex-col gap-1 pt-2 border-t border-(--border)/10">
+											<span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-(--text-muted)">
 												{t('components.header.omnibar.liveResultsHeading')}
 											</span>
-											{liveMatches.map((match) => {
-												const Icon = match.type === 'bot' ? Bot : match.type === 'server' ? Server : Building2;
-												const badgeLabel =
-													match.type === 'bot'
-														? t('components.header.omnibar.badgeBot')
-														: match.type === 'server'
-															? t('components.header.omnibar.badgeServer')
-															: t('components.header.omnibar.badgeOrg');
-												return (
-													<button
-														key={`${match.type}-${match.id}`}
-														type="button"
-														onClick={() => {
-															setDropdownOpen(false);
-															window.location.href = match.href;
-														}}
-														className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl hover:bg-(--foreground) text-left transition-colors cursor-pointer group"
-													>
-														<span className="flex items-center gap-2 min-w-0">
-															<Icon className="w-3.5 h-3.5 text-(--accent) shrink-0" />
-															<span className="text-xs font-bold text-(--text) group-hover:text-(--accent) truncate">{match.name}</span>
-														</span>
-														<span className="px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) text-[10px] font-bold">{badgeLabel}</span>
-													</button>
-												);
-											})}
+											<div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+												{liveMatches.map((match) => {
+													const Icon = match.type === 'bot' ? Bot : match.type === 'server' ? Server : Building2;
+													const badgeLabel =
+														match.type === 'bot'
+															? t('components.header.omnibar.badgeBot')
+															: match.type === 'server'
+																? t('components.header.omnibar.badgeServer')
+																: t('components.header.omnibar.badgeOrg');
+													return (
+														<button
+															key={`${match.type}-${match.id}`}
+															type="button"
+															onClick={() => {
+																setDropdownOpen(false);
+																window.location.href = match.href;
+															}}
+															className="flex items-center justify-between gap-2 px-3 py-2 rounded-2xl bg-(--background)/50 hover:bg-(--accent)/10 border border-(--border)/10 hover:border-(--accent)/30 text-left transition-all cursor-pointer group"
+														>
+															<span className="flex items-center gap-2 min-w-0">
+																<Icon className="w-3.5 h-3.5 text-(--accent) shrink-0" />
+																<span className="text-xs font-bold text-(--text) group-hover:text-(--accent) truncate">{match.name}</span>
+															</span>
+															<span className="px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) text-[10px] font-bold shrink-0">{badgeLabel}</span>
+														</button>
+													);
+												})}
+											</div>
 										</div>
 									)}
 
-									<div className="flex flex-col gap-1 pt-1 border-t border-(--border)/10">
-										<span className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-(--text-muted)">
+									<div className="flex flex-col gap-1.5 pt-2 border-t border-(--border)/10">
+										<span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-(--text-muted)">
 											{t('components.header.omnibar.quickActionsHeading')}
 										</span>
-										<div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
 											<button
 												type="button"
 												onClick={() => {
 													setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
 													setDropdownOpen(false);
 												}}
-												className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-(--foreground) text-left text-xs font-semibold text-(--text) transition-colors cursor-pointer"
+												className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-(--background)/50 hover:bg-(--accent)/10 border border-(--border)/10 hover:border-(--accent)/30 text-left text-xs font-semibold text-(--text) transition-all cursor-pointer"
 											>
-												{resolvedTheme === 'dark' ? <Sun className="w-3.5 h-3.5 text-(--accent)" /> : <Moon className="w-3.5 h-3.5 text-(--accent)" />}
+												{resolvedTheme === 'dark' ? <Sun className="w-3.5 h-3.5 text-(--accent) shrink-0" /> : <Moon className="w-3.5 h-3.5 text-(--accent) shrink-0" />}
 												<span className="truncate">{t('components.header.omnibar.actionToggleTheme')}</span>
 											</button>
 											<button
@@ -428,9 +377,9 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 													setDropdownOpen(false);
 													window.location.href = resolveOmnibarUrl('haste', selectedEnv, '/');
 												}}
-												className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-(--foreground) text-left text-xs font-semibold text-(--text) transition-colors cursor-pointer"
+												className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-(--background)/50 hover:bg-(--accent)/10 border border-(--border)/10 hover:border-(--accent)/30 text-left text-xs font-semibold text-(--text) transition-all cursor-pointer"
 											>
-												<FileCode2 className="w-3.5 h-3.5 text-(--accent)" />
+												<FileCode2 className="w-3.5 h-3.5 text-(--accent) shrink-0" />
 												<span className="truncate">{t('components.header.omnibar.actionNewPaste')}</span>
 											</button>
 											<button
@@ -439,9 +388,9 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 													setDropdownOpen(false);
 													window.location.href = resolveOmnibarUrl('store', selectedEnv, '/?tab=credits');
 												}}
-												className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-(--foreground) text-left text-xs font-semibold text-(--text) transition-colors cursor-pointer"
+												className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-(--background)/50 hover:bg-(--accent)/10 border border-(--border)/10 hover:border-(--accent)/30 text-left text-xs font-semibold text-(--text) transition-all cursor-pointer"
 											>
-												<Coins className="w-3.5 h-3.5 text-(--accent)" />
+												<Coins className="w-3.5 h-3.5 text-(--accent) shrink-0" />
 												<span className="truncate">{t('components.header.omnibar.actionDailyCredits')}</span>
 											</button>
 											{user?.id && (
@@ -452,9 +401,9 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 														toast({ type: 'success', title: t('components.header.omnibar.discordIdCopied'), description: String(user.id) });
 														setDropdownOpen(false);
 													}}
-													className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-(--foreground) text-left text-xs font-semibold text-(--text) transition-colors cursor-pointer"
+													className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-(--background)/50 hover:bg-(--accent)/10 border border-(--border)/10 hover:border-(--accent)/30 text-left text-xs font-semibold text-(--text) transition-all cursor-pointer"
 												>
-													<User className="w-3.5 h-3.5 text-(--accent)" />
+													<User className="w-3.5 h-3.5 text-(--accent) shrink-0" />
 													<span className="truncate">{t('components.header.omnibar.actionCopyDiscordId')}</span>
 												</button>
 											)}
@@ -465,7 +414,7 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 						</AnimatePresence>
 					</div>
 
-					<div className="flex items-center gap-1">
+					<div className="flex items-center gap-1.5 shrink-0">
 						<button
 							type="button"
 							aria-label={t('components.header.copyUrl')}
@@ -478,9 +427,9 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 									setTimeout(() => setUrlCopied(false), 2000);
 								});
 							}}
-							className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-xl transition-all cursor-pointer"
+							className={navIconBtnClass}
 						>
-							{urlCopied ? <Check size={16} strokeWidth={2.5} className="text-(--accent-green)" /> : <Copy size={16} strokeWidth={2.5} />}
+							{urlCopied ? <Check size={15} strokeWidth={2.5} className="text-(--accent-green)" /> : <Copy size={15} strokeWidth={2.5} />}
 						</button>
 
 						<button
@@ -488,9 +437,9 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 							aria-label={t('common.close')}
 							title={t('common.close')}
 							onClick={onClose}
-							className="text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 p-1.5 rounded-xl transition-all cursor-pointer"
+							className="h-8 w-8 rounded-full bg-(--foreground)/35 hover:bg-(--accent-red)/15 border border-(--border)/10 hover:border-(--accent-red)/35 flex items-center justify-center text-(--text-muted) hover:text-(--accent-red) transition-all cursor-pointer shrink-0"
 						>
-							<X size={16} strokeWidth={2.5} />
+							<X size={15} strokeWidth={2.5} />
 						</button>
 					</div>
 				</motion.div>

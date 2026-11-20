@@ -2,6 +2,64 @@
 
 # admin
 
+## 0.31.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
+## 0.31.1
+
+### Patch Changes
+
+- ## Admin IME Safety & Modern Runtime Polish
+  
+  Improved international keyboard support in admin editors and modernized network timeouts and array sorting.
+  
+  ### Changed
+  
+  - **IME-Safe Enter Handling**: Guarded `Enter` keydown handlers in the Translations editor and Invite Permissions editor against active IME composition so CJK input confirmations never prematurely advance or submit.
+  - **Native Timeout & Sorting APIs**: Replaced manual `AbortController` timeout boilerplate with `AbortSignal.timeout()` across service health probes and modernized array sorting/reversing across token and user management panels.
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
+## 0.31.0
+
+### Minor Changes
+
+- ## Per-Server Bot Profile Inspectors, Dynamic Subdomain Telemetry & Skeletons
+  
+  Added Virtue and YourApps bot profile tabs to Admin Users and Servers modals, dynamic 13-subdomain telemetry counts, and shimmer skeletons.
+  
+  ### Added
+  
+  - **User & Server Bot Profile Tabs**: Added per-server `<Selector>` Virtue & YourApps profile inspection/editing in the Manage User modal and server-level Virtue & YourApps setup inspection in the Manage Server modal.
+  - **Admin Shimmer Skeletons (`AdminSkeleton`)**: Added loading skeletons across Overview, SEO, and Media views.
+  
+  ### Changed
+  
+  - **User Modal Deduplication & Dynamic Suite Count**: Removed the duplicate `Unverify (Reset ToS & PP)` button, added singular `1 Server` card badges, and bound Overview/SEO suite counts dynamically to all 13 subdomains (including `blog` and `haste`).
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 0.30.2
 
 ### Patch Changes

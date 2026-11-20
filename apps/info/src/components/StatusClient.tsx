@@ -105,10 +105,7 @@ export default function StatusClient() {
 							const targetUrl = getEnvUrl(`https://${probeHost}/api/version`);
 							const start = performance.now();
 							try {
-								const controller = new AbortController();
-								const timeout = setTimeout(() => controller.abort(), 5000);
-								const res = await fetch(targetUrl, { signal: controller.signal, cache: 'no-store' });
-								clearTimeout(timeout);
+								const res = await fetch(targetUrl, { signal: AbortSignal.timeout(5000), cache: 'no-store' });
 								if (res.ok) {
 									ping = Math.round(performance.now() - start);
 									const data = await res.json().catch(() => ({}));
@@ -195,10 +192,19 @@ export default function StatusClient() {
 		return ((up / valid.length) * 100).toFixed(1);
 	})();
 
+	const resolveServiceHost = useCallback(
+		(host: string) =>
+			getEnvUrl(`https://${host}`)
+				.replace(/^https?:\/\//, '')
+				.replace(/\/$/, ''),
+		[getEnvUrl]
+	);
+
 	const filteredServices = services.filter((s) => {
 		if (!search.trim()) return true;
 		const q = search.toLowerCase();
-		return t(s.labelKey).toLowerCase().includes(q) || s.host.toLowerCase().includes(q) || s.id.toLowerCase().includes(q);
+		const envHost = resolveServiceHost(s.host).toLowerCase();
+		return t(s.labelKey).toLowerCase().includes(q) || s.host.toLowerCase().includes(q) || envHost.includes(q) || s.id.toLowerCase().includes(q);
 	});
 
 	const filteredBots = bots.filter((b) => {
@@ -345,7 +351,7 @@ export default function StatusClient() {
 					<Server size={20} className="text-(--accent)" />
 					{t('info.status.servicesHeading')}
 				</h2>
-				<div className="w-full sm:w-72">
+				<div className="w-full sm:w-80">
 					<Input variant="search" shortcut={true} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('info.status.searchPlaceholder')} />
 				</div>
 			</div>
@@ -371,7 +377,7 @@ export default function StatusClient() {
 								</a>
 								<p className="text-xs font-mono text-(--text-muted) flex items-center gap-1 mt-0.5">
 									<Globe size={11} className="opacity-60" />
-									{svc.host}
+									{resolveServiceHost(svc.host)}
 								</p>
 							</div>
 

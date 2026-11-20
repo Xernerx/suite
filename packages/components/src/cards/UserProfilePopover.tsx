@@ -91,10 +91,21 @@ export function UserProfilePopover({ userId, initialUser, children, className = 
 	const [bundle, setBundle] = useState<CachedUserBundle | null>(() => (userId ? userBundleCache.get(String(userId)) || null : null));
 	const [roles, setRoles] = useState<any[]>(cachedSystemRoles || []);
 	const [coords, setCoords] = useState<{ top: number; left: number; placement: 'top' | 'bottom' }>({ top: 0, left: 0, placement: 'bottom' });
+	const [avatarFailed, setAvatarFailed] = useState(false);
+	const [bannerFailed, setBannerFailed] = useState(false);
+	const [decorationFailed, setDecorationFailed] = useState(false);
+	const [clanBadgeFailed, setClanBadgeFailed] = useState(false);
 	const triggerRef = useRef<HTMLDivElement>(null);
 	const popoverRef = useRef<HTMLDivElement>(null);
 	const cleanId = String(userId || '').trim();
 	const viewerId = (session as any)?.user?.id;
+
+	useEffect(() => {
+		setAvatarFailed(false);
+		setBannerFailed(false);
+		setDecorationFailed(false);
+		setClanBadgeFailed(false);
+	}, [cleanId, bundle]);
 
 	const updatePosition = () => {
 		if (!triggerRef.current || typeof window === 'undefined') return;
@@ -285,7 +296,9 @@ export function UserProfilePopover({ userId, initialUser, children, className = 
 								className="flex flex-col rounded-3xl border border-(--border)/15 bg-(--background)/95 backdrop-blur-xl shadow-2xl text-left"
 							>
 								<div className="h-24 w-full relative overflow-hidden rounded-t-3xl bg-gradient-to-br from-(--accent)/30 via-(--foreground) to-(--background)">
-									{bannerUrl && <Image src={bannerUrl} alt={displayName} fill className="object-cover" unoptimized draggable={false} />}
+									{bannerUrl && !bannerFailed && (
+										<Image src={bannerUrl} alt={displayName} fill className="object-cover object-center" unoptimized draggable={false} onError={() => setBannerFailed(true)} />
+									)}
 									{hasDotMatrixBanner && (
 										<div className="absolute inset-0 opacity-75">
 											<XernerxDotLogo variant={(dbUser?.credits?.dotMatrixVariant as any) || 'orbit'} backgroundMode ripple={true} vivid={true} />
@@ -315,10 +328,18 @@ export function UserProfilePopover({ userId, initialUser, children, className = 
 								<div className="p-4 flex flex-col gap-3">
 									<div className="flex items-start justify-between gap-2">
 										<div className="relative -mt-11 rounded-full border-4 border-(--background) bg-(--foreground) shrink-0 shadow-md">
-											{avatarUrl ? (
+											{avatarUrl && !avatarFailed ? (
 												<div className="relative h-16 w-16">
-													<Image src={avatarUrl} alt={displayName} fill className="rounded-full object-cover" unoptimized draggable={false} />
-													{decorationUrl && !isPrivateBlocked && (
+													<Image
+														src={avatarUrl}
+														alt={displayName}
+														fill
+														className="rounded-full object-cover"
+														unoptimized
+														draggable={false}
+														onError={() => setAvatarFailed(true)}
+													/>
+													{decorationUrl && !decorationFailed && !isPrivateBlocked && (
 														<Image
 															src={decorationUrl}
 															alt=""
@@ -326,6 +347,7 @@ export function UserProfilePopover({ userId, initialUser, children, className = 
 															className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
 															unoptimized
 															draggable={false}
+															onError={() => setDecorationFailed(true)}
 														/>
 													)}
 												</div>
@@ -376,7 +398,11 @@ export function UserProfilePopover({ userId, initialUser, children, className = 
 										<div className="flex flex-wrap items-center gap-1.5">
 											{discord?.clan?.tag && (
 												<span className="bg-(--foreground)/50 text-(--text) text-[10px] font-extrabold px-2 py-1 rounded-lg flex items-center gap-1 border border-(--border)/10">
-													{clanBadgeUrl ? <Image src={clanBadgeUrl} alt="" width={11} height={11} unoptimized /> : <Zap size={10} className="text-(--accent-orange)" />}
+													{clanBadgeUrl && !clanBadgeFailed ? (
+														<Image src={clanBadgeUrl} alt="" width={11} height={11} unoptimized onError={() => setClanBadgeFailed(true)} />
+													) : (
+														<Zap size={10} className="text-(--accent-orange)" />
+													)}
 													{discord.clan.tag}
 												</span>
 											)}

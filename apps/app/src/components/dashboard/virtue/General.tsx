@@ -172,7 +172,7 @@ export default function VirtueGeneral({ id, managedGuilds, isActive = true }: { 
 				setProfile(updated);
 				setDynamicRoles(nextSnapshot.dynamicRoles || DEFAULT_DYNAMIC_ROLES);
 				setLevelRoles(nextSnapshot.levelRoles || []);
-				setOriginalConfig(JSON.parse(JSON.stringify(nextSnapshot)));
+				setOriginalConfig(structuredClone(nextSnapshot));
 				remind(false);
 				toast({ title: t('app.dashboard.virtue.toast.savedSuccess'), type: 'success' });
 			} else {
@@ -185,7 +185,7 @@ export default function VirtueGeneral({ id, managedGuilds, isActive = true }: { 
 		} finally {
 			setSaving(false);
 		}
-	}, [id, getEnvUrl, currentConfigObject, profile?.serverPremium, remind, toast, t]);
+	}, [id, getEnvUrl, currentConfigObject, profile, remind, toast, t]);
 
 	const handleReset = useCallback(() => {
 		if (!originalConfig) return;

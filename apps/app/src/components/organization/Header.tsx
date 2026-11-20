@@ -3,9 +3,9 @@
 
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Button, CopyButton } from '@xernerx/ui';
-import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, Share2 } from 'lucide-react';
+import { ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, Share2, Building2 } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
-import Image from 'next/image';
+import SafeAvatar from '@/components/SafeAvatar';
 
 export default function Header({ organization, id, servers }: { organization: any; id: string; servers?: any[] }) {
 	const { t } = useDictionary();
@@ -30,19 +30,18 @@ export default function Header({ organization, id, servers }: { organization: an
 					style={{ backgroundImage: `url(${getEnvUrl(organization.bannerUrl)})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
 				/>
 			)}
-			{organization.iconUrl || organization.icon ? (
-				<Image
-					src={organization.iconUrl ? getEnvUrl(organization.iconUrl) : organization.icon}
-					alt={organization.name || t('app.organization.header.unknownOrg')}
-					width={128}
-					height={128}
-					className="rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10"
-				/>
-			) : (
-				<div className="w-32 h-32 rounded-2xl bg-(--background) border-2 border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-lg relative z-10">
-					<User className="w-12 h-12" />
-				</div>
-			)}
+			<SafeAvatar
+				src={organization.iconUrl ? getEnvUrl(organization.iconUrl) : organization.icon}
+				alt={organization.name || t('app.organization.header.unknownOrg')}
+				width={128}
+				height={128}
+				className="w-32 h-32 rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10 object-cover"
+				fallback={
+					<div className="w-32 h-32 rounded-2xl bg-(--background) border-2 border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-lg relative z-10">
+						<Building2 className="w-12 h-12" />
+					</div>
+				}
+			/>
 			<div className="flex-1 relative z-10">
 				<div className="flex flex-wrap items-center gap-4 mb-3">
 					<div className="flex items-center gap-3">

@@ -4,6 +4,61 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.13.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
+## 0.13.3
+
+### Patch Changes
+
+- ## Store Promo Input & Ledger Polish
+  
+  Improved promo code input reliability for international keyboards and modernized credit ledger sorting.
+  
+  ### Changed
+  
+  - **IME-Safe Promo Entry**: Guarded the promo code `Enter` shortcut against active IME composition.
+  - **Credit Ledger Sorting**: Updated recent transaction sorting to use non-mutating `.toSorted()`.
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
+## 0.13.2
+
+### Patch Changes
+
+- ## Consistent Store Pricing, Crest Previews & Loading Skeletons
+  
+  Standardized currency formatting across all Store plans and perks and bundled all desktop app icon crests.
+  
+  ### Added
+  
+  - **Store Loading Skeletons**: Added glassmorphic loading skeletons while Store categories and featured passes hydrate.
+  - **Desktop App Crest Previews**: Bundled all 10 custom desktop app crest icons with resilient image fallbacks.
+  
+  ### Changed
+  
+  - **Standardized Currency Formatting**: Unified subscription, add-on, and credit pack price labels across the Store.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 0.13.1
 
 ### Patch Changes

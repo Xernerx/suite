@@ -6,7 +6,7 @@ import { Search, Command } from 'lucide-react';
 import { usePlatform } from '@xernerx/providers';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
-	variant?: 'text' | 'search' | 'textarea' | 'date' | 'number';
+	variant?: 'text' | 'search' | 'textarea' | 'date' | 'number' | 'inline';
 	shortcut?: string | boolean;
 	onSearch?: (value: string) => void;
 	rows?: number;
@@ -54,7 +54,11 @@ export function Input({ variant = 'text', shortcut, onSearch, className = '', re
 		};
 
 		const handleKeyDown = (e: React.KeyboardEvent) => {
-			if (e.key === 'Enter') handleSearchClick();
+			if (e.key === 'Enter') {
+				if (!e.nativeEvent.isComposing && e.keyCode !== 229) {
+					handleSearchClick();
+				}
+			}
 			if (props.onKeyDown) props.onKeyDown(e as any);
 		};
 
@@ -89,6 +93,18 @@ export function Input({ variant = 'text', shortcut, onSearch, className = '', re
 					<Search className="w-3.5 h-3.5" />
 				</button>
 			</div>
+		);
+	}
+
+	if (variant === 'inline' || className.includes('!bg-transparent') || className.includes('bg-transparent!')) {
+		return (
+			<input
+				ref={setRefs}
+				type={props.type || 'text'}
+				data-search-shortcut={activeShortcut ? activeShortcut.toLowerCase() : undefined}
+				className={`bg-transparent border-none outline-none ring-0 focus:ring-0 p-0 text-sm text-(--text) placeholder:text-(--text-muted) min-w-0 w-full ${className}`}
+				{...(props as React.InputHTMLAttributes<HTMLInputElement>)}
+			/>
 		);
 	}
 

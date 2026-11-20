@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import Image from 'next/image';
 import { User as UserIcon } from 'lucide-react';
 
@@ -71,18 +71,30 @@ export function SidebarAccountCard({
 	actions,
 }: SidebarAccountCardProps) {
 	const avatarRounding = avatarShape === 'circle' ? 'rounded-full' : 'rounded-xl';
+	const [avatarFailed, setAvatarFailed] = useState(false);
+	const [bgFailed, setBgFailed] = useState(false);
+
+	useEffect(() => {
+		setAvatarFailed(false);
+	}, [avatarUrl]);
+
+	useEffect(() => {
+		setBgFailed(false);
+	}, [backgroundUrl]);
+
+	const hasActiveBg = Boolean(backgroundUrl && !bgFailed);
 
 	return (
 		<div
 			className={`group relative overflow-hidden flex w-full items-center rounded-2xl border border-(--border)/10 transition-all ${
-				backgroundUrl ? 'shadow-inner' : 'bg-(--foreground)/30 hover:bg-(--foreground)/45 backdrop-blur-md'
+				hasActiveBg ? 'bg-(--foreground) shadow-sm' : 'bg-(--foreground)/30 hover:bg-(--foreground)/45 backdrop-blur-md'
 			} ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}`}
 			style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
 		>
-			{backgroundUrl && (
+			{hasActiveBg && backgroundUrl && (
 				<>
-					<Image src={backgroundUrl} alt="" fill unoptimized className="object-cover z-0 pointer-events-none opacity-90" />
-					<div className="absolute inset-0 bg-(--background)/15 z-0 pointer-events-none" />
+					<Image src={backgroundUrl} alt="" fill unoptimized className="object-cover object-center z-0 pointer-events-none opacity-95" onError={() => setBgFailed(true)} />
+					<div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/25 to-black/15 z-0 pointer-events-none" />
 				</>
 			)}
 
@@ -95,9 +107,17 @@ export function SidebarAccountCard({
 				style={isCollapsed ? undefined : { gap: 'var(--ui-gap)' }}
 			>
 				<div className="relative shrink-0">
-					{avatarUrl ? (
+					{avatarUrl && !avatarFailed ? (
 						<div className="relative h-9 w-9">
-							<Image src={avatarUrl} alt={avatarAlt || title} fill unoptimized draggable={false} className={`${avatarRounding} border border-(--border)/35 object-cover`} />
+							<Image
+								src={avatarUrl}
+								alt={avatarAlt || title}
+								fill
+								unoptimized
+								draggable={false}
+								className={`${avatarRounding} border border-(--border)/35 object-cover`}
+								onError={() => setAvatarFailed(true)}
+							/>
 						</div>
 					) : (
 						<div className={`flex h-9 w-9 items-center justify-center ${avatarRounding} border border-(--border)/20 bg-(--background)/60 text-(--text-muted)`}>
@@ -111,11 +131,11 @@ export function SidebarAccountCard({
 					className={`flex flex-col overflow-hidden transition-all duration-300 relative ${isCollapsed ? 'w-0 opacity-0 hidden' : 'flex-1 min-w-0 opacity-100'}`}
 					style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}
 				>
-					<span className={`flex items-center gap-1.5 truncate text-sm font-bold tracking-wide ${backgroundUrl ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-(--text)'}`}>
+					<span className={`flex items-center gap-1.5 truncate text-sm font-bold tracking-wide ${hasActiveBg ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-(--text)'}`}>
 						<span className="truncate">{title}</span>
 						{badge}
 					</span>
-					<span className={`flex items-center gap-1 truncate text-xs ${backgroundUrl ? 'text-white/80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]' : 'text-(--text-muted)'}`}>
+					<span className={`flex items-center gap-1 truncate text-xs ${hasActiveBg ? 'text-white/80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]' : 'text-(--text-muted)'}`}>
 						<span className="truncate">{subtitle || '\u00A0'}</span>
 						{subtitleIcon}
 					</span>
