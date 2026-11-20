@@ -97,6 +97,29 @@ export function HomeAboutSection() {
 					</motion.div>
 				))}
 			</div>
+
+			{/* ECOSYSTEM SCALE & PROOF CALLOUTS */}
+			<div className="mt-10 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 p-6 sm:p-8 shadow-sm">
+				<h3 className="text-xs font-extrabold uppercase tracking-wider text-(--accent) mb-5">{t('www.about.proof.heading')}</h3>
+				<dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+					{(
+						[
+							{ value: t('www.about.proof.serversValue'), label: t('www.about.proof.serversLabel') },
+							{ value: t('www.about.proof.usersValue'), label: t('www.about.proof.usersLabel') },
+							{ value: t('www.about.proof.botsValue'), label: t('www.about.proof.botsLabel') },
+							{ value: t('www.about.proof.packagesValue'), label: t('www.about.proof.packagesLabel') },
+							{ value: t('www.about.proof.loggingValue'), label: t('www.about.proof.loggingLabel') },
+						] as const
+					).map((stat) => (
+						<div key={stat.label} className="flex flex-col gap-1 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4">
+							<dt className="text-xs font-medium text-(--text-muted) order-2 leading-snug">{stat.label}</dt>
+							<dd className="text-2xl sm:text-3xl font-extrabold text-(--text) order-1 tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{stat.value}
+							</dd>
+						</div>
+					))}
+				</dl>
+			</div>
 		</section>
 	);
 }

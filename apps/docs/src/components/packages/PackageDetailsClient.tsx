@@ -5,6 +5,7 @@ import { ArrowLeft, Box, Code, FileCode2, Layers, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { PackageBanner } from '@/components/packages/PackageBanner';
 import { PackageDocSidebar } from '@/components/packages/PackageDocSidebar';
 import { PackageInstallBar } from '@/components/packages/PackageInstallBar';
 import { VersionSelector } from '@/components/packages/VersionSelector';
@@ -198,6 +199,11 @@ export function PackageDetailsClient({ data, availableVersions, pkgName, version
 				hasChangelog={hasChangelog}
 				changelogHref={hasChangelog ? `${getEnvUrl('https://info.xernerx.com/changelog')}#${pkgName.toLowerCase()}` : undefined}
 			/>
+
+			{/* Package Visual SVG Banner */}
+			<div className="mb-6">
+				<PackageBanner pkgName={pkgName} className="rounded-2xl" />
+			</div>
 
 			{/* Clean Top Page Header */}
 			<motion.div

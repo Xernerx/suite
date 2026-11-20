@@ -4,6 +4,25 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.13.5
+
+### Patch Changes
+
+- ## Checkout Cancel View Polish & Brand Asset Sync
+  
+  Polished the store checkout cancellation page and synchronized the 26-accent brand asset suite.
+  
+  ### Changed
+  
+  - **Checkout Cancellation & Brand Assets**: Refined the `/[id]/cancel` layout and synchronized all 26 accent banners, icons, and logos.
+- Updated dependencies
+  - @xernerx/components@0.20.0
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 0.13.4
 
 ### Patch Changes

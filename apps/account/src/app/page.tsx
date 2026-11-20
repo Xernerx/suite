@@ -45,10 +45,6 @@ export default function Home() {
 	const isBlacklisted = Boolean((user as any)?.blacklisted);
 
 	useEffect(() => {
-		hide();
-	}, [hide]);
-
-	useEffect(() => {
 		if (status === 'loading') return;
 
 		if (!session) {

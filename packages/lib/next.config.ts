@@ -5,6 +5,7 @@ import type { NextConfig } from 'next';
 export function withXernerxConfig(appConfig: NextConfig = {}): NextConfig {
 	return {
 		poweredByHeader: false,
+		htmlLimitedBots: appConfig.htmlLimitedBots ?? /.*/,
 		cacheMaxMemorySize: 16 * 1024 * 1024,
 		onDemandEntries: {
 			maxInactiveAge: 15 * 1000,

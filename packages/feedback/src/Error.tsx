@@ -3,7 +3,7 @@
 
 import { Check, Copy, RotateCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useDictionary, useLoading } from '@xernerx/providers';
+import { useDictionary, useLoading, useOptionalSidebar } from '@xernerx/providers';
 import { XernerxDotLogo } from './XernerxDotLogo';
 
 export function Error({
@@ -17,7 +17,13 @@ export function Error({
 }) {
 	const { t } = useDictionary();
 	const { setBackgroundMode, setDotVariant } = useLoading();
+	const sidebar = useOptionalSidebar();
+	const hideSidebar = sidebar?.hide;
 	const [copied, setCopied] = useState(false);
+
+	useEffect(() => {
+		hideSidebar?.();
+	}, [hideSidebar]);
 
 	useEffect(() => {
 		console.warn('Route Error:', error?.message || error);

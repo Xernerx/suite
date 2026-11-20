@@ -27,12 +27,20 @@ function getNestedJsonString(fileContent: string, keyPath: string[]): string | n
 	}
 }
 
-function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean; cookiesChanged: boolean; securityChanged: boolean; licenseChanged: boolean } {
+function detectPolicyChanges(): {
+	termsChanged: boolean;
+	privacyChanged: boolean;
+	cookiesChanged: boolean;
+	securityChanged: boolean;
+	licenseChanged: boolean;
+	developerPolicyChanged: boolean;
+} {
 	let termsChanged = false;
 	let privacyChanged = false;
 	let cookiesChanged = false;
 	let securityChanged = false;
 	let licenseChanged = false;
+	let developerPolicyChanged = false;
 
 	try {
 		const rawStatus = execSync('git status --porcelain').toString();
@@ -56,6 +64,9 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 			if (filePath.includes('apps/www/src/app/license') || filePath === 'LICENSE') {
 				licenseChanged = true;
 			}
+			if (filePath.includes('apps/www/src/app/developer-policy')) {
+				developerPolicyChanged = true;
+			}
 
 			if (filePath.startsWith('packages/lib/src/dictionaries/') && filePath.endsWith('.json')) {
 				const absPath = path.resolve(process.cwd(), filePath);
@@ -75,6 +86,7 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 					if (getNestedJsonString(currentRaw, ['www', 'cookies'])) cookiesChanged = true;
 					if (getNestedJsonString(currentRaw, ['www', 'security'])) securityChanged = true;
 					if (getNestedJsonString(currentRaw, ['www', 'license'])) licenseChanged = true;
+					if (getNestedJsonString(currentRaw, ['www', 'developerPolicy'])) developerPolicyChanged = true;
 				} else {
 					if (getNestedJsonString(currentRaw, ['www', 'terms']) !== getNestedJsonString(headRaw, ['www', 'terms'])) {
 						termsChanged = true;
@@ -94,6 +106,9 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 					if (getNestedJsonString(currentRaw, ['www', 'license']) !== getNestedJsonString(headRaw, ['www', 'license'])) {
 						licenseChanged = true;
 					}
+					if (getNestedJsonString(currentRaw, ['www', 'developerPolicy']) !== getNestedJsonString(headRaw, ['www', 'developerPolicy'])) {
+						developerPolicyChanged = true;
+					}
 				}
 			}
 		}
@@ -101,7 +116,7 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 		// Safely ignore git errors if not in a git repo
 	}
 
-	return { termsChanged, privacyChanged, cookiesChanged, securityChanged, licenseChanged };
+	return { termsChanged, privacyChanged, cookiesChanged, securityChanged, licenseChanged, developerPolicyChanged };
 }
 
 function flattenDictionary(obj: Record<string, any>, prefix = '', out: Record<string, string> = {}): Record<string, string> {
@@ -191,7 +206,7 @@ export default function registerCommit(program: Command) {
 
 			if (process.stdin.isTTY) {
 				try {
-					const { termsChanged, privacyChanged, cookiesChanged, securityChanged } = detectPolicyChanges();
+					const { termsChanged, privacyChanged, cookiesChanged, securityChanged, developerPolicyChanged } = detectPolicyChanges();
 					const now = new Date();
 					const newDate = now.toISOString().split('T')[0] + 'T00:00:00Z';
 					const readableDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -280,6 +295,26 @@ export default function registerCommit(program: Command) {
 								fs.writeFileSync(securityPagePath, pageContent);
 								commitLog.log(`✔ Updated Last Reviewed date to ${readableDate} in apps/www/src/app/security/page.tsx`);
 								execSync(`git add "${securityPagePath}"`);
+							}
+						}
+					}
+
+					if (developerPolicyChanged) {
+						const bumpDevPolicy = await select({
+							message: 'You have modified the Internal Developer Policy page (/developer-policy). Do you want to update its Effective Date?',
+							options: [
+								{ label: 'No, this was just a minor typo or layout fix', value: false },
+								{ label: 'Yes, update the Effective Date to today', value: true },
+							],
+						});
+
+						if (!isCancel(bumpDevPolicy) && bumpDevPolicy) {
+							const devPolicyPagePath = path.resolve(process.cwd(), 'apps/www/src/app/developer-policy/page.tsx');
+							if (fs.existsSync(devPolicyPagePath)) {
+								const pageContent = fs.readFileSync(devPolicyPagePath, 'utf8').replace(/(\{t\('www\.developerPolicy\.header\.effectiveDate'\)\})\s+[^<]+/g, `$1 ${readableDate}`);
+								fs.writeFileSync(devPolicyPagePath, pageContent);
+								commitLog.log(`✔ Updated Effective Date to ${readableDate} in apps/www/src/app/developer-policy/page.tsx`);
+								execSync(`git add "${devPolicyPagePath}"`);
 							}
 						}
 					}

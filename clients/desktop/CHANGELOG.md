@@ -2,6 +2,18 @@
 
 # @xernerx/desktop
 
+## 2.6.7
+
+### Patch Changes
+
+- ## Desktop Client Brand Asset Synchronization
+  
+  Synchronized the 26-accent static banner, icon, and vector logo suite inside the Electron desktop client.
+  
+  ### Changed
+  
+  - **Desktop Public Brand Assets**: Updated `clients/desktop/public` with the full 26-color SVG and PNG banner, icon, and logo kit.
+
 ## 2.6.6
 
 ### Patch Changes

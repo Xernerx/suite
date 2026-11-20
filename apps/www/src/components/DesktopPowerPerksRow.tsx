@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Check, EyeOff, Layers, MousePointerClick, Webhook } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 
-export function DesktopPowerPerksRow() {
+export function DesktopPowerPerksRow({ modKey = 'Ctrl' }: { modKey?: string }) {
 	const { t } = useDictionary();
 	const [relayPinged, setRelayPinged] = useState(false);
 	const [startupIndex, setStartupIndex] = useState(0);
@@ -68,7 +68,7 @@ export function DesktopPowerPerksRow() {
 					</div>
 					<div className="flex flex-col items-start gap-1 flex-1 min-w-0">
 						<span className="text-xs font-extrabold text-(--text) truncate">{t('www.download.perks.multiWindow.startupLabel', { target: startupTargets[startupIndex] })}</span>
-						<span className="text-[10px] font-mono text-(--accent) truncate">Ctrl + Shift + N • Middle-Click</span>
+						<span className="text-[10px] font-mono text-(--accent) truncate">{modKey} + Shift + N • Middle-Click</span>
 					</div>
 				</div>
 

@@ -2,6 +2,18 @@
 
 # @xernerx/styles
 
+## 0.4.5
+
+### Patch Changes
+
+- ## Global Stylesheet Utility & Animation Refinements
+  
+  Added global CSS utility refinements in `packages/styles/globals.css` for policy typography, scrollbars, and spotlight transitions.
+  
+  ### Changed
+  
+  - **Global Stylesheet (`globals.css`)**: Added utility rules supporting smooth policy section scrolling and glassmorphic surface polish.
+
 ## 0.4.4
 
 ### Patch Changes

@@ -145,7 +145,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 			alternates: { canonical: url },
 			...(post.privacy === 'limited' ? { robots: { index: false, follow: true } } : {}),
 			openGraph: {
-				title: `${post.title} | Xernerx Blog`,
+				title: post.title,
 				description: post.subtitle || 'Read the full article on Xernerx Blog.',
 				url,
 				siteName: 'Xernerx Blog',
@@ -158,7 +158,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 			},
 			twitter: {
 				card: 'summary_large_image',
-				title: `${post.title} | Xernerx Blog`,
+				title: post.title,
 				description: post.subtitle || 'Read the full article on Xernerx Blog.',
 				images: [post.coverImage || '/opengraph-image'],
 			},
@@ -232,13 +232,6 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
 	return (
 		<>
 			{jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
-			{post && (
-				<article className="sr-only">
-					<h1>{post.title}</h1>
-					<p>{post.subtitle}</p>
-					<div>{post.content}</div>
-				</article>
-			)}
 			<BlogArticleClient slug={slug} initialPost={post} />
 		</>
 	);

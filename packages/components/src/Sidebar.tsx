@@ -38,7 +38,7 @@ const DISCORD_NAMEPLATE_PALETTES: Record<string, string> = {
 
 export function Sidebar() {
 	const { data: session } = useSession();
-	const { state, isMobileOpen, setMobileOpen, navItems, view, setView, topSlot, bottomSlot, accountSlot, accountCards } = useSidebar();
+	const { state, isResolved, isMobileOpen, setMobileOpen, navItems, view, setView, topSlot, bottomSlot, accountSlot, accountCards } = useSidebar();
 	const { user: discordUser, loading: userLoading } = useUser();
 	const { device } = usePlatform();
 	const { t } = useDictionary();
@@ -233,7 +233,7 @@ export function Sidebar() {
 		return !isAuthRoute && window.location.href ? `${base}?redirect=${encodeURIComponent(window.location.href)}` : base;
 	})();
 
-	if (state === 'hidden') return null;
+	if (!isResolved || state === 'hidden') return null;
 
 	return (
 		<>
@@ -269,9 +269,9 @@ export function Sidebar() {
                     md:w-80 md:max-w-none md:top-0 md:bottom-auto md:sticky md:h-full md:pt-0 md:pb-0
                     md:translate-x-0 
                     ${isCollapsed ? 'md:w-[80px]' : ''}
-                    ${isSidebarItemHighlighted('collapse') ? 'ring-2 ring-inset ring-(--accent) shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_45%,transparent)]' : ''}
                     ${onboardingStage.active ? 'pointer-events-none select-none' : ''}
                 `}
+				data-onboarding-target="sidebar-collapse"
 				style={{
 					paddingLeft: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))',
 					paddingRight: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))',
@@ -299,8 +299,9 @@ export function Sidebar() {
 				{/* Navigation Items */}
 				<nav
 					aria-label={t('components.sidebar.title')}
+					data-onboarding-target="sidebar-views"
 					className={`flex flex-1 flex-col overflow-y-auto overflow-x-hidden ${topSlot && !onboardingStage.active ? 'pt-1' : 'pt-4'} rounded-2xl transition-all duration-300 ${
-						isSidebarItemHighlighted('views') ? 'ring-2 ring-(--accent) bg-(--accent)/10 p-1.5 shadow-[0_0_22px_color-mix(in_srgb,var(--accent)_50%,transparent)]' : ''
+						isSidebarItemHighlighted('views') ? 'bg-(--accent)/10 p-1.5' : ''
 					}`}
 					style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
 				>
@@ -466,11 +467,12 @@ export function Sidebar() {
 
 								{/* Combined Trigger Card Wrapper */}
 								<div
+									data-onboarding-target="sidebar-moved-dock"
 									className={`group relative overflow-hidden flex w-full items-center rounded-2xl border transition-all 
                                 ${customNameplate !== 'none' ? `xrx-nameplate-${customNameplate} border-(--accent)/35 shadow-sm` : !hasActiveNameplate ? 'border-(--border)/10 bg-(--foreground)/30 hover:bg-(--foreground)/45 backdrop-blur-md' : 'border-(--border)/15 shadow-sm'}
                                 ${customNameplate === 'none' && !hasActiveNameplate && activeMenu !== 'none' ? 'bg-(--foreground)/45 backdrop-blur-md' : ''}
                                 ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
-                                ${isSidebarItemHighlighted('moved-dock') ? 'ring-2 ring-(--accent) shadow-[0_0_22px_color-mix(in_srgb,var(--accent)_60%,transparent)] bg-(--accent)/15' : ''}
+                                ${isSidebarItemHighlighted('moved-dock') ? 'bg-(--accent)/15' : ''}
                             `}
 									style={{
 										padding: 'calc(var(--ui-gap) * 0.75)',
@@ -597,15 +599,16 @@ export function Sidebar() {
 										{/* App Drawer Trigger (Replaces Suite) */}
 										<button
 											type="button"
+											data-onboarding-target="sidebar-drawer"
 											aria-label={t('components.header.title1')}
 											title={t('components.header.title1')}
 											onClick={() => {
 												setActiveMenu('none');
 												setNavOpen(true);
 											}}
-											className={`shrink-0 flex items-center justify-center rounded-xl transition-all cursor-pointer 
+											className={`relative shrink-0 flex items-center justify-center rounded-xl transition-all cursor-pointer 
                                             ${hasActiveNameplate ? 'hover:bg-(--background)/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
-                                            ${isNavPromptActive ? 'ring-2 ring-(--accent) bg-(--accent)/20 text-(--accent) shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_75%,transparent)] scale-110 animate-pulse pointer-events-auto cursor-pointer' : ''}
+                                            ${isNavPromptActive ? 'text-(--accent) pointer-events-auto cursor-pointer' : ''}
                                         `}
 											style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
 										>

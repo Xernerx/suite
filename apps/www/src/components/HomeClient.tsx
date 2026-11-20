@@ -53,7 +53,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 		},
 	];
 
-	const internalPackageKeywords = ['websocket', '@xernerx/ui', '@xernerx/components', '@xernerx/lib', '@xernerx/styles', '@xernerx/providers', '@xernerx/feedback', '@xernerx/cli'];
+	const internalPackageKeywords = ['@xernerx/ui', '@xernerx/components', '@xernerx/lib', '@xernerx/styles', '@xernerx/providers', '@xernerx/feedback', '@xernerx/cli'];
 	const publicPackages = initialPackages.filter((pkg) => {
 		const lower = pkg.name.toLowerCase();
 		return !internalPackageKeywords.some((kw) => lower.includes(kw));
@@ -279,18 +279,16 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			{/* HISTORY */}
 			<Timeline />
 
-			{/* FAQ SECTION */}
-			<div className="px-6 pb-16">
-				<PageFaqSection
-					subtitle={t('www.home.faq.subtitle')}
-					items={[
-						{ question: t('www.home.faq.q1'), answer: t('www.home.faq.a1') },
-						{ question: t('www.home.faq.q2'), answer: t('www.home.faq.a2') },
-						{ question: t('www.home.faq.q3'), answer: t('www.home.faq.a3') },
-						{ question: t('www.home.faq.q4'), answer: t('www.home.faq.a4') },
-					]}
-				/>
-			</div>
+			{/* FAQ SCHEMA */}
+			<PageFaqSection
+				subtitle={t('www.home.faq.subtitle')}
+				items={[
+					{ question: t('www.home.faq.q1'), answer: t('www.home.faq.a1') },
+					{ question: t('www.home.faq.q2'), answer: t('www.home.faq.a2') },
+					{ question: t('www.home.faq.q3'), answer: t('www.home.faq.a3') },
+					{ question: t('www.home.faq.q4'), answer: t('www.home.faq.a4') },
+				]}
+			/>
 
 			{/* CLOSING CALL TO ACTION */}
 			<LandingCta />

@@ -70,7 +70,8 @@ export default function APIDocs() {
 	const appliedHashVersionRef = useRef<string | null>(null);
 
 	useEffect(() => {
-		if (version === 'secure' && !loading && !isAdmin) {
+		if (version === 'secure' && loading) return;
+		if (version === 'secure' && !isAdmin) {
 			clearNavItems();
 			hide();
 			return;

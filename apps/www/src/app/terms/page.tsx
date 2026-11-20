@@ -1,11 +1,12 @@
 /** @format */
 'use client';
 
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { ReadingProgressBar } from '@xernerx/components';
 import Link from 'next/link';
 import { useDictionary, useSidebar } from '@xernerx/providers';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PageFaqSection } from '@/components/PageFaqSection';
+import { PolicySubsection, PolicyTocSidebar } from '@/components/PolicySubsection';
 type Section = {
 	id: string;
 	title: string;
@@ -32,12 +33,20 @@ export default function Page() {
 			id: 'acceptable-use',
 			title: t('www.terms.sections.acceptableUse.title'),
 			content: (
-				<ul className="list-disc pl-6 space-y-2">
-					<li>{t('www.terms.sections.acceptableUse.items.0')}</li>
-					<li>{t('www.terms.sections.acceptableUse.items.1')}</li>
-					<li>{t('www.terms.sections.acceptableUse.items.2')}</li>
-					<li>{t('www.terms.sections.acceptableUse.items.3')}</li>
-				</ul>
+				<div className="space-y-3">
+					<PolicySubsection code="3.1" id="acceptable-use-3-1">
+						{t('www.terms.sections.acceptableUse.items.0')}
+					</PolicySubsection>
+					<PolicySubsection code="3.2" id="acceptable-use-3-2">
+						{t('www.terms.sections.acceptableUse.items.1')}
+					</PolicySubsection>
+					<PolicySubsection code="3.3" id="acceptable-use-3-3">
+						{t('www.terms.sections.acceptableUse.items.2')}
+					</PolicySubsection>
+					<PolicySubsection code="3.4" id="acceptable-use-3-4">
+						{t('www.terms.sections.acceptableUse.items.3')}
+					</PolicySubsection>
+				</div>
 			),
 		},
 		{
@@ -46,12 +55,20 @@ export default function Page() {
 			content: (
 				<div className="space-y-4">
 					<p>{t('www.terms.sections.apiUsage.content')}</p>
-					<ul className="list-disc pl-6 space-y-2">
-						<li>{t('www.terms.sections.apiUsage.items.0')}</li>
-						<li>{t('www.terms.sections.apiUsage.items.1')}</li>
-						<li>{t('www.terms.sections.apiUsage.items.2')}</li>
-						<li>{t('www.terms.sections.apiUsage.items.3')}</li>
-					</ul>
+					<div className="space-y-3">
+						<PolicySubsection code="4.1" id="api-usage-4-1">
+							{t('www.terms.sections.apiUsage.items.0')}
+						</PolicySubsection>
+						<PolicySubsection code="4.2" id="api-usage-4-2">
+							{t('www.terms.sections.apiUsage.items.1')}
+						</PolicySubsection>
+						<PolicySubsection code="4.3" id="api-usage-4-3">
+							{t('www.terms.sections.apiUsage.items.2')}
+						</PolicySubsection>
+						<PolicySubsection code="4.4" id="api-usage-4-4">
+							{t('www.terms.sections.apiUsage.items.3')}
+						</PolicySubsection>
+					</div>
 				</div>
 			),
 		},
@@ -71,11 +88,23 @@ export default function Page() {
 			content: (
 				<div className="space-y-4">
 					<p>{t('www.terms.sections.storeAndBilling.content')}</p>
-					<ul className="list-disc pl-6 space-y-2">
-						<li>{t('www.terms.sections.storeAndBilling.items.0')}</li>
-						<li>{t('www.terms.sections.storeAndBilling.items.1')}</li>
-						<li>{t('www.terms.sections.storeAndBilling.items.2')}</li>
-					</ul>
+					<div className="space-y-3">
+						<PolicySubsection code="7.1" id="store-and-billing-7-1">
+							{t('www.terms.sections.storeAndBilling.items.0')}
+						</PolicySubsection>
+						<PolicySubsection code="7.2" id="store-and-billing-7-2">
+							{t('www.terms.sections.storeAndBilling.items.1')}
+						</PolicySubsection>
+						<PolicySubsection code="7.3" id="store-and-billing-7-3">
+							{t('www.terms.sections.storeAndBilling.items.2')}
+						</PolicySubsection>
+						<PolicySubsection code="7.4" id="store-and-billing-7-4">
+							{t('www.terms.sections.storeAndBilling.items.3')}
+						</PolicySubsection>
+						<PolicySubsection code="7.5" id="store-and-billing-7-5">
+							{t('www.terms.sections.storeAndBilling.items.4')}
+						</PolicySubsection>
+					</div>
 				</div>
 			),
 		},
@@ -104,17 +133,44 @@ export default function Page() {
 		{
 			id: 'availability',
 			title: t('www.terms.sections.availability.title'),
-			content: <p>{t('www.terms.sections.availability.content')}</p>,
+			content: (
+				<div className="space-y-3">
+					<PolicySubsection code="10.1" id="availability-10-1">
+						{t('www.terms.sections.availability.items.0')}
+					</PolicySubsection>
+					<PolicySubsection code="10.2" id="availability-10-2">
+						{t('www.terms.sections.availability.items.1')}
+					</PolicySubsection>
+				</div>
+			),
 		},
 		{
 			id: 'third-party',
 			title: t('www.terms.sections.thirdParty.title'),
-			content: <p>{t('www.terms.sections.thirdParty.content')}</p>,
+			content: (
+				<div className="space-y-3">
+					<PolicySubsection code="11.1" id="third-party-11-1">
+						{t('www.terms.sections.thirdParty.items.0')}
+					</PolicySubsection>
+					<PolicySubsection code="11.2" id="third-party-11-2">
+						{t('www.terms.sections.thirdParty.items.1')}
+					</PolicySubsection>
+				</div>
+			),
 		},
 		{
 			id: 'intellectual-property',
 			title: t('www.terms.sections.intellectualProperty.title'),
-			content: <p>{t('www.terms.sections.intellectualProperty.content')}</p>,
+			content: (
+				<div className="space-y-3">
+					<PolicySubsection code="12.1" id="intellectual-property-12-1">
+						{t('www.terms.sections.intellectualProperty.items.0')}
+					</PolicySubsection>
+					<PolicySubsection code="12.2" id="intellectual-property-12-2">
+						{t('www.terms.sections.intellectualProperty.items.1')}
+					</PolicySubsection>
+				</div>
+			),
 		},
 		{
 			id: 'warranty',
@@ -124,7 +180,16 @@ export default function Page() {
 		{
 			id: 'liability',
 			title: t('www.terms.sections.liability.title'),
-			content: <p>{t('www.terms.sections.liability.content')}</p>,
+			content: (
+				<div className="space-y-3">
+					<PolicySubsection code="14.1" id="liability-14-1">
+						{t('www.terms.sections.liability.items.0')}
+					</PolicySubsection>
+					<PolicySubsection code="14.2" id="liability-14-2">
+						{t('www.terms.sections.liability.items.1')}
+					</PolicySubsection>
+				</div>
+			),
 		},
 		{
 			id: 'indemnification',
@@ -155,20 +220,6 @@ export default function Page() {
 		...section,
 		title: `${idx + 1}. ${String(section.title).replace(/^\d+\.\s*/, '')}`,
 	}));
-	const containerRef = useRef<HTMLElement | null>(null);
-	const [ready, setReady] = useState(false);
-	useEffect(() => {
-		const el = document.getElementById('main-scroll-container');
-		if (el) {
-			containerRef.current = el;
-			setReady(true);
-		}
-	}, []);
-	const { scrollYProgress } = useScroll(ready ? { container: containerRef } : {});
-	const scaleX = useSpring(scrollYProgress, {
-		stiffness: 100,
-		damping: 30,
-	});
 	const [active, setActive] = useState<string | null>(null);
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -192,30 +243,11 @@ export default function Page() {
 	}, [sections]);
 	return (
 		<div className="relative">
-			<motion.div
-				style={{
-					scaleX,
-					top: 'calc(50px + env(safe-area-inset-top, 0px))',
-				}}
-				className="fixed left-0 right-0 h-0.75 origin-left bg-(--accent) z-50"
-			/>
+			<ReadingProgressBar />
 
 			<div className="min-h-screen px-6 py-32">
 				<div className="max-w-(--page-width) mx-auto w-full grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
-					<aside className="hidden lg:block sticky top-32 self-start">
-						<div className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.terms.toc')}</div>
-						<nav className="space-y-4 text-sm">
-							{sections.map((section) => (
-								<a
-									key={section.id}
-									href={`#${section.id}`}
-									className={`block transition ${active === section.id ? 'text-(--accent) font-medium' : 'text-(--text-muted) hover:text-(--text)'}`}
-								>
-									{section.title}
-								</a>
-							))}
-						</nav>
-					</aside>
+					<PolicyTocSidebar tocTitle={t('www.terms.toc')} sections={sections} activeSectionId={active} onSelectSection={setActive} />
 
 					<div className="space-y-16">
 						<header className="text-center mb-16 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm">
@@ -227,7 +259,7 @@ export default function Page() {
 							>
 								{t('www.terms.header.title')}
 							</h1>
-							<div className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.terms.header.effectiveDate')} 17 November 2026</div>
+							<div className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.terms.header.effectiveDate')} 20 November 2026</div>
 						</header>
 
 						<div className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm space-y-16">

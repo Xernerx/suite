@@ -134,9 +134,20 @@ export function FirstSignInSetupScene({
 			>
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 					<div className="flex items-start gap-3 min-w-0">
-						<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-(--accent) text-white border border-(--accent) shadow-sm">
+						<motion.div
+							key={`tier-icon-${privacy}`}
+							initial={{ scale: 0.75, rotate: -8 }}
+							animate={{ scale: 1, rotate: 0 }}
+							transition={{ type: 'spring', stiffness: 360, damping: 18 }}
+							className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-(--accent) text-white border border-(--accent) shadow-sm"
+						>
+							<motion.span
+								animate={{ scale: [1, 1.28, 1], opacity: [0.55, 0, 0.55] }}
+								transition={{ duration: 2.1, repeat: Infinity, ease: 'easeInOut' }}
+								className="absolute inset-0 rounded-2xl border-2 border-(--accent)"
+							/>
 							<SelectedTierIcon size={20} />
-						</div>
+						</motion.div>
 						<div className="min-w-0">
 							<h3 className="text-base font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 								{t('components.firstSignIn.setup.privacySelectorTitle')}
@@ -149,10 +160,16 @@ export function FirstSignInSetupScene({
 					</div>
 				</div>
 
-				<div className="rounded-2xl bg-(--foreground)/75 border border-(--border)/15 px-3.5 py-2.5 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+				<motion.div
+					key={`tier-where-${privacy}`}
+					initial={{ opacity: 0, y: 6 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.25 }}
+					className="rounded-2xl bg-(--foreground)/75 border border-(--border)/15 px-3.5 py-2.5 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2"
+				>
 					<span className="shrink-0 text-[11px] font-extrabold uppercase tracking-wider text-(--accent)">{t('components.firstSignIn.setup.whereYouShowUpLabel')}</span>
 					<span className="text-xs text-(--text) font-medium leading-snug">{selectedTier.whereYouShowUp}</span>
-				</div>
+				</motion.div>
 			</div>
 
 			{/* Language & Theme Cards */}
@@ -200,9 +217,11 @@ export function FirstSignInSetupScene({
 							const ModeIcon = mode.icon;
 							const active = theme === mode.id;
 							return (
-								<button
+								<motion.button
 									key={mode.id}
 									type="button"
+									whileHover={{ scale: 1.03 }}
+									whileTap={{ scale: 0.96 }}
 									onClick={() => setTheme(mode.id)}
 									className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-bold transition-all cursor-pointer ${
 										active ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
@@ -210,7 +229,7 @@ export function FirstSignInSetupScene({
 								>
 									<ModeIcon size={14} />
 									<span>{mode.label}</span>
-								</button>
+								</motion.button>
 							);
 						})}
 					</div>
@@ -357,9 +376,19 @@ export function FirstSignInHeaderScene({
 								</div>
 							</div>
 						) : (
-							<div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/35">
+							<motion.div
+								initial={{ scale: 0.78, rotate: -6 }}
+								animate={{ scale: 1, rotate: 0 }}
+								transition={{ type: 'spring', stiffness: 360, damping: 18 }}
+								className="relative flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/35"
+							>
+								<motion.span
+									animate={{ scale: [1, 1.24, 1], opacity: [0.65, 0, 0.65] }}
+									transition={{ duration: 1.9, repeat: Infinity, ease: 'easeOut' }}
+									className="absolute inset-0 rounded-2xl border-2 border-(--accent)"
+								/>
 								<ActiveIcon size={26} />
-							</div>
+							</motion.div>
 						)}
 
 						<div className="flex-1 min-w-0 w-full">
@@ -369,9 +398,14 @@ export function FirstSignInHeaderScene({
 								</h3>
 								<div className="flex items-center gap-2 shrink-0">
 									{activeMeta.kbd && (
-										<kbd className="rounded-xl bg-(--foreground) border border-(--accent)/30 px-2.5 py-0.5 font-mono text-xs font-extrabold text-(--accent) whitespace-nowrap">
+										<motion.kbd
+											initial={{ scale: 0.85, y: -4 }}
+											animate={{ scale: [1, 1.06, 1], y: 0 }}
+											transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+											className="rounded-xl bg-(--foreground) border border-(--accent)/40 px-2.5 py-0.5 font-mono text-xs font-extrabold text-(--accent) whitespace-nowrap shadow-[0_0_14px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
+										>
 											{activeMeta.kbd}
-										</kbd>
+										</motion.kbd>
 									)}
 									<div className="flex items-center gap-1.5">
 										{headerSteps.map((stepId, idx) => (

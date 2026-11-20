@@ -5,17 +5,28 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, BatteryCharging, Bell, Camera, Command, QrCode, Radio, RefreshCw, ShieldCheck, Sparkles, Users, Zap } from 'lucide-react';
-import { useDictionary } from '@xernerx/providers';
+import { useDictionary, usePlatform } from '@xernerx/providers';
 import { DesktopPowerPerksRow } from './DesktopPowerPerksRow';
+import { useDesktopPreviewData } from './useDesktopPreviewData';
 
 const SAMPLE_CODES = ['XRN-84K', 'K7M-92P', 'V4X-31Q', 'Q9L-55Z'];
 
-export function DesktopPerksBento() {
+export function DesktopPerksBento({ platform: platformProp }: { platform?: 'windows' | 'macos' | 'linux' }) {
 	const { t } = useDictionary();
+	const { platform: detectedPlatform } = usePlatform();
+	const liveData = useDesktopPreviewData();
+	const effectivePlatform = platformProp || (detectedPlatform === 'macos' ? 'macos' : detectedPlatform === 'linux' ? 'linux' : 'windows');
+	const modKey = effectivePlatform === 'macos' ? '⌘' : 'Ctrl';
+
 	const [selectedAccount, setSelectedAccount] = useState<'main' | 'alt'>('main');
+	const [bentoAvatarFailed, setBentoAvatarFailed] = useState(false);
 	const [altActivity, setAltActivity] = useState(false);
 	const [pinned, setPinned] = useState(true);
 	const [notifPlatform, setNotifPlatform] = useState<'windows' | 'macos'>('windows');
+
+	useEffect(() => {
+		setNotifPlatform(effectivePlatform === 'macos' ? 'macos' : 'windows');
+	}, [effectivePlatform]);
 	const [streamerProtected, setStreamerProtected] = useState(true);
 	const [captureCopied, setCaptureCopied] = useState(false);
 	const [ecoBattery, setEcoBattery] = useState(false);
@@ -60,11 +71,18 @@ export function DesktopPerksBento() {
 					<div className="rounded-2xl bg-(--background)/60 border border-(--border)/10 p-3 flex flex-col gap-2">
 						{(
 							[
-								{ id: 'main', handle: '@Alex', role: t('www.download.preview.mainRole'), initial: 'A' },
-								{ id: 'alt', handle: '@CozyAlt', role: t('www.download.preview.altRole'), initial: 'C' },
+								{
+									id: 'main',
+									handle: liveData.isSignedIn ? `${liveData.displayName} (${liveData.handle})` : '@Alex',
+									role: t('www.download.preview.mainRole'),
+									initial: liveData.initial,
+									avatarUrl: liveData.avatarUrl,
+								},
+								{ id: 'alt', handle: '@CozyAlt', role: t('www.download.preview.altRole'), initial: 'C', avatarUrl: null },
 							] as const
 						).map((acct) => {
 							const isCurrent = selectedAccount === acct.id;
+							const showAcctAvatar = Boolean(acct.avatarUrl && !bentoAvatarFailed);
 							return (
 								<button
 									type="button"
@@ -76,11 +94,21 @@ export function DesktopPerksBento() {
 								>
 									<div className="flex items-center gap-3 min-w-0">
 										<div
-											className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 transition-colors ${
+											className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 overflow-hidden transition-colors ${
 												isCurrent ? 'bg-(--accent) text-(--accent-contrast)' : 'bg-(--foreground) border border-(--border)/20 text-(--text-muted)'
 											}`}
 										>
-											{acct.initial}
+											{showAcctAvatar ? (
+												<img
+													src={acct.avatarUrl!}
+													alt={`${acct.handle} account avatar`}
+													onError={() => setBentoAvatarFailed(true)}
+													className="h-full w-full object-cover"
+													draggable={false}
+												/>
+											) : (
+												acct.initial
+											)}
 										</div>
 										<div className="flex flex-col text-left min-w-0">
 											<span className="text-xs font-extrabold text-(--text) truncate">{acct.handle}</span>
@@ -248,7 +276,7 @@ export function DesktopPerksBento() {
 				>
 					<div className="rounded-2xl bg-(--background)/60 border border-(--border)/10 p-3.5 flex flex-col items-center justify-center gap-2.5">
 						<motion.div animate={keyBounce ? { scale: [1, 1.12, 1] } : {}} className="flex items-center gap-1.5">
-							{['Ctrl', 'Shift', 'X'].map((key, idx) => (
+							{[modKey, 'Shift', 'X'].map((key, idx) => (
 								<div key={key} className="flex items-center gap-1.5">
 									<kbd className="rounded-xl bg-(--foreground)/70 border border-(--accent)/40 px-3 py-1.5 text-xs font-black text-(--text) shadow-sm">{key}</kbd>
 									{idx < 2 && <span className="text-xs font-bold text-(--text-muted)">+</span>}
@@ -365,7 +393,7 @@ export function DesktopPerksBento() {
 							<span className="rounded-full bg-(--accent)/15 border border-(--accent)/30 px-2.5 py-0.5 text-[11px] font-extrabold text-(--accent) truncate max-w-full">
 								{captureCopied ? t('www.download.perks.quickCapture.copiedLabel') : t('www.download.perks.quickCapture.actionLabel')}
 							</span>
-							<span className="text-[10px] font-mono text-(--text-muted) truncate">Ctrl + Shift + S</span>
+							<span className="text-[10px] font-mono text-(--text-muted) truncate">{modKey} + Shift + S</span>
 						</div>
 					</div>
 
@@ -412,7 +440,7 @@ export function DesktopPerksBento() {
 					</div>
 				</motion.div>
 
-				<DesktopPowerPerksRow />
+				<DesktopPowerPerksRow modKey={modKey} />
 			</div>
 		</section>
 	);

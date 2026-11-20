@@ -1,12 +1,13 @@
 /** @format */
 'use client';
 
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { ReadingProgressBar } from '@xernerx/components';
 import { Bot, CheckCircle2, Database, KeyRound, Lock, ShieldCheck, Sparkles, Trash2 } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PageFaqSection } from '@/components/PageFaqSection';
+import { PolicySubsection, PolicyTocSidebar } from '@/components/PolicySubsection';
 
 type Section = {
 	id: string;
@@ -104,24 +105,23 @@ export default function SecurityPage() {
 			id: 'authentication',
 			title: t('www.security.sections.authentication.title'),
 			content: (
-				<ul className="list-disc pl-6 space-y-4">
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.authentication.items.oauth.title')}</strong> {t('www.security.sections.authentication.items.oauth.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.authentication.items.devices.title')}</strong> {t('www.security.sections.authentication.items.devices.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.authentication.items.qr.title')}</strong> {t('www.security.sections.authentication.items.qr.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.authentication.items.partitions.title')}</strong> {t('www.security.sections.authentication.items.partitions.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.authentication.items.connections.title')}</strong>{' '}
+				<div className="space-y-3">
+					<PolicySubsection code="2.1" id="authentication-2-1" title={t('www.security.sections.authentication.items.oauth.title')}>
+						{t('www.security.sections.authentication.items.oauth.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.2" id="authentication-2-2" title={t('www.security.sections.authentication.items.devices.title')}>
+						{t('www.security.sections.authentication.items.devices.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.3" id="authentication-2-3" title={t('www.security.sections.authentication.items.qr.title')}>
+						{t('www.security.sections.authentication.items.qr.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.4" id="authentication-2-4" title={t('www.security.sections.authentication.items.partitions.title')}>
+						{t('www.security.sections.authentication.items.partitions.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.5" id="authentication-2-5" title={t('www.security.sections.authentication.items.connections.title')}>
 						{t('www.security.sections.authentication.items.connections.desc')}
-					</li>
-				</ul>
+					</PolicySubsection>
+				</div>
 			),
 		},
 		{
@@ -130,17 +130,17 @@ export default function SecurityPage() {
 			content: (
 				<div className="space-y-4">
 					<p>{t('www.security.sections.privacyTiers.intro')}</p>
-					<ul className="list-disc pl-6 space-y-4">
-						<li>
-							<strong className="text-(--text)">{t('www.security.sections.privacyTiers.public.title')}</strong> {t('www.security.sections.privacyTiers.public.desc')}
-						</li>
-						<li>
-							<strong className="text-(--text)">{t('www.security.sections.privacyTiers.limited.title')}</strong> {t('www.security.sections.privacyTiers.limited.desc')}
-						</li>
-						<li>
-							<strong className="text-(--text)">{t('www.security.sections.privacyTiers.private.title')}</strong> {t('www.security.sections.privacyTiers.private.desc')}
-						</li>
-					</ul>
+					<div className="space-y-3">
+						<PolicySubsection code="3.1" id="privacy-tiers-3-1" title={t('www.security.sections.privacyTiers.public.title')}>
+							{t('www.security.sections.privacyTiers.public.desc')}
+						</PolicySubsection>
+						<PolicySubsection code="3.2" id="privacy-tiers-3-2" title={t('www.security.sections.privacyTiers.limited.title')}>
+							{t('www.security.sections.privacyTiers.limited.desc')}
+						</PolicySubsection>
+						<PolicySubsection code="3.3" id="privacy-tiers-3-3" title={t('www.security.sections.privacyTiers.private.title')}>
+							{t('www.security.sections.privacyTiers.private.desc')}
+						</PolicySubsection>
+					</div>
 				</div>
 			),
 		},
@@ -150,33 +150,33 @@ export default function SecurityPage() {
 			content: (
 				<div className="space-y-6">
 					<p>{t('www.security.sections.bots.intro')}</p>
-					<div className="grid grid-cols-1 gap-6">
-						{botCards.map((bot) => (
-							<div key={bot.id} className="rounded-2xl bg-(--background)/50 border border-(--border)/10 p-6 flex flex-col gap-4">
-								<div className="flex flex-wrap items-center justify-between gap-3">
-									<a
-										href={bot.href}
-										className="inline-flex items-center gap-2.5 text-lg font-bold text-(--text) hover:text-(--accent) transition-colors"
-										style={{ fontFamily: 'var(--font-fredoka)' }}
-									>
-										<Bot size={20} className="text-(--accent) shrink-0" />
-										<span>{bot.title}</span>
-									</a>
-									<span className="inline-flex items-center gap-1.5 rounded-full bg-(--accent)/10 border border-(--accent)/30 px-3 py-1 text-xs font-bold text-(--accent)">
-										<Sparkles size={12} />
-										{bot.badge}
-									</span>
+					<div className="space-y-6">
+						{botCards.map((bot, botIdx) => {
+							const botCode = `4.${botIdx + 1}`;
+							return (
+								<div
+									key={bot.id}
+									id={`bots-4-${botIdx + 1}`}
+									data-policy-subsection="true"
+									data-subsection-code={botCode}
+									data-subsection-label={bot.title}
+									className="scroll-mt-32 space-y-2.5"
+								>
+									<h3 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+										<a href={bot.href} className="hover:text-(--accent) transition-colors">
+											{botCode} {bot.title}
+										</a>
+									</h3>
+									<div className="space-y-2 pl-4 border-l border-(--border)/20">
+										{bot.points.map((pt, i) => (
+											<PolicySubsection key={i} code={`${botCode}.${i + 1}`}>
+												{pt}
+											</PolicySubsection>
+										))}
+									</div>
 								</div>
-								<ul className="space-y-2.5 text-sm text-(--text-muted)">
-									{bot.points.map((pt, i) => (
-										<li key={i} className="flex items-start gap-2.5">
-											<CheckCircle2 size={16} className="text-(--accent) shrink-0 mt-0.5" />
-											<span>{pt}</span>
-										</li>
-									))}
-								</ul>
-							</div>
-						))}
+							);
+						})}
 					</div>
 				</div>
 			),
@@ -185,37 +185,37 @@ export default function SecurityPage() {
 			id: 'api-and-webhooks',
 			title: t('www.security.sections.apiAndWebhooks.title'),
 			content: (
-				<ul className="list-disc pl-6 space-y-4">
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.apiAndWebhooks.items.tokens.title')}</strong> {t('www.security.sections.apiAndWebhooks.items.tokens.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.apiAndWebhooks.items.webhooks.title')}</strong> {t('www.security.sections.apiAndWebhooks.items.webhooks.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.apiAndWebhooks.items.websocket.title')}</strong> {t('www.security.sections.apiAndWebhooks.items.websocket.desc')}
-					</li>
-				</ul>
+				<div className="space-y-3">
+					<PolicySubsection code="5.1" id="api-and-webhooks-5-1" title={t('www.security.sections.apiAndWebhooks.items.tokens.title')}>
+						{t('www.security.sections.apiAndWebhooks.items.tokens.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="5.2" id="api-and-webhooks-5-2" title={t('www.security.sections.apiAndWebhooks.items.webhooks.title')}>
+						{t('www.security.sections.apiAndWebhooks.items.webhooks.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="5.3" id="api-and-webhooks-5-3" title={t('www.security.sections.apiAndWebhooks.items.websocket.title')}>
+						{t('www.security.sections.apiAndWebhooks.items.websocket.desc')}
+					</PolicySubsection>
+				</div>
 			),
 		},
 		{
 			id: 'infrastructure',
 			title: t('www.security.sections.infrastructure.title'),
 			content: (
-				<ul className="list-disc pl-6 space-y-4">
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.infrastructure.items.databases.title')}</strong> {t('www.security.sections.infrastructure.items.databases.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.infrastructure.items.cdn.title')}</strong> {t('www.security.sections.infrastructure.items.cdn.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.infrastructure.items.stripe.title')}</strong> {t('www.security.sections.infrastructure.items.stripe.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.security.sections.infrastructure.items.audit.title')}</strong> {t('www.security.sections.infrastructure.items.audit.desc')}
-					</li>
-				</ul>
+				<div className="space-y-3">
+					<PolicySubsection code="6.1" id="infrastructure-6-1" title={t('www.security.sections.infrastructure.items.databases.title')}>
+						{t('www.security.sections.infrastructure.items.databases.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="6.2" id="infrastructure-6-2" title={t('www.security.sections.infrastructure.items.cdn.title')}>
+						{t('www.security.sections.infrastructure.items.cdn.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="6.3" id="infrastructure-6-3" title={t('www.security.sections.infrastructure.items.stripe.title')}>
+						{t('www.security.sections.infrastructure.items.stripe.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="6.4" id="infrastructure-6-4" title={t('www.security.sections.infrastructure.items.audit.title')}>
+						{t('www.security.sections.infrastructure.items.audit.desc')}
+					</PolicySubsection>
+				</div>
 			),
 		},
 		{
@@ -224,14 +224,26 @@ export default function SecurityPage() {
 			content: (
 				<div className="space-y-4">
 					<p>{t('www.security.sections.dataControl.content')}</p>
-					<ul className="list-disc pl-6 space-y-2.5">
-						<li>{t('www.security.sections.dataControl.items.0')}</li>
-						<li>{t('www.security.sections.dataControl.items.1')}</li>
-						<li>{t('www.security.sections.dataControl.items.2')}</li>
-						<li>{t('www.security.sections.dataControl.items.3')}</li>
-						<li>{t('www.security.sections.dataControl.items.5')}</li>
-						<li>{t('www.security.sections.dataControl.items.4')}</li>
-					</ul>
+					<div className="space-y-3">
+						<PolicySubsection code="7.1" id="data-control-7-1">
+							{t('www.security.sections.dataControl.items.0')}
+						</PolicySubsection>
+						<PolicySubsection code="7.2" id="data-control-7-2">
+							{t('www.security.sections.dataControl.items.1')}
+						</PolicySubsection>
+						<PolicySubsection code="7.3" id="data-control-7-3">
+							{t('www.security.sections.dataControl.items.2')}
+						</PolicySubsection>
+						<PolicySubsection code="7.4" id="data-control-7-4">
+							{t('www.security.sections.dataControl.items.3')}
+						</PolicySubsection>
+						<PolicySubsection code="7.5" id="data-control-7-5">
+							{t('www.security.sections.dataControl.items.5')}
+						</PolicySubsection>
+						<PolicySubsection code="7.6" id="data-control-7-6">
+							{t('www.security.sections.dataControl.items.4')}
+						</PolicySubsection>
+					</div>
 				</div>
 			),
 		},
@@ -241,10 +253,10 @@ export default function SecurityPage() {
 			content: (
 				<div className="space-y-4">
 					<p>{t('www.security.sections.licensing.intro')}</p>
-					<ul className="list-disc pl-6 space-y-4">
-						<li>
-							<strong className="text-(--text)">{t('www.security.sections.licensing.proprietaryTitle')}</strong> {t('www.security.sections.licensing.proprietaryDesc')}{' '}
-							<span className="inline-flex flex-wrap items-center gap-3 mt-1">
+					<div className="space-y-3">
+						<PolicySubsection code="8.1" id="licensing-8-1" title={t('www.security.sections.licensing.proprietaryTitle')}>
+							<p>{t('www.security.sections.licensing.proprietaryDesc')}</p>
+							<span className="inline-flex flex-wrap items-center gap-3 mt-2">
 								<Link href="/license" className="text-(--accent) hover:underline font-medium">
 									{t('www.security.sections.licensing.proprietaryLink')}
 								</Link>
@@ -253,10 +265,10 @@ export default function SecurityPage() {
 									{t('www.security.sections.licensing.plainTextLink')}
 								</Link>
 							</span>
-						</li>
-						<li>
-							<strong className="text-(--text)">{t('www.security.sections.licensing.apacheTitle')}</strong> {t('www.security.sections.licensing.apacheDesc')}{' '}
-							<span className="inline-flex flex-wrap items-center gap-3 mt-1">
+						</PolicySubsection>
+						<PolicySubsection code="8.2" id="licensing-8-2" title={t('www.security.sections.licensing.apacheTitle')}>
+							<p>{t('www.security.sections.licensing.apacheDesc')}</p>
+							<span className="inline-flex flex-wrap items-center gap-3 mt-2">
 								<a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline font-medium">
 									{t('www.security.sections.licensing.apacheLink')}
 								</a>
@@ -269,8 +281,8 @@ export default function SecurityPage() {
 									{t('www.security.sections.licensing.githubLink')}
 								</a>
 							</span>
-						</li>
-					</ul>
+						</PolicySubsection>
+					</div>
 					<p className="text-sm">
 						{t('www.security.sections.licensing.policiesPrefix')}
 						<Link href="/terms" className="text-(--accent) hover:underline font-medium">
@@ -280,9 +292,13 @@ export default function SecurityPage() {
 						<Link href="/privacy" className="text-(--accent) hover:underline font-medium">
 							{t('www.security.sections.licensing.privacyLink')}
 						</Link>
-						{t('www.security.sections.licensing.andText')}
+						{', '}
 						<Link href="/cookies" className="text-(--accent) hover:underline font-medium">
 							{t('www.security.sections.licensing.cookiesLink')}
+						</Link>
+						{t('www.security.sections.licensing.andText')}
+						<Link href="/developer-policy" className="text-(--accent) hover:underline font-medium">
+							{t('www.security.sections.licensing.developerPolicyLink')}
 						</Link>
 						.
 					</p>
@@ -308,23 +324,6 @@ export default function SecurityPage() {
 			),
 		},
 	];
-
-	const containerRef = useRef<HTMLElement | null>(null);
-	const [ready, setReady] = useState(false);
-
-	useEffect(() => {
-		const el = document.getElementById('main-scroll-container');
-		if (el) {
-			containerRef.current = el;
-			setReady(true);
-		}
-	}, []);
-
-	const { scrollYProgress } = useScroll(ready ? { container: containerRef } : {});
-	const scaleX = useSpring(scrollYProgress, {
-		stiffness: 100,
-		damping: 30,
-	});
 
 	const [active, setActive] = useState<string | null>(null);
 
@@ -353,32 +352,12 @@ export default function SecurityPage() {
 
 	return (
 		<div className="relative">
-			<motion.div
-				style={{
-					scaleX,
-					top: 'calc(50px + env(safe-area-inset-top, 0px))',
-				}}
-				className="fixed left-0 right-0 h-0.75 origin-left bg-(--accent) z-50"
-			/>
+			<ReadingProgressBar />
 
 			<div className="min-h-screen px-6 py-32">
 				<div className="max-w-(--page-width) mx-auto w-full grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
 					{/* TOC */}
-					<aside className="hidden lg:block sticky top-32 self-start">
-						<div className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.security.toc')}</div>
-
-						<nav className="space-y-4 text-sm">
-							{sections.map((section) => (
-								<a
-									key={section.id}
-									href={`#${section.id}`}
-									className={`block transition ${active === section.id ? 'text-(--accent) font-medium' : 'text-(--text-muted) hover:text-(--text)'}`}
-								>
-									{section.title}
-								</a>
-							))}
-						</nav>
-					</aside>
+					<PolicyTocSidebar tocTitle={t('www.security.toc')} sections={sections} activeSectionId={active} onSelectSection={setActive} />
 
 					{/* MAIN */}
 					<div className="space-y-12">
@@ -396,7 +375,7 @@ export default function SecurityPage() {
 								{t('www.security.header.title')}
 							</h1>
 							<p className="max-w-3xl text-base text-(--text-muted) leading-relaxed">{t('www.security.header.subtitle')}</p>
-							<div className="text-xs font-medium tracking-wide uppercase text-(--text-muted)">{t('www.security.header.effectiveDate')} 17 November 2026</div>
+							<div className="text-xs font-medium tracking-wide uppercase text-(--text-muted)">{t('www.security.header.effectiveDate')} 20 November 2026</div>
 						</header>
 
 						{/* Core Security Pillars Bento */}

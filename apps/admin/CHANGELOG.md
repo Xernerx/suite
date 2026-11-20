@@ -2,6 +2,25 @@
 
 # admin
 
+## 0.31.3
+
+### Patch Changes
+
+- ## Staff Portal Brand Kit Synchronization
+  
+  Synchronized the 26-accent static banner, icon, and vector logo suite across the internal Admin portal.
+  
+  ### Changed
+  
+  - **Static Brand Assets**: Updated `public/` with the full 26-color SVG and PNG banner, icon, and logo kit.
+- Updated dependencies
+  - @xernerx/components@0.20.0
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 0.31.2
 
 ### Patch Changes

@@ -2,6 +2,27 @@
 
 # @xernerx/providers
 
+## 0.25.0
+
+### Minor Changes
+
+- ## Command Palette Developer Policy Entry, Cookie Version Bump & Tour Targets
+  
+  Added the Internal Developer Policy to the global `Ctrl + K` Command Palette, bumped `COOKIES_VERSION`, and wired `data-onboarding-target` anchors into the floating support launcher.
+  
+  ### Added
+  
+  - **Command Palette Developer Policy Route**: Registered `/developer-policy` in `commandPaletteCatalog.ts` for instant `Ctrl + K` navigation.
+  
+  ### Changed
+  
+  - **Support Launcher Onboarding Anchor & Cookie Version**: Added `data-onboarding-target="support-launcher"` to `SupportProvider`, bumped `COOKIES_VERSION` in `CookieProvider`, and refined `PlatformProvider` and `SidebarProvider` state synchronization.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.30.0
+
 ## 0.24.4
 
 ### Patch Changes

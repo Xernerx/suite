@@ -1,9 +1,9 @@
 /** @format */
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { ReadingProgressBar } from '@xernerx/components';
 import { ArrowLeft, Calendar, Check, Clock, Copy, Eye, Flame, Heart, Lock, Megaphone, PenSquare, Rocket, Rss, ShieldCheck, Sparkles, Terminal, Users } from 'lucide-react';
 import { useDictionary, useEnvironment, usePermissions, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { NotFound } from '@xernerx/feedback';
@@ -47,26 +47,9 @@ export default function BlogArticleClient({ slug, initialPost }: { slug: string;
 	const [reactingKey, setReactingKey] = useState<ReactionKey | null>(null);
 	const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
 
-	const containerRef = useRef<HTMLElement | null>(null);
-	const [scrollReady, setScrollReady] = useState(false);
-
 	useEffect(() => {
 		hide();
 	}, [hide]);
-
-	useEffect(() => {
-		const el = document.getElementById('main-scroll-container');
-		if (el) {
-			containerRef.current = el;
-			setScrollReady(true);
-		}
-	}, []);
-
-	const { scrollYProgress } = useScroll(scrollReady ? { container: containerRef } : {});
-	const scaleX = useSpring(scrollYProgress, {
-		stiffness: 100,
-		damping: 30,
-	});
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -197,13 +180,7 @@ export default function BlogArticleClient({ slug, initialPost }: { slug: string;
 	return (
 		<div className="relative">
 			{/* Policy-Style Top Reading Progress Bar */}
-			<motion.div
-				style={{
-					scaleX,
-					top: 'calc(50px + env(safe-area-inset-top, 0px))',
-				}}
-				className="fixed left-0 right-0 h-0.75 origin-left bg-(--accent) z-50"
-			/>
+			<ReadingProgressBar />
 
 			<div className="min-h-screen px-6 py-16 lg:py-24">
 				<div className="max-w-(--page-width) mx-auto w-full grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">

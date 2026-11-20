@@ -2,6 +2,25 @@
 
 # auth
 
+## 2.18.2
+
+### Patch Changes
+
+- ## Account Hub Polish & 26-Accent Brand Asset Sync
+  
+  Cleaned up the Account identity hub overview and synchronized the 26-accent branding asset suite.
+  
+  ### Changed
+  
+  - **Account Overview & Brand Assets**: Refined the account overview layout and synchronized all 26 accent banners, icons, and vector logos.
+- Updated dependencies
+  - @xernerx/components@0.20.0
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 2.18.1
 
 ### Patch Changes

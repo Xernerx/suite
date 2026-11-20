@@ -1,5 +1,6 @@
 /** @format */
 
+import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { buildDiscordBotAuthorizeUrl, getEnabledInviteOptions } from '@xernerx/lib';
@@ -8,6 +9,91 @@ import { InviteOptionChooser } from '@/components/InviteOptionChooser';
 import { findDefaultOfficialInvite } from '@/lib/defaultOfficialInvites';
 
 export const dynamic = 'force-dynamic';
+
+const OFFICIAL_INVITE_SEO: Record<string, { title: string; description: string }> = {
+	virtue: {
+		title: 'Invite Virtue — Discord XP & Leveling Bot | Xernerx',
+		description: 'Invite Virtue to your Discord server with least-privilege OAuth2 presets. Track text & voice XP, leaderboards, and role rewards with zero message logging.',
+	},
+	yourapps: {
+		title: 'Invite YourApps — Discord Forms & Apps Bot | Xernerx',
+		description: 'Invite YourApps to Discord with least-privilege OAuth2 presets. Build Modals V2 applications, web portals, Apply panels, and automated review workflows.',
+	},
+	metamorphosis: {
+		title: 'Invite Metamorphosis — Discord Translator | Xernerx',
+		description: 'Invite Metamorphosis to Discord with least-privilege OAuth2 presets for real-time multilingual translation, auto-translated channels, and global communities.',
+	},
+	zodiac: {
+		title: 'Invite Zodiac — Discord Astrology & Horoscope Bot',
+		description: 'Invite Zodiac to your Discord server with least-privilege OAuth2 presets for daily horoscopes, zodiac sign profiles, compatibility checks, and birth charts.',
+	},
+	todo: {
+		title: 'Invite To-Do List Bot — Discord Task Boards | Xernerx',
+		description: 'Invite To-Do List Bot to Discord with least-privilege OAuth2 presets for collaborative server task boards, personal checklists, priorities, and reminders.',
+	},
+};
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+	const { id } = await params;
+	const cleanKey = id.trim().toLowerCase();
+	const officialSeo = OFFICIAL_INVITE_SEO[cleanKey];
+	const fallback = findDefaultOfficialInvite(id);
+	let botName = fallback?.name || id;
+	let description =
+		officialSeo?.description || `Invite ${botName} to your Discord server with verified least-privilege OAuth2 permission presets and manage settings in the unified Xernerx Suite dashboard.`;
+
+	if (!officialSeo && process.env.MONGO_XERNERX) {
+		try {
+			const dbLookup = await Promise.race([
+				(async () => {
+					const db = await database('xernerx');
+					const foundInvite: any = await db.models.core.AppInvite.findOne({ id }).lean();
+					if (!foundInvite) return null;
+					const foundBot = await (db.models.bots as any)?.Bot?.findOne({ id: foundInvite.clientId })
+						.select('name description discordCache')
+						.lean()
+						.catch(() => null);
+					return { invite: foundInvite, botDoc: foundBot };
+				})(),
+				new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
+			]);
+			if (dbLookup?.invite) {
+				botName = dbLookup.botDoc?.discordCache?.globalName || dbLookup.botDoc?.discordCache?.username || dbLookup.botDoc?.name || dbLookup.invite.name || botName;
+				const rawDesc = String(dbLookup.botDoc?.description || '').trim();
+				if (rawDesc.length >= 60) {
+					description = `Invite ${botName} to Discord: ${rawDesc}`.slice(0, 158);
+				} else {
+					description = `Invite ${botName} to your Discord server with verified least-privilege OAuth2 permission presets and manage settings in the unified Xernerx Suite dashboard.`;
+				}
+			}
+		} catch {
+			// Fall back to official invite defaults
+		}
+	}
+
+	const canonicalUrl = `https://www.xernerx.com/invites/${encodeURIComponent(id)}`;
+	const title = officialSeo?.title || `Invite ${botName} — Official Discord Bot | Xernerx`;
+
+	return {
+		title: { absolute: title },
+		description,
+		alternates: { canonical: canonicalUrl },
+		openGraph: {
+			title,
+			description,
+			url: canonicalUrl,
+			siteName: 'Xernerx Studios',
+			images: [{ url: '/banner.png', width: 1200, height: 630, alt: title }],
+			type: 'website',
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title,
+			description,
+			images: ['/banner.png'],
+		},
+	};
+}
 
 function resolveAppBaseUrl(host: string | null): string {
 	const h = (host || '').toLowerCase();

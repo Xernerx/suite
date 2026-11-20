@@ -34,7 +34,6 @@
 		"footer": {
 			"tagline": "Building modern software, infrastructure, and developer tools with a focus on performance, simplicity, and long-term maintainability.",
 			"sections": {
-				"resources": "Resources",
 				"developer": "Developer"
 			},
 			"links": {

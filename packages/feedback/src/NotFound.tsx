@@ -6,13 +6,19 @@ import { Button } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDictionary, useLoading } from '@xernerx/providers';
+import { useDictionary, useLoading, useOptionalSidebar } from '@xernerx/providers';
 import { XernerxDotLogo } from './XernerxDotLogo';
 
 export function NotFound() {
 	const { t } = useDictionary();
 	const router = useRouter();
 	const { setBackgroundMode, setDotVariant } = useLoading();
+	const sidebar = useOptionalSidebar();
+	const hideSidebar = sidebar?.hide;
+
+	useEffect(() => {
+		hideSidebar?.();
+	}, [hideSidebar]);
 
 	useEffect(() => {
 		setBackgroundMode('sticky-ripple');

@@ -2,6 +2,18 @@
 
 # @xernerx/cli
 
+## 2.9.0
+
+### Minor Changes
+
+- ## Internal Developer Policy Change Detection in Suite Commit CLI
+  
+  Extended `pnpm suite commit` to detect modifications to `/developer-policy` and `www.developerPolicy` dictionary keys and prompt to bump the Effective Date.
+  
+  ### Added
+  
+  - **Developer Policy Effective Date Bumper**: Added `developerPolicyChanged` detection in `.xernerx/cli/commands/commit.ts` covering `apps/www/src/app/developer-policy` and `www.developerPolicy` dictionary diffs.
+
 ## 2.8.1
 
 ### Patch Changes

@@ -9,6 +9,8 @@ import { getEnabledInviteOptions, type InviteOptionsConfig } from '@xernerx/lib'
 import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
 import { PageFaqSection } from '@/components/PageFaqSection';
+import { StudioTrustProofStrip } from '@/components/StudioTrustProofStrip';
+import { SuiteComparisonTable } from '@/components/SuiteComparisonTable';
 import { DEFAULT_OFFICIAL_INVITES } from '@/lib/defaultOfficialInvites';
 
 interface Invite {
@@ -184,9 +186,13 @@ export default function InvitesPage() {
 
 											<h2 className="font-bold text-2xl text-(--text) mb-2 group-hover:text-(--accent) transition-colors" style={{ fontFamily: 'var(--font-fredoka)' }}>
 												{isSingleUrl ? (
-													<a href={`/invites/${invite.id}`} className="after:absolute after:inset-0">
+													<button
+														type="button"
+														onClick={() => window.open(`/invites/${invite.id}`, '_blank', 'noopener,noreferrer')}
+														className="after:absolute after:inset-0 text-left cursor-pointer"
+													>
 														{invite.botName}
-													</a>
+													</button>
 												) : (
 													<Link href={`/invites/${invite.id}`} className="after:absolute after:inset-0">
 														{invite.botName}
@@ -197,17 +203,26 @@ export default function InvitesPage() {
 
 											{!isSingleUrl && (
 												<div className="relative z-10 flex flex-wrap items-center gap-1.5 mb-4">
-													{enabledOptions.map((opt) => (
-														<motion.a
-															key={opt.key}
-															href={`/invites/${invite.id}/${opt.key}`}
-															whileHover={{ scale: 1.05, y: -1 }}
-															whileTap={{ scale: 0.95 }}
-															className="rounded-full bg-(--background)/60 hover:bg-(--accent) hover:text-(--accent-contrast) border border-(--border)/10 px-2.5 py-1 text-xs font-semibold text-(--text-muted) transition-colors cursor-pointer"
-														>
-															{t(`www.invites.options.${opt.key}.label`)}
-														</motion.a>
-													))}
+													{enabledOptions.map((opt) => {
+														const optionLabel = t(`www.invites.options.${opt.key}.label`);
+														return (
+															<motion.button
+																key={opt.key}
+																type="button"
+																onClick={(e) => {
+																	e.preventDefault();
+																	e.stopPropagation();
+																	window.open(`/invites/${invite.id}/${opt.key}`, '_blank', 'noopener,noreferrer');
+																}}
+																aria-label={`${optionLabel} — ${invite.botName}`}
+																whileHover={{ scale: 1.05, y: -1 }}
+																whileTap={{ scale: 0.95 }}
+																className="rounded-full bg-(--background)/60 hover:bg-(--accent) hover:text-(--accent-contrast) border border-(--border)/10 px-2.5 py-1 text-xs font-semibold text-(--text-muted) transition-colors cursor-pointer"
+															>
+																{optionLabel}
+															</motion.button>
+														);
+													})}
 												</div>
 											)}
 
@@ -309,12 +324,17 @@ export default function InvitesPage() {
 					</div>
 				</section>
 
+				<SuiteComparisonTable />
+
+				<StudioTrustProofStrip />
+
 				<PageFaqSection
 					subtitle={t('www.invites.faq.subtitle')}
 					items={[
 						{ question: t('www.invites.faq.q1'), answer: t('www.invites.faq.a1') },
 						{ question: t('www.invites.faq.q2'), answer: t('www.invites.faq.a2') },
 						{ question: t('www.invites.faq.q3'), answer: t('www.invites.faq.a3') },
+						{ question: t('www.invites.faq.q4'), answer: t('www.invites.faq.a4') },
 					]}
 				/>
 			</div>

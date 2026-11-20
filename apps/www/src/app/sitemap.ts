@@ -1,135 +1,69 @@
 /** @format */
 
 import { MetadataRoute } from 'next';
+import { getEnabledInviteOptions } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { DEFAULT_OFFICIAL_INVITES } from '@/lib/defaultOfficialInvites';
 
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+	const baseUrl = 'https://www.xernerx.com';
 	const now = new Date();
 
 	const entries: MetadataRoute.Sitemap = [
-		// WWW (www.xernerx.com)
-		{ url: 'https://www.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
-		{ url: 'https://www.xernerx.com/download', lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-		{ url: 'https://www.xernerx.com/invites', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: 'https://www.xernerx.com/applications', lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-		{ url: 'https://www.xernerx.com/contact', lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
-		{ url: 'https://www.xernerx.com/security', lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-		{ url: 'https://www.xernerx.com/terms', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-		{ url: 'https://www.xernerx.com/privacy', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-		{ url: 'https://www.xernerx.com/cookies', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-
-		// APP (app.xernerx.com)
-		{ url: 'https://app.xernerx.com/', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-		{ url: 'https://app.xernerx.com/bots', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-		{ url: 'https://app.xernerx.com/bots/virtue', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-		{ url: 'https://app.xernerx.com/bots/yourapps', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-		{ url: 'https://app.xernerx.com/bots/todo', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-		{ url: 'https://app.xernerx.com/bots/metamorphosis', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-		{ url: 'https://app.xernerx.com/bots/zodiac', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-		{ url: 'https://app.xernerx.com/servers', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-		{ url: 'https://app.xernerx.com/users', lastModified: now, changeFrequency: 'daily', priority: 0.85 },
-		{ url: 'https://app.xernerx.com/leaderboard', lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-
-		// DOCS (docs.xernerx.com)
-		{ url: 'https://docs.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-		{ url: 'https://docs.xernerx.com/api', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: 'https://docs.xernerx.com/api/v1', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: 'https://docs.xernerx.com/packages', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: 'https://docs.xernerx.com/cdn', lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-		{ url: 'https://docs.xernerx.com/websocket', lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-
-		// INFO (info.xernerx.com)
-		{ url: 'https://info.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: 'https://info.xernerx.com/status', lastModified: now, changeFrequency: 'hourly', priority: 0.85 },
-		{ url: 'https://info.xernerx.com/roadmap', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: 'https://info.xernerx.com/suggestions', lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-		{ url: 'https://info.xernerx.com/issues', lastModified: now, changeFrequency: 'daily', priority: 0.7 },
-		{ url: 'https://info.xernerx.com/changelog', lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-		{ url: 'https://info.xernerx.com/faq', lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-
-		// STORE & PORTAL & HASTE & BLOG
-		{ url: 'https://store.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-		{ url: 'https://portal.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: 'https://haste.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-		{ url: 'https://blog.xernerx.com/', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+		{ url: `${baseUrl}/`, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
+		{ url: `${baseUrl}/download`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+		{ url: `${baseUrl}/invites`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
+		{ url: `${baseUrl}/applications`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
+		{ url: `${baseUrl}/contact`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+		{ url: `${baseUrl}/security`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
+		{ url: `${baseUrl}/terms`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+		{ url: `${baseUrl}/privacy`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+		{ url: `${baseUrl}/cookies`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+		{ url: `${baseUrl}/license`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
 	];
 
-	try {
-		const db = await database('xernerx');
-		const BotModel = (db.models.bots as any)?.Bot;
-		const GuildModel = (db.models.guilds as any)?.Guild;
-		const OrganizationModel = (db.models.organizations as any)?.Organization;
-
-		const [publicBots, publicServers, publicOrgs] = await Promise.all([
-			BotModel
-				? BotModel.find({ privacy: 'public' })
-						.select('id vanitySlug updatedAt')
-						.limit(500)
-						.lean()
-						.catch(() => [])
-				: [],
-			GuildModel
-				? GuildModel.find({ privacy: 'public' })
-						.select('id vanitySlug updatedAt')
-						.limit(500)
-						.lean()
-						.catch(() => [])
-				: [],
-			OrganizationModel
-				? OrganizationModel.find({ $or: [{ privacy: 'public' }, { 'config.privacy': 'public' }] })
-						.select('_id vanitySlug updatedAt')
-						.limit(200)
-						.lean()
-						.catch(() => [])
-				: [],
-		]);
-
-		const officialIdToSlug: Record<string, string> = {
-			'1484880634844287138': 'virtue',
-			'619328560141697036': 'yourapps',
-			'782105629572464652': 'todo',
-			'881678826906730547': 'metamorphosis',
-			'950251264095162418': 'zodiac',
-		};
-		const seenBotSlugs = new Set<string>(['virtue', 'yourapps', 'todo', 'metamorphosis', 'zodiac']);
-
-		for (const bot of publicBots) {
-			const slugOrId = bot.vanitySlug || officialIdToSlug[String(bot.id)] || bot.id;
-			if (!slugOrId || seenBotSlugs.has(String(slugOrId).toLowerCase())) continue;
-			seenBotSlugs.add(String(slugOrId).toLowerCase());
+	// Include canonical multi-option invite chooser pages (never /invites/<bot>/<preset> OAuth redirect endpoints)
+	const seenInviteIds = new Set<string>();
+	for (const inv of DEFAULT_OFFICIAL_INVITES) {
+		if (getEnabledInviteOptions(inv).length > 1) {
+			seenInviteIds.add(inv.id.toLowerCase());
 			entries.push({
-				url: `https://app.xernerx.com/bots/${encodeURIComponent(String(slugOrId))}`,
-				lastModified: bot.updatedAt ? new Date(bot.updatedAt) : now,
+				url: `${baseUrl}/invites/${encodeURIComponent(inv.id)}`,
+				lastModified: now,
 				changeFrequency: 'weekly',
 				priority: 0.8,
 			});
 		}
+	}
 
-		for (const guild of publicServers) {
-			const slugOrId = guild.vanitySlug || guild.id;
-			if (!slugOrId) continue;
-			entries.push({
-				url: `https://app.xernerx.com/servers/${encodeURIComponent(String(slugOrId))}`,
-				lastModified: guild.updatedAt ? new Date(guild.updatedAt) : now,
-				changeFrequency: 'weekly',
-				priority: 0.8,
-			});
+	if (process.env.MONGO_XERNERX) {
+		try {
+			const db = await database('xernerx');
+			const AppInviteModel = (db.models.core as any)?.AppInvite;
+			if (AppInviteModel) {
+				const invites = await AppInviteModel.find({})
+					.select('id options permissions updatedAt')
+					.limit(100)
+					.lean()
+					.catch(() => []);
+				for (const inv of invites) {
+					const id = String(inv?.id || '').trim();
+					if (!id || seenInviteIds.has(id.toLowerCase())) continue;
+					if (getEnabledInviteOptions(inv).length <= 1) continue;
+					seenInviteIds.add(id.toLowerCase());
+					entries.push({
+						url: `${baseUrl}/invites/${encodeURIComponent(id)}`,
+						lastModified: inv.updatedAt ? new Date(inv.updatedAt) : now,
+						changeFrequency: 'weekly',
+						priority: 0.75,
+					});
+				}
+			}
+		} catch {
+			// Gracefully fall back to static entries if database is unreachable during build
 		}
-
-		for (const org of publicOrgs) {
-			const slugOrId = org.vanitySlug || (org._id ? String(org._id) : '');
-			if (!slugOrId) continue;
-			entries.push({
-				url: `https://app.xernerx.com/organization/${encodeURIComponent(String(slugOrId))}`,
-				lastModified: org.updatedAt ? new Date(org.updatedAt) : now,
-				changeFrequency: 'weekly',
-				priority: 0.75,
-			});
-		}
-	} catch {
-		// Gracefully fall back to static entries if database is unreachable during build
 	}
 
 	return entries;

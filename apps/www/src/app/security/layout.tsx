@@ -3,14 +3,14 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Platform & Discord Bot Security Architecture',
-	description: 'Learn how Xernerx Studios secures the Xernerx Suite monorepo, API gateway, and official Discord bots including Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac.',
+	title: 'Platform & Bot Security Architecture',
+	description: 'Explore how Xernerx Studios secures the Xernerx Suite, API gateway, and official Discord bots (Virtue, YourApps, To-Do List, Metamorphosis, Zodiac).',
 	alternates: {
 		canonical: '/security',
 	},
 	openGraph: {
-		title: 'Xernerx Studios | Platform & Discord Bot Security Architecture',
-		description: 'Learn how Xernerx Studios secures the Xernerx Suite monorepo, API gateway, and official Discord bots including Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac.',
+		title: 'Xernerx Studios | Platform & Bot Security Architecture',
+		description: 'Explore how Xernerx Studios secures the Xernerx Suite, API gateway, and official Discord bots (Virtue, YourApps, To-Do List, Metamorphosis, Zodiac).',
 		url: 'https://www.xernerx.com/security',
 		siteName: 'Xernerx',
 		images: [{ url: '/banner.png', width: 1200, height: 630, alt: 'Xernerx Security Architecture' }],
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Studios | Platform & Discord Bot Security Architecture',
-		description: 'Learn how Xernerx Studios secures the Xernerx Suite monorepo, API gateway, and official Discord bots including Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac.',
+		title: 'Xernerx Studios | Platform & Bot Security Architecture',
+		description: 'Explore how Xernerx Studios secures the Xernerx Suite, API gateway, and official Discord bots (Virtue, YourApps, To-Do List, Metamorphosis, Zodiac).',
 		images: ['/banner.png'],
 	},
 };

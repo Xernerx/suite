@@ -37,19 +37,11 @@ export function FirstSignInPageTourScene({
 		.replace(/\/$/, '');
 	const currentStepId: PageTourStepId = steps[stepIndex] || steps[0];
 
-	// Highlight and scroll to the active [data-tour] element on the live page
+	// Scroll to the active [data-tour] element on the live page (spotlight visual is rendered by OnboardingSpotlightPortal)
 	useEffect(() => {
 		if (typeof document === 'undefined') return;
 
-		const clearHighlights = () => {
-			document.querySelectorAll('[data-tour-spotlit="true"]').forEach((el) => {
-				el.removeAttribute('data-tour-spotlit');
-				el.classList.remove(...SPOTLIGHT_CLASSES);
-			});
-		};
-
-		const applyHighlight = () => {
-			clearHighlights();
+		const scrollToTarget = () => {
 			if (currentStepId === 'dash-sidebar') {
 				const scroller = document.getElementById('main-scroll-container');
 				scroller?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -57,9 +49,6 @@ export function FirstSignInPageTourScene({
 			}
 			const target = document.querySelector(`[data-tour="${currentStepId}"]`) as HTMLElement | null;
 			if (!target) return false;
-
-			target.setAttribute('data-tour-spotlit', 'true');
-			target.classList.add(...SPOTLIGHT_CLASSES);
 
 			const scroller = document.getElementById('main-scroll-container');
 			if (scroller) {
@@ -74,14 +63,13 @@ export function FirstSignInPageTourScene({
 			return true;
 		};
 
-		applyHighlight();
-		const retryTimer1 = setTimeout(applyHighlight, 250);
-		const retryTimer2 = setTimeout(applyHighlight, 700);
+		scrollToTarget();
+		const retryTimer1 = setTimeout(scrollToTarget, 250);
+		const retryTimer2 = setTimeout(scrollToTarget, 700);
 
 		return () => {
 			clearTimeout(retryTimer1);
 			clearTimeout(retryTimer2);
-			clearHighlights();
 		};
 	}, [currentStepId, phase]);
 
@@ -182,9 +170,19 @@ export function FirstSignInPageTourScene({
 					className="w-full rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--accent)/40 p-4 sm:p-5 text-left shadow-[0_0_40px_color-mix(in_srgb,var(--accent)_22%,transparent)]"
 				>
 					<div className="flex flex-col sm:flex-row items-start gap-4">
-						<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/35">
+						<motion.div
+							initial={{ scale: 0.78, rotate: -6 }}
+							animate={{ scale: 1, rotate: 0 }}
+							transition={{ type: 'spring', stiffness: 360, damping: 18 }}
+							className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/35"
+						>
+							<motion.span
+								animate={{ scale: [1, 1.25, 1], opacity: [0.65, 0, 0.65] }}
+								transition={{ duration: 1.9, repeat: Infinity, ease: 'easeOut' }}
+								className="absolute inset-0 rounded-2xl border-2 border-(--accent)"
+							/>
 							<ActiveIcon size={24} />
-						</div>
+						</motion.div>
 
 						<div className="flex-1 min-w-0 w-full">
 							<div className="flex items-center justify-between gap-3 mb-1">
@@ -193,9 +191,14 @@ export function FirstSignInPageTourScene({
 								</h3>
 								<div className="flex items-center gap-2 shrink-0">
 									{activeMeta.kbd && (
-										<kbd className="rounded-xl bg-(--foreground) border border-(--accent)/30 px-2.5 py-0.5 font-mono text-xs font-extrabold text-(--accent) whitespace-nowrap shrink-0">
+										<motion.kbd
+											initial={{ scale: 0.85, y: -4 }}
+											animate={{ scale: [1, 1.06, 1], y: 0 }}
+											transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+											className="rounded-xl bg-(--foreground) border border-(--accent)/40 px-2.5 py-0.5 font-mono text-xs font-extrabold text-(--accent) whitespace-nowrap shrink-0 shadow-[0_0_14px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
+										>
 											{activeMeta.kbd}
-										</kbd>
+										</motion.kbd>
 									)}
 									<div className="flex items-center gap-1.5">
 										{steps.map((stepId, idx) => (
@@ -225,7 +228,7 @@ export function FirstSignInPageTourScene({
 	);
 }
 
-export function FirstSignInNavPromptScene({ targetPhase, onOpenNavMenu }: { targetPhase: TourNavTargetPhase; onOpenNavMenu: () => void }) {
+export function FirstSignInNavPromptScene({ targetPhase }: { targetPhase: TourNavTargetPhase }) {
 	const { t } = useDictionary();
 	const destinationName = t(`components.firstSignIn.navHandoff.destinations.${targetPhase}`);
 	const DestIcon = targetPhase === 'dashboard' ? Gauge : targetPhase === 'portal' ? Building2 : Compass;
@@ -244,12 +247,21 @@ export function FirstSignInNavPromptScene({ targetPhase, onOpenNavMenu }: { targ
 				className="w-full rounded-3xl bg-(--background)/95 backdrop-blur-2xl border border-(--accent)/50 p-4 sm:p-6 text-left shadow-[0_0_44px_color-mix(in_srgb,var(--accent)_28%,transparent)]"
 			>
 				<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-					<div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/40 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_35%,transparent)]">
+					<motion.div
+						animate={{ scale: [1, 1.05, 1] }}
+						transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+						className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/40 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
+					>
+						<motion.span
+							animate={{ scale: [1, 1.32, 1.48], opacity: [0.75, 0.3, 0] }}
+							transition={{ duration: 1.7, repeat: Infinity, ease: 'easeOut' }}
+							className="absolute inset-0 rounded-2xl border-2 border-(--accent)"
+						/>
 						<LayoutGrid size={26} />
 						<span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-(--accent) text-white border-2 border-(--background)">
 							<DestIcon size={12} />
 						</span>
-					</div>
+					</motion.div>
 
 					<div className="flex-1 min-w-0 w-full">
 						<div className="flex flex-wrap items-center gap-2 mb-1">
@@ -257,24 +269,19 @@ export function FirstSignInNavPromptScene({ targetPhase, onOpenNavMenu }: { targ
 								<Sparkles size={11} />
 								{t('components.firstSignIn.navHandoff.promptBadge')}
 							</span>
-							<kbd className="rounded-xl bg-(--foreground) border border-(--accent)/40 px-2.5 py-0.5 font-mono text-xs font-extrabold text-(--accent) whitespace-nowrap">
+							<motion.kbd
+								animate={{ scale: [1, 1.07, 1] }}
+								transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+								className="rounded-xl bg-(--foreground) border border-(--accent)/40 px-2.5 py-0.5 font-mono text-xs font-extrabold text-(--accent) whitespace-nowrap shadow-[0_0_14px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
+							>
 								Ctrl + Space
-							</kbd>
+							</motion.kbd>
 						</div>
 						<h3 className="text-lg sm:text-xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{t('components.firstSignIn.navHandoff.promptTitle', { destination: destinationName })}
 						</h3>
 						<p className="text-xs sm:text-sm text-(--text-muted) leading-relaxed mt-1">{t('components.firstSignIn.navHandoff.promptDesc', { destination: destinationName })}</p>
 					</div>
-
-					<Button
-						variant="primary"
-						onClick={onOpenNavMenu}
-						className="w-full sm:w-auto justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm whitespace-nowrap shrink-0 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
-					>
-						<LayoutGrid size={16} className="shrink-0" />
-						<span>{t('components.firstSignIn.navHandoff.openMenuBtn')}</span>
-					</Button>
 				</div>
 			</div>
 		</motion.div>

@@ -2,7 +2,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
+import { useEnvironment, useToast, useDictionary, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Input, MultiSelector } from '@xernerx/ui';
 import { motion } from 'framer-motion';
@@ -14,6 +14,11 @@ export default function RoadmapPage() {
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
 	const { t } = useDictionary();
+	const { hide } = useSidebar();
+
+	useEffect(() => {
+		hide();
+	}, [hide]);
 	const [roadmap, setRoadmap] = useState<any[]>([]);
 	const [issues, setIssues] = useState<any[]>([]);
 	const [products, setProducts] = useState<string[]>([]);

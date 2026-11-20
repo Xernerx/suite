@@ -47,9 +47,10 @@
 		"footer": {
 			"tagline": "Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.",
 			"sections": {
-				"resources": "Resources",
+				"platform": "Platform",
 				"support": "Support",
-				"developer": "Developer"
+				"developer": "Developer",
+				"legal": "Legal & Trust"
 			},
 			"links": {
 				"security": "Security",
@@ -75,7 +76,9 @@
 				"statusDegraded": "System Status: Degraded",
 				"download": "Desktop Client",
 				"invites": "Bot Invites",
-				"blog": "Blog & Newsroom"
+				"blog": "Blog & Newsroom",
+				"developerPolicy": "Developer Policy",
+				"portal": "Developer Portal"
 			},
 			"follow": {
 				"label": "Follow",
@@ -4193,7 +4196,9 @@
 				"q2": "Can I contribute to Xernerx localization or open-source packages remotely?",
 				"a2": "Yes. All roles at Xernerx Studios are fully remote and collaborative across global time zones. Contributors work together through Discord, GitHub, and our internal Staff and Translation Portals.",
 				"q3": "What happens after I submit my team application?",
-				"a3": "Our department leads review every application directly in the Staff Portal. When your application is reviewed or accepted, you receive an instant notification on the web dashboard and via Discord."
+				"a3": "Our department leads review every application directly in the Staff Portal. When your application is reviewed or accepted, you receive an instant notification on the web dashboard and via Discord.",
+				"q4": "Where is Xernerx Studios based and what technologies do you build with?",
+				"a4": "Xernerx Studios is an independent European software studio founded in 2020 building the TypeScript Xernerx Suite monorepo (Next.js, Node.js, MongoDB, WebSockets, Electron), 5 official verified Discord bots, and 8 open-source @xernerx/* NPM packages."
 			}
 		},
 		"applications": {
@@ -4313,6 +4318,7 @@
 			"title": "Contact Us",
 			"description": "Whether you have a technical question, found a bug, want to discuss a partnership or simply need to get in touch, we",
 			"description2": "re happy to help. Using the correct contact address helps your message reach the right person faster.",
+			"studioIdentity": "Xernerx Studios (founded in the Netherlands, Europe) is a software development studio building verified Discord bots, TypeScript SDKs, and the Xernerx Suite.",
 			"title2": "Looking for documentation?",
 			"description3": "Most technical questions are already covered in our documentation. You may find your answer immediately without waiting for a reply.",
 			"button": "Documentation",
@@ -4423,6 +4429,19 @@
 					"title": "1 Account, 1 Place, 1 Setup",
 					"description": "Your single Xernerx Account connects you across the Xernerx Suite, Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac. Your identity, custom themes, preferences, and server setups stay unified everywhere."
 				}
+			},
+			"proof": {
+				"heading": "Verified Ecosystem Scale & Architecture Proof",
+				"serversValue": "26,400+",
+				"serversLabel": "Active Discord Servers",
+				"usersValue": "2.65M+",
+				"usersLabel": "Discord Users Reached",
+				"botsValue": "5",
+				"botsLabel": "Official Verified Bots",
+				"packagesValue": "8",
+				"packagesLabel": "Open-Source NPM Packages",
+				"loggingValue": "0",
+				"loggingLabel": "Message Contents Stored"
 			}
 		},
 		"sections": {
@@ -4479,7 +4498,7 @@
 					"title": "2. Information We Collect",
 					"account": {
 						"title": "Account & Device Session Information:",
-						"desc": "When you sign in via Discord OAuth2 or our QR Code / 6-character Pairing Code Device Sign-In flow, we collect your Discord ID, username, avatar, email address, custom profile settings (display name, bio, pronouns, birthday, timezone, banner, profile showcases, and vanity URL slug), and recent device session metadata (browser, operating system, device type, and last-active timestamp for up to 10 devices) so you can review and manage active sessions."
+						"desc": "When you sign in via Discord OAuth2, our QR Code / 6-character Pairing Code Device Sign-In flow, or our Mobile Authenticator number-matching push approval flow, we collect your Discord ID, username, avatar, email address, custom profile settings (display name, bio, pronouns, birthday, timezone, banner, profile showcases, and vanity URL slug), and active web, desktop, and mobile session metadata (device name, platform, OS/app version, push notification token if enabled, and last-active timestamp) so you can review and revoke sessions remotely. Ephemeral number-matching login approval requests temporarily record the requesting browser’s user-agent and approximate IP/location so you can verify the sign-in attempt before expiring."
 					},
 					"connections": {
 						"title": "Connected Third-Party Accounts:",
@@ -4498,8 +4517,8 @@
 						"desc": "Files uploaded to cdn.xernerx.com, code and text snippets saved on haste.xernerx.com, profile showcases, and community bug/suggestion attachments are stored and served strictly according to our universal three-tier privacy model: Public (listed in public directories and accessible by anyone), Limited (unlisted from directories, leaderboards, and search results, but accessible via direct link or ID), and Private (strictly accessible only by the owner and explicitly authorized users or organization members). Haste pastes with a configured expiration (TTL) are automatically deleted upon expiry."
 					},
 					"desktop": {
-						"title": "Xernerx Desktop Client & Local Bot Runner:",
-						"desc": "When using the Xernerx Desktop App, window state, update channel preferences (Stable/Canary), hotkey bindings, local Bot Runner process configurations, and isolated multi-account session slots are stored locally on your machine. Local bot processes launched via the Desktop Bot Runner and local API latency telemetry execute on your own device. If enabled, the app communicates locally with your Discord client for Rich Presence (RPC) and writes diagnostic logs locally only when Debug Logging is turned on."
+						"title": "Xernerx Desktop & Mobile Clients:",
+						"desc": "In the Xernerx Desktop App, window state, update channel preferences (Stable/Canary), hotkey bindings, idle Privacy Shield settings, local Bot Runner configurations, and isolated multi-account session slots are stored locally on your machine. If you use Desktop Quick Capture, Watch-Folder auto-upload, or the Support \"Report Bug on Page\" screenshot tool, captured images are uploaded to your cdn.xernerx.com storage under Limited (unlisted) visibility. Local biometric unlock checks and the 60-second Clipboard Secret Guard execute locally on your device. In the Xernerx Mobile App (iOS & Android), your session token and device ID are stored in hardware-backed Expo SecureStore, biometric checks (Face ID / Touch ID / Android Biometrics) execute locally via the OS enclave without ever transmitting biometric data to our servers, and an optional Expo Push Token is stored solely to deliver login approval prompts and account alerts."
 					},
 					"usage": {
 						"title": "Usage & Diagnostic Data:",
@@ -4507,7 +4526,7 @@
 					},
 					"integration": {
 						"title": "Billing, Store, Credits & Rewards Data:",
-						"desc": "Subscription status, one-time Credit Top-Up Pack purchases, billing history, and regional checkout details processed securely via Stripe (we never store raw payment card numbers), along with Virtual Credit balances, transaction ledgers, daily mystery gift streaks, streak shields, referral attributions, achievement unlocks, Organization Treasury contributions, Spotlight Boost activations, and peer-to-peer credit tips (when you tip a bot, your Discord ID, tip amount, and optional note are shared with the bot's configured tip webhook)."
+						"desc": "Subscription status, one-time Credit Top-Up Pack purchases, billing history, and regional checkout details processed securely via Stripe or Discord Storefront SKUs (we never store raw payment card numbers), along with Virtual Credit balances, transaction ledgers, daily mystery gift streaks, streak shields, referral attributions, achievement unlocks, platform Giveaway entries and prize fulfillment records, Organization Treasury contributions, Spotlight Boost activations, and peer-to-peer credit tips (when you tip a bot, your Discord ID, tip amount, and optional note are shared with the bot’s configured tip webhook). If you submit a team application at xernerx.com/applications, we also store your application responses and review status."
 					}
 				},
 				"apiData": {
@@ -4628,7 +4647,7 @@
 				},
 				"accounts": {
 					"title": "6. User Accounts, QR Sign-In & Connected Accounts",
-					"content": "You sign in via Discord OAuth2 or our encrypted QR Code and Pairing Code Device Sign-In system. Never approve a QR code or enter a 6-character pairing code that you did not start yourself. You may optionally link third-party accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, or Reddit) to display on your profile. You can revoke active device sessions or unlink connected accounts at any time in Account Settings. If your account is suspended or blacklisted for violating these Terms, access to platform services is restricted via BlacklistGate, while self-service access to Account Settings (account.xernerx.com) remains available so you can export your personal data archive or permanently delete your Virtue data, YourApps data, profile data, and account."
+					"content": "You sign in via Discord OAuth2, our encrypted QR Code and 6-character Pairing Code Device Sign-In system, or our Mobile Authenticator number-matching push approval flow (selecting the matching 2-digit verification number on your trusted Xernerx Mobile device). Never approve a QR code, pairing code, or number-matching prompt that you did not initiate yourself. You may optionally link third-party accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, or Reddit) to display on your profile. You can revoke active web, desktop, or mobile device sessions or unlink connected accounts at any time in Account Settings. If your account is suspended or blacklisted for violating these Terms, access to platform services is restricted via BlacklistGate, while self-service access to Account Settings (account.xernerx.com) remains available so you can export your personal data archive or permanently delete your Virtue data, YourApps data, profile data, and account."
 				},
 				"storeAndBilling": {
 					"title": "7. Store, Subscriptions, Virtual Credits & Perks",
@@ -4636,12 +4655,14 @@
 					"items": [
 						"You can cancel a recurring subscription any time in the Billing Portal. Your plan benefits remain active until the end of the current billing period.",
 						"Virtual Credits—whether purchased via Credit Top-Up Packs or earned through Daily Mystery Gifts, login streaks, bot server invites (+100 Credits per newly connected server), referrals, or achievements—are non-monetary digital platform tokens with no real-world cash value. Peer-to-peer credit tips, Organization Treasury deposits, and credit redemptions (including Spotlight Boosts, Vanity URL unlocks, extra CDN/Showcase/Bot slots, 7-Day Trial Passes, Streak Shields, Vanity Badges, Dot-Matrix Banner formations, Stage Render Forms, Ambient Canvas Scenes, Glass Surface Styles, Cursor Trail & Click Shockwave FX, Header & Icon Packs, Desktop App Icon Crests, Avatar Frame Shaders, Animated Nameplates, Profile Card Themes, Overlay HUD Skins, and Master Cosmetic Bundles) are final, non-withdrawable, and non-refundable outside statutory consumer rights.",
-						"If a subscription or trial expires, features and CDN storage quotas revert to standard tier limits (plus any permanent slot upgrades you have unlocked). Existing files are kept, but new uploads may pause if you exceed your quota."
+						"If a subscription or trial expires, features and CDN storage quotas revert to standard tier limits (plus any permanent slot upgrades you have unlocked). Existing files are kept, but new uploads may pause if you exceed your quota.",
+						"Official platform Giveaways and promotional draws (for Virtual Credits, Store items, passes, or Discord roles) are open to eligible users free of charge where required by law. Giveaway prizes and bonus entry weights are non-transferable, have no cash alternative, and any attempt to enter with multiple accounts or automated scripts results in immediate disqualification and forfeiture.",
+						"Initiating an unauthorized or fraudulent chargeback or payment dispute via Stripe or Discord billing without first contacting Xernerx Support to resolve the issue will result in immediate account restriction via BlacklistGate and permanent revocation of disputed subscriptions, Virtual Credits, Spotlight Boosts, and gifted items."
 					]
 				},
 				"desktopClient": {
-					"title": "8. Xernerx Desktop Client & Local Bot Runner",
-					"content": "We grant you a limited, non-exclusive, revocable license to use the Xernerx Desktop application. The Desktop client can install automatic updates across Stable or Canary channels and register optional global shortcuts. It also supports a floating mini overlay, isolated multi-account sessions, local Discord Rich Presence, and an optional Local Bot Runner that spawns and monitors bot processes on your computer. Any local scripts or bot processes you execute through the Desktop Bot Runner run on your own machine at your sole responsibility."
+					"title": "8. Xernerx Desktop & Mobile Clients",
+					"content": "We grant you a limited, non-exclusive, revocable license to use the Xernerx Desktop and Xernerx Mobile applications. The Desktop client supports automatic updates across Stable or Canary channels, optional global shortcuts, a floating mini overlay, isolated multi-account Chromium partitions, an idle Privacy Shield with local OS biometric unlock, a Clipboard Secret Guard that automatically clears copied xrn_/xrx_ tokens after 60 seconds, quick screen/watch-folder CDN captures, local Discord Rich Presence, and an optional Local Bot Runner that executes bot processes on your machine at your sole responsibility. The Mobile client (iOS & Android) provides account management, hardware-backed SecureStore session storage, local biometric lock (Face ID / Touch ID / Android Biometrics), push notifications, and number-matching Authenticator login approvals."
 				},
 				"data": {
 					"title": "9. User Data & Cookies",
@@ -4653,15 +4674,27 @@
 				},
 				"availability": {
 					"title": "10. Service Availability",
-					"content": "We strive for high availability across our suite, but we do not guarantee uninterrupted operation. Features, bot modules, APIs, Haste storage, or experimental Canary builds may be updated or discontinued at any time."
+					"content": "We strive for high availability across our suite, but we do not guarantee uninterrupted operation. Features, bot modules, APIs, Haste storage, or experimental Canary builds may be updated or discontinued at any time.",
+					"items": {
+						"0": "We strive for high availability across our suite, but we do not guarantee uninterrupted operation. Features, bot modules, APIs, Haste storage, or experimental Canary builds may be updated, rate-limited, or discontinued at any time.",
+						"1": "Force Majeure & Upstream Outages: Xernerx Studios is not liable for service interruptions, webhook delays, or data unavailability caused by events beyond our reasonable control, including upstream outages of Discord (Gateway or REST API), Cloudflare, Vercel, MongoDB Atlas, Stripe, internet backbone failures, or denial-of-service attacks."
+					}
 				},
 				"thirdParty": {
 					"title": "11. Third-Party Services",
-					"content": "Our ecosystem integrates with Discord, Stripe, Google, and optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, and Reddit). We are not responsible for the availability or independent policies of third-party services."
+					"content": "Our ecosystem integrates with Discord, Stripe, Google, and optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, and Reddit). We are not responsible for the availability or independent policies of third-party services.",
+					"items": {
+						"0": "Platform Integrations: Our ecosystem integrates with Discord, Stripe, Google, and optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, and Reddit). We are not responsible for the availability or independent policies of third-party services.",
+						"1": "Third-Party Bots & Community Servers in Explore: The Explore directory (app.xernerx.com) lists independent third-party Discord bots and community servers alongside official Xernerx applications. Xernerx Studios does not control, endorse, or assume liability for the content, moderation, permissions, uptime, or privacy practices of third-party bots, external servers, or external developers using our open-source @xernerx/* SDKs."
+					}
 				},
 				"intellectualProperty": {
 					"title": "12. Intellectual Property & User Content",
-					"content": "All Xernerx software, branding, and visual assets—including the Xernerx Suite monorepo, Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog, Xernerx Haste, Xernerx CDN, package documentation repository (docs), starter examples repository (examples), organization governance (.github), and the Xernerx Desktop and Mobile Clients—remain the exclusive property of Xernerx Studios under the Xernerx Studios Proprietary & SaaS License (xernerx.com/license). Our 8 standalone open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket) are governed by the Apache License, Version 2.0. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile. You grant Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL)."
+					"content": "All Xernerx software, branding, and visual assets—including the Xernerx Suite monorepo, Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog, Xernerx Haste, Xernerx CDN, package documentation repository (docs), starter examples repository (examples), organization governance (.github), and the Xernerx Desktop and Mobile Clients—remain the exclusive property of Xernerx Studios under the Xernerx Studios Proprietary & SaaS License (xernerx.com/license). Our 8 standalone open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket) are governed by the Apache License, Version 2.0. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile. You grant Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL).",
+					"items": {
+						"0": "Platform & Open-Source Ownership: All Xernerx software, branding, and visual assets—including the Xernerx Suite monorepo, Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog, Xernerx Haste, Xernerx CDN, package documentation repository (docs), starter examples repository (examples), organization governance (.github), and the Xernerx Desktop and Mobile Clients—remain the exclusive property of Xernerx Studios under the Xernerx Studios Proprietary & SaaS License (xernerx.com/license). Our 8 standalone open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket) are governed by the Apache License, Version 2.0. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile, granting Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL).",
+						"1": "Copyright / DMCA Takedown & Repeat Infringer Policy: Xernerx Studios respects intellectual property rights and responds to valid copyright takedown notices under the DMCA (17 U.S.C. § 512) and EU Digital Services Act. If you believe content hosted on cdn.xernerx.com, haste.xernerx.com, or a public directory profile infringes your copyright, send a written notice to legal@xernerx.com identifying the copyrighted work, the exact offending URL, your contact information, and a good-faith statement under penalty of perjury that the use is unauthorized. We promptly remove or disable access to verified infringing material and terminate repeat infringers."
+					}
 				},
 				"warranty": {
 					"title": "13. Disclaimer of Warranties",
@@ -4669,7 +4702,11 @@
 				},
 				"liability": {
 					"title": "14. Limitation of Liability",
-					"content": "To the fullest extent permitted by law, Xernerx Studios is not liable for indirect, incidental, or consequential damages. This includes any loss of data, revenue, or profits arising from your use of our services."
+					"content": "To the fullest extent permitted by law, Xernerx Studios is not liable for indirect, incidental, or consequential damages. This includes any loss of data, revenue, or profits arising from your use of our services.",
+					"items": {
+						"0": "Exclusion of Indirect Damages: To the fullest extent permitted by law, Xernerx Studios is not liable for any indirect, incidental, special, consequential, or punitive damages, including any loss of data, virtual items, revenue, profits, or community goodwill arising from your use of or inability to use our services.",
+						"1": "Aggregate Liability Cap: In no event shall Xernerx Studios’ total cumulative liability to you for all claims arising out of or relating to these Terms or our services exceed the greater of (a) the total amount you actually paid to Xernerx Studios in the twelve (12) months immediately preceding the event giving rise to the claim, or (b) $50.00 USD (or €50.00 EUR). Mandatory consumer protection rights in your jurisdiction remain unaffected."
+					}
 				},
 				"indemnification": {
 					"title": "15. Indemnification",
@@ -4755,7 +4792,7 @@
 				},
 				"localStorage": {
 					"title": "5. Local Storage & Desktop Client Storage",
-					"content": "We also use browser localStorage to cache non-sensitive theme, zoom, page width, dot-matrix stage, ambient scene, glass surface, cursor FX, header/icon style, and overlay skin preferences (theme, accent, uiZoom, uiGap, textScale, pageWidth, clientSync, syncFromDiscord, pref_dotMatrixStage, pref_dotMatrixType, pref_dotMatrixRenderStyle, pref_dotMatrixAnimation, pref_windowControls, pref_uiIconStyle, pref_ambientScene, pref_surfaceStyle, pref_cursorFx, pref_overlaySkin, pref_headerSubdomains, and related pref_* workspace flags), interactive tour and post-invite onboarding progress (xernerx_tour_postponed, xernerx_post_first_signin_return_url, xernerx_bot_onboarded_guilds_v1, xernerx_dashboard_bot_tour_v1), and sidebar state for instant startup. All Credit Store cosmetics cached in localStorage are automatically verified against your account's unlockedBadges ledger on sync. In the Xernerx Desktop App, local settings, taskbar/Dock app icon crests, and Local Bot Runner configurations live in metadata.json, and each account slot uses an isolated Chromium session partition (persist:xernerx-<slot>) so you can switch accounts safely."
+					"content": "We also use browser localStorage to cache non-sensitive theme, zoom, page width, dot-matrix stage, ambient scene, glass surface, cursor FX, header/icon style, and overlay skin preferences (theme, accent, uiZoom, uiGap, textScale, pageWidth, clientSync, syncFromDiscord, pref_dotMatrixStage, pref_dotMatrixType, pref_dotMatrixRenderStyle, pref_dotMatrixAnimation, pref_windowControls, pref_uiIconStyle, pref_ambientScene, pref_surfaceStyle, pref_cursorFx, pref_overlaySkin, pref_headerSubdomains, and related pref_* workspace flags), dismissed announcement banner IDs (xernerx-dismissed-announcements), interactive tour and post-invite onboarding progress (xernerx_tour_postponed, xernerx_tour_nav_explained, xernerx_post_first_signin_return_url, xernerx_onboarded_bots, xernerx_bot_onboarded_guilds_v1, xernerx_dashboard_bot_tour_v1), and sidebar state for instant startup. All Credit Store cosmetics cached in localStorage are automatically verified against your account’s unlockedBadges ledger on sync. In the Xernerx Desktop App, local settings, taskbar/Dock app icon crests, and Local Bot Runner configurations live in metadata.json, and each account slot uses an isolated Chromium session partition (persist:xernerx-<slot>). In the Xernerx Mobile App, session and preference keys (xernerx_mobile_access_token, xernerx_mobile_device_id, xernerx_mobile_env, xernerx_mobile_theme, xernerx_mobile_accent, xernerx_mobile_locale, xernerx_mobile_biometrics) are stored in hardware-encrypted device storage (Expo SecureStore) rather than browser cookies."
 				},
 				"thirdParty": {
 					"title": "6. Third-Party Cookies",
@@ -4828,12 +4865,12 @@
 							"desc": "Every active session is logged in your Account Security dashboard (account.xernerx.com/?tab=devices), allowing you to inspect paired devices and revoke sessions remotely with one click."
 						},
 						"qr": {
-							"title": "Cryptographic QR Login Pairing:",
-							"desc": "Signing into the Xernerx Desktop App via QR code uses short-lived, single-use cryptographic challenge tokens that require explicit confirmation from an already-authenticated session."
+							"title": "Cryptographic QR Pairing & Number-Matching Mobile Authenticator:",
+							"desc": "Signing in across devices via QR code, 6-character pairing code, or Mobile Authenticator push notification uses short-lived AES-256-GCM encrypted challenge tokens and 3-option number-matching verification (AuthApprovalRequest) with attempt caps, device/location display, and automatic 3-minute expiration."
 						},
 						"partitions": {
-							"title": "Isolated Chromium Partitions (Desktop Client):",
-							"desc": "Multi-account switching in the Desktop App isolates each account slot inside its own dedicated Chromium storage partition (persist:xernerx-<slot>) so cookies and tokens never bleed between accounts."
+							"title": "Desktop Partitioning, Privacy Shield & Mobile SecureStore:",
+							"desc": "Multi-account switching in the Desktop App isolates each account slot inside its own Chromium storage partition (persist:xernerx-<slot>), pairs with an automatic idle Privacy Shield (unlockable via local OS biometrics) and a 60-second Clipboard Secret Guard for copied xrn_/xrx_ tokens, while the Mobile App stores SHA-256 hashed session tokens in hardware-backed Expo SecureStore gated by local Face ID / Touch ID / Android Biometrics."
 						},
 						"connections": {
 							"title": "Sanitized Secondary Connections:",
@@ -4974,7 +5011,8 @@
 					"termsLink": "Terms of Service",
 					"privacyLink": "Privacy Policy",
 					"andText": " and ",
-					"cookiesLink": "Cookie Policy"
+					"cookiesLink": "Cookie Policy",
+					"developerPolicyLink": "Internal Developer Policy"
 				},
 				"disclosure": {
 					"title": "9. Vulnerability Disclosure & Security Contact",
@@ -5020,7 +5058,17 @@
 				"offBadge": "OFF",
 				"ghostBadge": "Ghost",
 				"ghostActive": "Click-Through ON",
-				"companionBadge": "Ctrl+Shift+N"
+				"companionBadge": "Ctrl+Shift+N",
+				"cycleControlsHint": "Click window controls to cycle styles ({style})",
+				"crestHint": "Click crest to cycle taskbar icons",
+				"omnibarHint": "Toggle URL Omnibar (Ctrl + .)",
+				"overlayToggle": "Overlay",
+				"userCardToggle": "Desktop Menu",
+				"omnibarToggle": "Omnibar",
+				"chromeLabel": "Chrome: {style}",
+				"crestLabel": "Icon",
+				"osAlertToggle": "OS Alert",
+				"liveUserSynced": "Live Account Preview"
 			},
 			"pills": {
 				"multiAccount": "1-Click Account Switcher",
@@ -5162,7 +5210,9 @@
 				"q2": "How does the 1-Click Account Switcher and Phone QR Login work?",
 				"a2": "You can sign in by scanning a QR code or entering a 6-character pairing code from an already authenticated phone or browser, and keep multiple Discord accounts signed in simultaneously in isolated session slots.",
 				"q3": "Is the In-Game Mini Overlay safe to use while streaming or gaming?",
-				"a3": "Yes. You can toggle click-through Ghost Mode with Alt + Shift + O while gaming, and enable Streamer Protection so sensitive dashboard and API token screens remain masked from OBS and screen recorders."
+				"a3": "Yes. You can toggle click-through Ghost Mode with Alt + Shift + O while gaming, and enable Streamer Protection so sensitive dashboard and API token screens remain masked from OBS and screen recorders.",
+				"q4": "Is the Xernerx Desktop App free to download and use?",
+				"a4": "Yes. The Xernerx Desktop App is €0/mo free across Windows, macOS, and Linux, including multi-account switching, QR login, native notifications, and the in-game overlay—with optional Bot Passes and the Ultra Ecosystem Bundle (€10/mo) available in the Store."
 			}
 		},
 		"features": {
@@ -5372,7 +5422,20 @@
 				"q2": "How do I configure Virtue, YourApps, To-Do List Bot, Metamorphosis, or Zodiac after inviting them?",
 				"a2": "As soon as the bot joins your server, open app.xernerx.com and select your server from the dashboard to configure XP curves, level roles, translation channels, and module toggles in real time.",
 				"q3": "Are all official Xernerx Studios Discord bots verified by Discord?",
-				"a3": "Yes. Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac are verified Discord applications hosted on our 24/7 monitored infrastructure with least-privilege OAuth2 scopes."
+				"a3": "Yes. Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac are verified Discord applications hosted on our 24/7 monitored infrastructure with least-privilege OAuth2 scopes.",
+				"q4": "How much do official Xernerx Discord bots cost for my server?",
+				"a4": "All 5 official Xernerx Studios bots—Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac—are free (€0/mo) to invite and use. Optional individual Bot Passes or the all-in-one Ultra Ecosystem Bundle (€10/mo) unlock expanded limits and boosted perks at store.xernerx.com."
+			},
+			"chooserFaq": {
+				"subtitle": "Common questions about {bot} permission presets, Discord OAuth2 authorization, and server configuration.",
+				"q1": "Which permission preset should I choose when inviting {bot}?",
+				"a1": "Essential is recommended for most Discord servers because it requests only the core permissions {bot} needs to operate cleanly. Choose Optional for extra convenience permissions, or Advanced (0 permissions) to assign permissions manually after inviting.",
+				"q2": "Can I change {bot}'s permissions or server settings after inviting it?",
+				"a2": "Yes. You can adjust {bot}'s Discord role permissions at any time in your server settings and manage supported modules, server listings, and analytics in real time at app.xernerx.com/dashboard.",
+				"q3": "Does {bot} log or store private Discord message content?",
+				"a3": "No. Official Xernerx Studios bots enforce zero message content logging and Universal 3-Tier Privacy Truth (Public, Limited, and Private), verified server-side across every route and API endpoint.",
+				"q4": "Is {bot} free to invite and how does pricing work?",
+				"a4": "Yes, inviting and running {bot} on your Discord server is free (€0/mo). Communities that want higher limits or bonus perks can optionally upgrade with a dedicated Bot Pass or the Xernerx Ultra Ecosystem Bundle (€10/mo) at store.xernerx.com."
 			}
 		},
 		"changelog": {
@@ -5433,6 +5496,288 @@
 			"invites": "Official Bot Invites",
 			"careers": "Open Team Roles",
 			"contact": "Get in Touch"
+		},
+		"comparison": {
+			"badge": "Compare & Decide",
+			"title": "Plans, Pricing & Comparison: Free vs. Ultra",
+			"subtitle": "Compare the Free Tier (€0/mo), Bot Passes & Ultra (€10/mo), Developer Pro SDKs, and vs. traditional Discord bots—built on 1 Account, 1 Place, 1 Setup and zero message content logging.",
+			"caption": "Comparison of Xernerx Suite plans, audience fit, and zero-message-logging architecture versus traditional Discord bots",
+			"columns": {
+				"capability": "Capability",
+				"free": "Free Tier (€0/mo)",
+				"passes": "Bot Passes & Ultra (€10/mo)",
+				"developer": "Developer Pro & SDKs",
+				"traditional": "vs. Traditional Discord Bots"
+			},
+			"rows": {
+				"audience": {
+					"label": "Best For",
+					"free": "Everyday Discord users & growing communities",
+					"passes": "Active servers scaling Virtue XP, YourApps forms & cosmetics",
+					"developer": "TypeScript bot authors & developer organizations",
+					"traditional": "Single-purpose servers juggling disconnected dashboards"
+				},
+				"pricing": {
+					"label": "Pricing & Value",
+					"free": "€0/mo forever across all 5 verified Discord bots, directory & dashboard",
+					"passes": "Individual Bot Passes or all-in-one Ultra bundle at €10/mo",
+					"developer": "8 free open-source @xernerx/* NPM packages + optional Developer Pro API",
+					"traditional": "Separate €5–€15/mo paywalls per individual bot"
+				},
+				"identity": {
+					"label": "Account & Setup",
+					"free": "1 Xernerx Account across all 13 Suite web apps & desktop client",
+					"passes": "Unified billing, synced themes & multi-account Desktop App slots",
+					"developer": "Scoped SHA-256 Bearer tokens (xrx_), Organizations & HMAC webhooks",
+					"traditional": "Separate logins, settings panels & billing portals per bot"
+				},
+				"privacy": {
+					"label": "Privacy Architecture",
+					"free": "Zero message content logging + 3-Tier Privacy (Public / Limited / Private)",
+					"passes": "Same zero-logging guarantee + self-service GDPR JSON export & deletion",
+					"developer": "Server-verified privacy enforcement across v1 REST API & edge CDN",
+					"traditional": "Broad MessageContent intents and opaque message retention"
+				},
+				"config": {
+					"label": "Modules & Telemetry",
+					"free": "Virtue leveling & YourApps forms dashboard + public directory listings",
+					"passes": "Expanded module limits, boosted XP multipliers & custom app crests",
+					"developer": "Automated shard telemetry (@xernerx/stats), command sync & SVG badges",
+					"traditional": "Closed-source tooling with minimal public API telemetry"
+				}
+			}
+		},
+		"faq": {
+			"heading": "Frequently Asked Questions"
+		},
+		"trustProof": {
+			"entityHeading": "Built by Xernerx Studios — Software Development Studio in the Netherlands, Europe",
+			"entityDesc": "Xernerx Studios (founded in the Netherlands, Europe) is a software development studio building verified Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the Xernerx Suite.",
+			"proofBadge": "26,400+ active servers · 2.65M+ users · 99.9% uptime SLA · Community reviews & verified ratings",
+			"proofMetrics": {
+				"servers": "26,400+ active servers",
+				"users": "2.65M+ users",
+				"uptime": "99.9% uptime SLA",
+				"reviews": "Community reviews & verified ratings"
+			},
+			"pricingHeading": "Plans, Pricing & Comparison: Free vs. Ultra",
+			"pricingTitle": "Simple, Transparent Pricing",
+			"tierFreeTitle": "Free Tier — €0/mo",
+			"tierFreeDesc": "Best for everyday users & growing servers: all 5 verified Discord bots, unified web dashboard, public directory, and native Desktop App — vs. traditional Discord bots that paywall essentials.",
+			"tierPassesTitle": "Bot Passes — Flexible",
+			"tierPassesDesc": "Best for active communities scaling Virtue XP multipliers, YourApps forms capacity, or individual bots on demand.",
+			"tierUltraTitle": "Ultra Bundle — €10/mo",
+			"tierUltraDesc": "Best for multi-bot servers & power users: all-in-one Ultra access across every official bot, priority perks, and cosmetics — vs. separate €5–€15/mo traditional Discord bots.",
+			"storeCta": "Compare Plans in Store"
+		},
+		"developerPolicy": {
+			"toc": "Contents",
+			"header": {
+				"badge": "Internal Team & Staff Governance",
+				"title": "Internal Developer Policy",
+				"subtitle": "Confidentiality, credential & infrastructure security, production data ethics, change management, and intellectual property obligations for internal Xernerx Studios developers, staff engineers, and maintainers.",
+				"effectiveDate": "Effective Date:"
+			},
+			"pillars": {
+				"confidentiality": {
+					"title": "Proprietary Code & Confidentiality",
+					"desc": "Non-public repositories, internal architecture, and unreleased features are strictly confidential and may only be used for authorized Xernerx Studios work."
+				},
+				"credentialSecurity": {
+					"title": "Credential & Infrastructure Security",
+					"desc": "Production tokens, database keys, and cloud credentials must remain isolated, encrypted, and never committed to repositories or shared in plain text."
+				},
+				"dataEthics": {
+					"title": "Need-to-Know Data Access & Audit Logs",
+					"desc": "Production user, server, and billing records may only be accessed when resolving active support or security cases, with every action logged in AuditLog."
+				},
+				"releaseGovernance": {
+					"title": "Development Testing & Production Integrity",
+					"desc": "All platform and bot updates are verified in Development before deploying to Production, preserving user privacy guarantees and backward compatibility."
+				}
+			},
+			"sections": {
+				"scope": {
+					"title": "1. Scope & Applicability (Internal Team vs. External API Users)",
+					"content": "This Internal Developer Policy (\"Policy\") governs internal Xernerx Studios developers, staff engineers, bot maintainers, moderators, translators, and contractors who are granted privileged access to internal Xernerx Studios repositories, staging and production infrastructure, or staff administration portals (admin.xernerx.com and hosting.xernerx.com).",
+					"externalPrefix": "If you are an external community developer building third-party applications or Discord bots using our public REST APIs, webhooks, WebSocket gateway, or open-source @xernerx/* packages, your access is governed instead by Section 4 of our",
+					"termsLink": "Terms of Service (/terms)",
+					"andText": "and our",
+					"licenseLink": "Software License (/license)",
+					"noEmploymentTitle": "No Employment or Agency Relationship:",
+					"noEmploymentDesc": "Participation as an internal volunteer developer, maintainer, translator, or moderator—or receipt of internal repository and staff portal access—does not create an employment contract, partnership, joint venture, or legal agency relationship with Xernerx Studios unless a separate written agreement is executed. Team members may not bind Xernerx Studios to financial, legal, or contractual commitments without explicit written authorization from leadership."
+				},
+				"confidentiality": {
+					"title": "2. Confidentiality, Non-Disclosure & Proprietary Code Custody",
+					"intro": "Internal developers are entrusted with access to proprietary source code, internal systems, and business operations. As a condition of team access, you agree to the following confidentiality obligations:",
+					"items": {
+						"proprietaryAssets": {
+							"title": "Protection of Proprietary Assets:",
+							"desc": "All non-public source code, database schemas, security architectures, unreleased product roadmaps, financial metrics, and internal documentation across the Xernerx Suite, official Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), and client applications are the confidential property of Xernerx Studios under the Xernerx Studios Proprietary & SaaS License v1.0."
+						},
+						"authorizedUse": {
+							"title": "Authorized Workstation Custody Only:",
+							"desc": "You may clone, inspect, and execute proprietary repositories solely on secured workstations for authorized development, testing, moderation, or localization on behalf of Xernerx Studios. You may not copy, redistribute, sublicense, sell, or reuse proprietary code or designs in personal, third-party, or competing projects."
+						},
+						"nonDisclosure": {
+							"title": "Non-Disclosure of Internal Operations:",
+							"desc": "Do not disclose internal security controls, private infrastructure topologies, staff deliberations, or unannounced features to unauthorized third parties without explicit approval from Xernerx Studios leadership."
+						}
+					}
+				},
+				"credentials": {
+					"title": "3. Credential Hygiene, Access Control & Infrastructure Security",
+					"intro": "Protecting the integrity of our cloud infrastructure, Discord bot applications, and user accounts requires strict operational security from every team member:",
+					"items": {
+						"accountSecurity": {
+							"title": "Workstation & Account Protection:",
+							"desc": "Internal developers must secure their GitHub, Discord, cloud hosting (Vercel, Easypanel), and workstation accounts with strong authentication and multi-factor verification where supported. Never share your personal staff session, API tokens, or SSH/GPG keys with anyone else."
+						},
+						"secretHandling": {
+							"title": "Strict Secret Isolation:",
+							"desc": "Production and staging secrets—including Discord bot tokens, OAuth client secrets, database connection URIs, payment processor keys (Stripe), private blob storage tokens, and deployment keys—must never be committed to Git history, exposed in client-facing bundles, pasted into haste.xernerx.com, or shared in public or unencrypted channels."
+						},
+						"incidentReporting": {
+							"title": "Mandatory Incident & Exposure Escalation:",
+							"desc": "If any token, key, workstation, or account with access to Xernerx Studios infrastructure is lost, compromised, or accidentally exposed, you must immediately notify security@xernerx.com so credentials can be rotated and an audit performed."
+						}
+					}
+				},
+				"dataEthics": {
+					"title": "4. Production Data Ethics, User Privacy & Staff Portal Conduct",
+					"intro": "Internal developers and staff members with access to production databases or administrative portals (admin.xernerx.com and hosting.xernerx.com) are bound by strict ethical and legal data-protection standards:",
+					"items": {
+						"needToKnow": {
+							"title": "Strict Need-to-Know Production Access:",
+							"desc": "You may only view or query non-public user profiles, server configurations, YourApps application submissions, private CDN/Haste records, or billing metadata when actively investigating a user-initiated support ticket, bug report, abuse escalation, or security incident."
+						},
+						"privacyCommitments": {
+							"title": "Preserving User Privacy & Data Minimization:",
+							"desc": "Internal developers must uphold every commitment made in our Privacy Policy and Security Overview—including our universal 3-tier privacy model (Public, Limited, and Private), our zero-message-content and zero-audio-capture guarantees across Discord bots, and our self-service GDPR/CCPA data export and deletion tools."
+						},
+						"noManipulation": {
+							"title": "Prohibition on Economy, Entitlement & Metric Manipulation:",
+							"desc": "Team members must never use administrative tools or database access to artificially mint or modify Virtual Credits, XP, levels, leaderboards, bot/server votes, subscription entitlements, vanity slugs, or cosmetic unlocks for themselves or others outside authorized testing or verified support remediation."
+						},
+						"auditTrail": {
+							"title": "Immutable Staff Audit Logging:",
+							"desc": "All administrative actions, role changes, moderation decisions, and infrastructure mutations performed through staff portals are permanently recorded with actor identity, timestamp, and before/after diffs in the immutable AuditLog. Attempting to tamper with, disable, or bypass audit logging is grounds for immediate termination of access."
+						}
+					}
+				},
+				"releases": {
+					"title": "5. Change Management, Testing & Service Reliability",
+					"intro": "To protect live communities and developers relying on *.xernerx.com and our official Discord bots, all engineering changes must follow disciplined development testing and production safeguards:",
+					"items": {
+						"devTesting": {
+							"title": "Development Environment Verification:",
+							"desc": "All code changes, database migrations, and bot updates must be tested and verified in our Development (dev) environment before being deployed to Production. Developers must confirm that changes operate without unhandled runtime or security errors prior to release."
+						},
+						"productionProtection": {
+							"title": "Production Safeguards & Live Infrastructure Integrity:",
+							"desc": "Unverified direct edits to live production containers or databases outside established deployment workflows and emergency recovery procedures are strictly prohibited."
+						},
+						"stabilityAndCompatibility": {
+							"title": "Backward Compatibility & Public Documentation:",
+							"desc": "Updates to public REST APIs, WebSocket gateways, webhooks, and open-source SDKs must respect published versioning commitments so existing community integrations are not unexpectedly broken, and public documentation must be kept accurate with every release."
+						}
+					}
+				},
+				"ip": {
+					"title": "8. Intellectual Property Assignment & Brand Protection",
+					"items": {
+						"ipOwnership": {
+							"title": "Intellectual Property & Contribution Assignment:",
+							"desc": "All software, features, designs, documentation, and translations authored by internal developers and staff within the scope of their work on Xernerx Studios projects are assigned to and owned by Xernerx Studios in accordance with Section 4 of the Xernerx Studios Proprietary & SaaS License (/license)."
+						},
+						"brandProtection": {
+							"title": "Trademarks & Official Branding:",
+							"desc": "All Xernerx Studios names, logos, bot identities (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot), and visual assets remain the exclusive trademarks of Xernerx Studios and may only be used in accordance with official brand guidelines."
+						}
+					}
+				},
+				"offboarding": {
+					"title": "9. Offboarding, Access Revocation & Policy Enforcement",
+					"items": {
+						"accessRevocation": {
+							"title": "Immediate Revocation Upon Role Change or Departure:",
+							"desc": "When an internal developer, maintainer, moderator, or contractor leaves the Xernerx Studios team or transitions out of an engineering role, all GitHub organization seats, staff RBAC permissions (admin.xernerx.com and hosting.xernerx.com), cloud hosting seats, and internal credentials are immediately revoked."
+						},
+						"dataDestruction": {
+							"title": "Deletion of Local Clones & Credentials:",
+							"desc": "Upon offboarding, departing team members must immediately delete all local copies of proprietary repositories, environment files (.env), database dumps, and internal credentials from their personal devices. Confidentiality and non-disclosure obligations survive indefinitely after departure."
+						},
+						"enforcement": {
+							"title": "Consequences of Policy Violations:",
+							"desc": "Violations of this Policy—including unauthorized data snooping, credential negligence, economy manipulation, or source code leakage—will result in immediate revocation of staff and repository access, removal from Xernerx Studios, account suspension, and legal or civil remedies where applicable."
+						}
+					},
+					"relatedPrefix": "This Internal Developer Policy operates alongside our",
+					"securityLink": "Security Architecture (/security)",
+					"licenseLink": "Software License (/license)",
+					"termsLink": "Terms of Service (/terms)",
+					"privacyLink": "Privacy Policy (/privacy)",
+					"docsLink": "Developer Documentation (docs.xernerx.com)"
+				},
+				"contact": {
+					"title": "10. Governance & Security Contact",
+					"prefix": "For internal governance inquiries, access requests, or security incident escalations, contact"
+				},
+				"bots": {
+					"title": "6. Official Discord Bot Standards & Mandatory /info Command",
+					"intro": "Every first-party Discord application developed or maintained by Xernerx Studios (including Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot) must adhere to our official bot transparency, integration, and privacy standards:",
+					"items": {
+						"infoCommand": {
+							"title": "Mandatory /info Transparency Command:",
+							"desc": "Every official Xernerx Discord bot must implement a standardized /info slash command that responds ephemerally and displays: (a) the bot’s official description, avatar thumbnail, user-synced accent color, and copyright footer; (b) live Statistics (server count, total user reach, and shard index when sharded); (c) live Runtime metrics (WebSocket latency in ms, memory usage in MB, and relative uptime timestamp); (d) System versions (bot version, @xernerx/framework version, Discord.js version, and Node.js version); (e) Credits (Lead Developer, Developers, and Publisher attribution to Xernerx Studios); and (f) five direct link buttons to Dashboard, Website (xernerx.com), Support (xernerx.com/support), Terms of Service (xernerx.com/terms), and Privacy Policy (xernerx.com/privacy)."
+						},
+						"ecosystemStack": {
+							"title": "First-Party Ecosystem Integration:",
+							"desc": "Official bots must integrate with the Xernerx ecosystem stack so slash command registries, live guild and user telemetry, vote/review/tip engagement rewards, and user theme or locale preferences remain synchronized with the Xernerx Suite and Server Dashboard."
+						},
+						"leastPrivilege": {
+							"title": "Least-Privilege Intents & Data Minimization:",
+							"desc": "Official bots must operate with the minimum Discord Gateway intents and permissions required for their functionality, never enable the privileged MessageContent intent to log or store raw chat messages, never record voice audio, and persist data through authenticated API or WebSocket services rather than exposing direct production database credentials."
+						},
+						"selfServiceWipe": {
+							"title": "Self-Service User & Server Data Controls:",
+							"desc": "Any official bot that stores user progression, form submissions, or server configurations must support immediate self-service user data deletion in Account Settings (such as \"Delete Virtue Data\" and \"Delete YourApps Data\") as well as per-server setup deletion in the Server Dashboard (such as \"Delete Virtue Setup\" and \"Delete YourApps Setup\")."
+						}
+					}
+				},
+				"sdk": {
+					"title": "7. Open-Source SDK Development & Stewardship (@xernerx/*)",
+					"intro": "Internal developers maintaining our 8 public open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket) under the Apache License, Version 2.0 must uphold the following stewardship rules:",
+					"items": {
+						"openSourceBoundary": {
+							"title": "Separation of Open-Source SDKs and Proprietary SaaS Logic:",
+							"desc": "Public @xernerx/* packages must remain general-purpose developer frameworks and utilities. Internal developers must never bundle proprietary SaaS business logic, private internal routes, or credentials into packages published to the public npm registry."
+						},
+						"semverAndCompatibility": {
+							"title": "Semantic Versioning & Backward Compatibility:",
+							"desc": "All public classes, builders, extension contracts, and client options exported by @xernerx/* packages must strictly follow Semantic Versioning (semver). Breaking changes may only be introduced in major version releases with clear migration documentation so community bots never break on minor or patch updates."
+						},
+						"docsAndExamples": {
+							"title": "Public Documentation & Starter Examples Parity:",
+							"desc": "Every public symbol, builder option, and emitted event in an SDK release must be documented so versioned reference snapshots on docs.xernerx.com/packages and our official TypeScript and JavaScript starter templates remain accurate and up to date."
+						},
+						"supplyChainSecurity": {
+							"title": "Supply-Chain Security & Dependency Minimalism:",
+							"desc": "SDK maintainers must keep external dependencies minimal, audit third-party dependencies for vulnerabilities prior to publishing, and never introduce unvetted or unauthorized telemetry-collecting dependencies into any @xernerx/* package."
+						}
+					}
+				}
+			},
+			"description": "security@xernerx.com",
+			"faq": {
+				"subtitle": "Answers to common questions about who this policy covers, production data access rules, and offboarding requirements.",
+				"q1": "Does this policy apply to third-party bot developers using @xernerx/framework or the public REST API?",
+				"a1": "No. External developers using our Apache-2.0 npm SDKs (@xernerx/*), portal.xernerx.com, webhooks, or public /v1/* APIs for their own bots are governed by Section 4 of our Terms of Service (/terms) and the Apache-2.0 License (/license). This policy applies specifically to internal Xernerx Studios developers, staff engineers, and repository maintainers.",
+				"q2": "When are internal developers allowed to view non-public user or server records in Admin or production databases?",
+				"a2": "Strictly on a need-to-know basis when actively investigating a user-submitted support ticket, bug report, or security incident. Browsing non-public records out of curiosity or manually altering credits, XP, or entitlements is strictly prohibited and logged in the immutable staff AuditLog.",
+				"q3": "What happens to repository and infrastructure access when a developer leaves the Xernerx Studios team?",
+				"a3": "All GitHub organization access, staff RBAC roles, cloud hosting seats, and internal tokens are revoked immediately, and the departing developer must delete all local clones of proprietary repositories and environment files from their devices."
+			}
 		}
 	},
 	"faq": {
@@ -9409,7 +9754,7 @@
 				"signalHeading": "Signal Locked",
 				"signalSubtitle": "Establishing your encrypted single sign-on bridge across the Xernerx ecosystem...",
 				"fusionHeading": "Identity Fused, {name}",
-				"fusionSubtitle": "Your Discord profile is now linked to 12+ Xernerx applications, server dashboards, and developer tools.",
+				"fusionSubtitle": "Your Discord profile is now linked to all 13 Xernerx applications, server dashboards, and developer tools.",
 				"vaultBadge": "Welcome Gift Unlocked",
 				"pillarBots": "Flagship Discord Bots",
 				"pillarDashboard": "Live Server Dashboards",
@@ -9427,22 +9772,26 @@
 				"heading": "Hey there, {name}!",
 				"subtitle": "Your Discord account is your single login across every Xernerx app — and we just added 1,000 free welcome credits to your wallet.",
 				"legalHeader": "Terms of Service & Privacy Policy",
-				"legalDescription": "Please review and accept our Terms of Service and Privacy Policy to activate your account.",
-				"agreeCheckbox": "I have read and agree to the Xernerx Terms of Service and Privacy Policy"
+				"legalDescription": "Please review and accept our Terms of Service and Privacy Policy to activate your account. You can also inspect our Cookie Policy, Security Architecture, and Software License below.",
+				"agreeCheckbox": "I have read and agree to the Xernerx Terms of Service and Privacy Policy",
+				"cookiesLink": "Cookie Policy",
+				"securityLink": "Security",
+				"licenseLink": "License",
+				"developerPolicyLink": "Developer Policy"
 			},
 			"whoWeAre": {
 				"heading": "How will you use Xernerx?",
 				"personaPrompt": "Pick one or both — we will tailor your shortcuts and tour automatically:",
 				"roleUserTitle": "Bot & Community User",
-				"roleUserDesc": "Set up bots like Virtue in your Discord servers, climb XP leaderboards, and discover new communities.",
+				"roleUserDesc": "Set up bots like Virtue and YourApps in your Discord servers, climb XP leaderboards, manage server applications, and discover new communities.",
 				"roleDevTitle": "Developer & Creator",
 				"roleDevDesc": "Build Discord bots with our TypeScript & JavaScript SDKs, manage team Organizations, and publish to the directory.",
 				"botsTitle": "Flagship Discord Bots",
-				"botsDesc": "Power your servers with Virtue (XP & voice leveling, hoist roles, boosts, and rank cards) and more.",
+				"botsDesc": "Power your servers with Virtue (XP & voice leveling, hoist roles, boosts, and rank cards), YourApps (interactive Discord forms & application reviews), and more.",
 				"suiteTitle": "Live Server Dashboards",
-				"suiteDesc": "Manage your Discord server profiles, view 30-day statistics, configure Virtue leveling, and claim daily credit gifts.",
+				"suiteDesc": "Manage your Discord server profiles, view 30-day statistics, configure Virtue leveling & YourApps forms, and claim daily credit gifts.",
 				"openSourceTitle": "Modular @xernerx/* SDK",
-				"openSourceDesc": "Build Discord.js bots faster with @xernerx/framework, @xernerx/commands, @xernerx/hooks, and @xernerx/stats.",
+				"openSourceDesc": "Build Discord.js bots faster with our Apache-2.0 open-source SDKs (@xernerx/framework, @xernerx/commands, @xernerx/hooks, @xernerx/stats, and more).",
 				"devPortalTitle": "Developer Portal & Teams",
 				"devPortalDesc": "Create team Organizations, customize your bot directory listings, sync slash commands, and configure HMAC-SHA256 webhooks.",
 				"bothDevAndPortalTitle": "Dashboards & Developer Portal",
@@ -9492,13 +9841,13 @@
 				"paletteTitle": "Global Search & Command Palette",
 				"paletteDesc": "Click the search button in the top-right (or press Ctrl + K) to search bots, servers, docs, or run quick actions from anywhere.",
 				"shortcutDashboardTitle": "Server Dashboard Shortcut",
-				"shortcutDashboardDesc": "Since you chose Bot & Community User, we pinned the Server Dashboard to your Top Bar for instant access to your servers and Virtue settings.",
+				"shortcutDashboardDesc": "Since you chose Bot & Community User, we pinned the Server Dashboard to your Top Bar for instant access to your servers, Virtue leveling, and YourApps applications.",
 				"shortcutPortalTitle": "Developer Portal Shortcut",
 				"shortcutPortalDesc": "Since you chose Developer & Creator, we pinned the Developer Portal to your Top Bar so you can manage your bots, teams, and webhooks in one click.",
 				"shortcutStoreTitle": "Your Quick-Launch Shortcuts",
 				"shortcutStoreDesc": "We also added the Store alongside your shortcuts. You can freely pin, unpin, or reorder any Xernerx app in Account Settings.",
 				"appDrawerTitle": "App Navigation Drawer",
-				"appDrawerDesc": "Click the 4-square grid icon in the top-right (or press Ctrl + Space) to switch between App, Account, Store, Docs, Info, and Portal.",
+				"appDrawerDesc": "Click the 4-square grid icon in the top-right (or press Ctrl + Space) to switch between App, Account, Store, Docs, Info, Blog, Haste, and Portal.",
 				"alertsTitle": "Notifications & Cooldowns",
 				"alertsDesc": "Your notification bell tracks platform updates, security alerts, and reminders when your vote or daily gift cooldowns are ready.",
 				"profileTitle": "Profile, Theme & Daily Gift",

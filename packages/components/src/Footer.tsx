@@ -1,16 +1,14 @@
 /** @format */
-// Force recompile
 'use client';
 
 import {
-	Activity,
+	ArrowUpRight,
 	BookOpen,
 	Briefcase,
 	Bug,
 	CircleQuestionMark,
-	Cookie,
+	Code2,
 	Download,
-	FileText,
 	History,
 	LifeBuoy,
 	Link as LinkIcon,
@@ -20,22 +18,24 @@ import {
 	MessageSquare,
 	Newspaper,
 	Package,
-	Shield,
-	ShieldCheck,
 	SlidersHorizontal,
+	Terminal,
 } from 'lucide-react';
 import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
-import { useEffect, useState } from 'react';
+import { Tooltip } from '@xernerx/ui';
+import { useEffect, useId, useState } from 'react';
 
 import { BsBluesky, BsDiscord, BsFacebook, BsGithub, BsInstagram, BsLinkedin, BsReddit, BsTwitterX, BsWhatsapp } from 'react-icons/bs';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 
 export function Footer() {
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { openPrompt } = useCookie();
 	const { t } = useDictionary();
 	const resolveUrl = (url: string) => getEnvUrl(url);
+
+	const followLabelId = useId();
+	const shareLabelId = useId();
 
 	const [systemOnline, setSystemOnline] = useState<boolean | null>(null);
 
@@ -102,11 +102,17 @@ export function Footer() {
 		},
 	];
 
+	const legalLinks = [
+		{ href: resolveUrl('https://www.xernerx.com/security'), label: t('common.footer.links.security') },
+		{ href: resolveUrl('https://www.xernerx.com/privacy'), label: t('common.footer.links.privacy') },
+		{ href: resolveUrl('https://www.xernerx.com/terms'), label: t('common.footer.links.terms') },
+		{ href: resolveUrl('https://www.xernerx.com/cookies'), label: t('common.footer.links.cookies') },
+		{ href: resolveUrl('https://www.xernerx.com/license'), label: t('common.footer.links.license') },
+	];
+
 	return (
-		<motion.footer
-			initial={{ opacity: 1, y: 0 }}
-			animate={{ opacity: 1, y: 0 }}
-			className="relative z-0 w-full overflow-hidden bg-(--background) backdrop-blur-md"
+		<footer
+			className="relative z-0 w-full overflow-x-clip bg-(--background) backdrop-blur-md"
 			style={{
 				fontSize: 'var(--text-scale, 14px)',
 				paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -114,163 +120,224 @@ export function Footer() {
 				paddingRight: 'env(safe-area-inset-right, 0px)',
 			}}
 		>
-			{/* Fading top border */}
-			<div className="pointer-events-none absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-(--accent) to-transparent opacity-50" />
+			{/* Fading accent top border */}
+			<div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-(--accent) to-transparent opacity-50" />
 
-			<div className="mx-auto grid w-full max-w-(--page-width) grid-cols-1 px-8 py-12 md:grid-cols-[1.6fr_1fr_1fr_1fr] md:px-12" style={{ gap: 'var(--ui-gap)' }}>
+			<div
+				className="mx-auto w-full max-w-(--page-width) px-6 md:px-10"
+				style={{
+					paddingBlockStart: 'calc(var(--ui-gap) * 1.75)',
+					paddingBlockEnd: 'calc(var(--ui-gap) * 1.25)',
+				}}
+			>
 				{/* ---------------------------------------------------------------- */}
-				{/* Brand */}
+				{/* Primary Grid: Brand + 3 Balanced Navigation Columns              */}
 				{/* ---------------------------------------------------------------- */}
-				<div className="flex flex-col justify-between text-center md:text-left" style={{ gap: 'var(--ui-gap)' }}>
-					<div className="flex flex-col items-center md:items-start" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-						<div className="text-lg font-semibold text-(--text)">{t('components.footer.text1')}</div>
-
-						<p className="max-w-md leading-7 text-(--text-muted)">{t('common.footer.tagline')}</p>
-
-						<div className="mt-1 inline-flex items-center gap-2 rounded-full border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs px-3 py-1 text-xs font-medium text-(--text-muted)">
-							<span
-								className={`h-2 w-2 rounded-full ${
-									systemOnline === null ? 'bg-(--text-muted) animate-pulse' : systemOnline ? 'bg-(--accent-green) shadow-[0_0_8px_rgba(52,211,153,0.7)]' : 'bg-(--accent-orange)'
-								}`}
-							/>
-							<span>{systemOnline === false ? t('common.footer.links.statusDegraded') : t('common.footer.links.statusOperational')}</span>
+				<div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,2.65fr)]" style={{ gap: 'calc(var(--ui-gap) * 1.75)' }}>
+					{/* Brand, Live Status & Follow */}
+					<div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+						<div className="text-lg font-bold tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{t('components.footer.text1')}
 						</div>
 
-						<div className="mt-2 flex flex-wrap items-center justify-center md:justify-start gap-2" aria-label={t('common.footer.follow.label')}>
-							<span className="text-xs font-semibold uppercase tracking-wider text-(--text-muted) mr-1">{t('common.footer.follow.label')}:</span>
-							{socialLinks.map((item) => {
-								const SocialIcon = item.icon;
-								return (
+						<p className="max-w-sm text-sm leading-relaxed text-(--text-muted)">{t('common.footer.tagline')}</p>
+
+						<Tooltip content={t('common.footer.links.status')} position="top">
+							<Link
+								suppressHydrationWarning
+								href={resolveUrl('https://info.xernerx.com/status')}
+								className="group inline-flex min-h-8 items-center gap-2 rounded-full border border-(--border)/10 bg-(--foreground)/30 px-3 py-1 text-xs font-medium text-(--text-muted) shadow-xs backdrop-blur-md transition-all hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--text) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+							>
+								<span
+									aria-hidden="true"
+									className={`h-2 w-2 shrink-0 rounded-full ${
+										systemOnline === null ? 'animate-pulse bg-(--text-muted)' : systemOnline ? 'bg-(--accent-green) shadow-[0_0_8px_rgba(52,211,153,0.7)]' : 'bg-(--accent-orange)'
+									}`}
+								/>
+								<span>{systemOnline === false ? t('common.footer.links.statusDegraded') : t('common.footer.links.statusOperational')}</span>
+								<ArrowUpRight
+									size={13}
+									aria-hidden="true"
+									className="shrink-0 opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-(--accent) group-hover:opacity-100"
+								/>
+							</Link>
+						</Tooltip>
+
+						<div className="flex flex-wrap items-center justify-center gap-2 pt-1 lg:justify-start">
+							<span id={followLabelId} className="text-[11px] font-semibold uppercase tracking-wider text-(--text-muted)">
+								{t('common.footer.follow.label')}
+							</span>
+							<ul role="list" aria-labelledby={followLabelId} className="flex flex-wrap items-center justify-center gap-1.5 lg:justify-start">
+								{socialLinks.map((item) => {
+									const SocialIcon = item.icon;
+									return (
+										<li key={item.href}>
+											<Tooltip content={item.label} position="top">
+												<Link
+													href={item.href}
+													target="_blank"
+													rel="me noopener noreferrer"
+													aria-label={item.label}
+													className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full border border-(--border)/10 bg-(--foreground)/30 text-(--text-muted) backdrop-blur-md transition-all hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--accent) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+												>
+													<SocialIcon size={13} aria-hidden="true" />
+												</Link>
+											</Tooltip>
+										</li>
+									);
+								})}
+							</ul>
+						</div>
+					</div>
+
+					{/* Navigation Columns */}
+					<div className="grid min-w-0 grid-cols-2 sm:grid-cols-3" style={{ gap: 'calc(var(--ui-gap) * 1.25)' }}>
+						{/* Platform */}
+						<FooterSection title={t('common.footer.sections.platform')}>
+							<FooterLink href={resolveUrl('https://www.xernerx.com/download')} icon={Download} label={t('common.footer.links.download')} external={false} />
+							<FooterLink href={resolveUrl('https://www.xernerx.com/invites')} icon={LinkIcon} label={t('common.footer.links.invites')} external={false} />
+							<FooterLink href={resolveUrl('https://blog.xernerx.com')} icon={Newspaper} label={t('common.footer.links.blog')} external={false} />
+							<FooterLink href={resolveUrl('https://www.xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers')} external={false} />
+							<FooterLink href={resolveUrl('https://www.xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
+						</FooterSection>
+
+						{/* Support */}
+						<FooterSection title={t('common.footer.sections.support')}>
+							<FooterLink href={resolveUrl('https://info.xernerx.com')} icon={LifeBuoy} label={t('common.footer.links.help')} external={false} />
+							<FooterLink href={resolveUrl('https://info.xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
+							<FooterLink href={resolveUrl('https://info.xernerx.com/roadmap')} icon={Map} label={t('common.footer.links.roadmap')} external={false} />
+							<FooterLink href={resolveUrl('https://info.xernerx.com/changelog')} icon={History} label={t('common.footer.links.changelog')} external={false} />
+							<FooterLink href={resolveUrl('https://info.xernerx.com/suggestions')} icon={MessageSquare} label={t('common.footer.links.suggestions')} external={false} />
+							<FooterLink href={resolveUrl('https://info.xernerx.com/issues')} icon={Bug} label={t('common.footer.links.issues')} external={false} />
+						</FooterSection>
+
+						{/* Developer */}
+						<FooterSection title={t('common.footer.sections.developer')} className="col-span-2 sm:col-span-1" listClassName="grid grid-cols-2 sm:flex sm:flex-col">
+							<FooterLink href={resolveUrl('https://docs.xernerx.com')} icon={BookOpen} label={t('common.footer.links.documentation')} external={false} />
+							<FooterLink href={resolveUrl('https://portal.xernerx.com')} icon={Code2} label={t('common.footer.links.portal')} external={false} />
+							<FooterLink href={resolveUrl('https://www.xernerx.com/developer-policy')} icon={Terminal} label={t('common.footer.links.developerPolicy')} external={false} />
+							<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github')} />
+							<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm')} />
+							<FooterLink href="https://discord.gg/yrm8gqTuXa" icon={MessageCircle} label={t('common.footer.links.discord')} />
+						</FooterSection>
+					</div>
+				</div>
+
+				{/* ---------------------------------------------------------------- */}
+				{/* Compact Bottom Bar: Copyright · Legal & Trust · Share            */}
+				{/* ---------------------------------------------------------------- */}
+				<div
+					className="flex flex-col items-center justify-between gap-3 border-t border-(--border)/10 xl:flex-row"
+					style={{
+						marginBlockStart: 'calc(var(--ui-gap) * 1.25)',
+						paddingBlockStart: 'var(--ui-gap)',
+					}}
+				>
+					<p className="shrink-0 text-xs text-(--text-muted)">
+						{t('components.footer.text2')} {new Date().getFullYear()} {t('components.footer.text3')}
+					</p>
+
+					<nav aria-label={t('common.footer.sections.legal')} className="min-w-0">
+						<ul className="flex flex-wrap-balance items-center justify-center gap-x-1 gap-y-1">
+							{legalLinks.map((item) => (
+								<li key={item.href}>
 									<Link
-										key={item.href}
+										suppressHydrationWarning
 										href={item.href}
-										target="_blank"
-										rel="me noopener noreferrer"
-										aria-label={item.label}
-										title={item.label}
-										className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-(--border)/10 bg-(--foreground)/30 text-(--text-muted) backdrop-blur-md transition-all hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--accent)"
+										className="inline-flex min-h-7 items-center rounded-full px-2.5 py-1 text-xs text-(--text-muted) transition-colors hover:bg-(--accent)/10 hover:text-(--text) focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--accent) whitespace-nowrap"
 									>
-										<SocialIcon size={13} />
-										<span className="sr-only">{item.label}</span>
+										{item.label}
 									</Link>
-								);
-							})}
-						</div>
+								</li>
+							))}
+							<li>
+								<button
+									type="button"
+									onClick={openPrompt}
+									className="inline-flex min-h-7 cursor-pointer items-center gap-1.5 rounded-full border border-(--border)/10 bg-(--foreground)/30 px-2.5 py-1 text-xs text-(--text-muted) transition-colors hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--text) focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--accent) whitespace-nowrap"
+								>
+									<SlidersHorizontal size={12} aria-hidden="true" className="shrink-0" />
+									<span>{t('common.footer.links.cookiePreferences')}</span>
+								</button>
+							</li>
+						</ul>
+					</nav>
 
-						<div className="mt-1 flex flex-wrap items-center justify-center md:justify-start gap-2" aria-label={t('common.footer.share.label')}>
-							<span className="text-xs font-semibold uppercase tracking-wider text-(--text-muted) mr-1">{t('common.footer.share.label')}:</span>
+					<div className="flex shrink-0 items-center gap-1.5">
+						<span id={shareLabelId} className="mr-0.5 text-[11px] font-semibold uppercase tracking-wider text-(--text-muted)">
+							{t('common.footer.share.label')}
+						</span>
+						<ul role="list" aria-labelledby={shareLabelId} className="flex items-center gap-1.5">
 							{shareLinks.map((item) => {
 								const ShareIcon = item.icon;
 								return (
-									<button
-										key={item.href}
-										type="button"
-										onClick={() => window.open(item.href, '_blank', 'noopener,noreferrer')}
-										aria-label={item.label}
-										title={item.label}
-										className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-(--border)/10 bg-(--foreground)/30 text-(--text-muted) backdrop-blur-md transition-all hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--accent) cursor-pointer"
-									>
-										<ShareIcon size={13} />
-										<span className="sr-only">{item.label}</span>
-									</button>
+									<li key={item.href}>
+										<Tooltip content={item.label} position="top">
+											<a
+												href={item.href}
+												target="_blank"
+												rel="noopener noreferrer"
+												aria-label={item.label}
+												className="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full border border-(--border)/10 bg-(--foreground)/30 text-(--text-muted) backdrop-blur-md transition-all hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--accent) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+											>
+												<ShareIcon size={12} aria-hidden="true" />
+											</a>
+										</Tooltip>
+									</li>
 								);
 							})}
-						</div>
-					</div>
-
-					<div className="text-sm text-(--text-muted)">
-						{t('components.footer.text2')} {new Date().getFullYear()} {t('components.footer.text3')}
+						</ul>
 					</div>
 				</div>
-				{/* ---------------------------------------------------------------- */}
-				{/* Resources */}
-				{/* ---------------------------------------------------------------- */}
-				<FooterSection title={t('common.footer.sections.resources')}>
-					<FooterLink href={resolveUrl('https://www.xernerx.com/download')} icon={Download} label={t('common.footer.links.download')} external={false} />
-					<FooterLink href={resolveUrl('https://blog.xernerx.com')} icon={Newspaper} label={t('common.footer.links.blog')} external={false} />
-					<FooterLink href={resolveUrl('https://www.xernerx.com/invites')} icon={LinkIcon} label={t('common.footer.links.invites')} external={false} />
-					<FooterLink href={resolveUrl('https://www.xernerx.com/security')} icon={ShieldCheck} label={t('common.footer.links.security')} external={false} />
-					<FooterLink href={resolveUrl('https://www.xernerx.com/license')} icon={FileText} label={t('common.footer.links.license')} external={false} />
-					<FooterLink href={resolveUrl('https://www.xernerx.com/privacy')} icon={Shield} label={t('common.footer.links.privacy')} external={false} />
-					<FooterLink href={resolveUrl('https://www.xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
-					<FooterLink href={resolveUrl('https://www.xernerx.com/cookies')} icon={Cookie} label={t('common.footer.links.cookies')} external={false} />
-					<FooterLink onClick={openPrompt} icon={SlidersHorizontal} label={t('common.footer.links.cookiePreferences')} />
-					<FooterLink href={resolveUrl('https://www.xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers')} external={false} />
-				</FooterSection>
-				{/* ---------------------------------------------------------------- */}
-				{/* Support */}
-				{/* ---------------------------------------------------------------- */}
-				<FooterSection title={t('common.footer.sections.support')}>
-					<FooterLink href={resolveUrl('https://info.xernerx.com')} icon={LifeBuoy} label={t('common.footer.links.help')} external={false} />
-					<FooterLink href={resolveUrl('https://info.xernerx.com/status')} icon={Activity} label={t('common.footer.links.status')} external={false} />
-					<FooterLink href={resolveUrl('https://info.xernerx.com/issues')} icon={Bug} label={t('common.footer.links.issues')} external={false} />
-					<FooterLink href={resolveUrl('https://info.xernerx.com/suggestions')} icon={MessageSquare} label={t('common.footer.links.suggestions')} external={false} />
-					<FooterLink href={resolveUrl('https://info.xernerx.com/roadmap')} icon={Map} label={t('common.footer.links.roadmap')} external={false} />
-					<FooterLink href={resolveUrl('https://info.xernerx.com/changelog')} icon={History} label={t('common.footer.links.changelog')} external={false} />
-					<FooterLink href={resolveUrl('https://info.xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
-					<FooterLink href={resolveUrl('https://www.xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
-				</FooterSection>
-				{/* ---------------------------------------------------------------- */}
-				{/* Developer */}
-				{/* ---------------------------------------------------------------- */}
-				<FooterSection title={t('common.footer.sections.developer')}>
-					<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github')} />
-					<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm')} />
-					<FooterLink href={resolveUrl('https://docs.xernerx.com')} icon={BookOpen} label={t('common.footer.links.documentation')} external={false} />
-					<FooterLink href="https://discord.gg/yrm8gqTuXa" icon={MessageCircle} label={t('common.footer.links.discord')} />
-				</FooterSection>
 			</div>
-		</motion.footer>
+		</footer>
 	);
 }
 
 /* -------------------------------------------------------------------------- */
-/* Sections */
+/* Sections                                                                   */
 /* -------------------------------------------------------------------------- */
 
-function FooterSection({ title, children }: { title?: string; children: React.ReactNode }) {
+function FooterSection({ title, children, className = '', listClassName = 'flex flex-col' }: { title?: string; children: React.ReactNode; className?: string; listClassName?: string }) {
+	const headingId = useId();
+
 	return (
-		<div className="flex flex-col items-center md:items-start" style={{ gap: 'var(--ui-gap)' }}>
-			<div className="text-sm font-semibold uppercase tracking-[0.2em] text-(--text)">{title}</div>
+		<nav aria-labelledby={headingId} className={`flex min-w-0 flex-col items-start ${className}`} style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+			<h2 id={headingId} className="px-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-(--text)">
+				{title}
+			</h2>
 
-			<div className="flex flex-col w-full" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-				{children}
-			</div>
-		</div>
+			<ul className={`w-full gap-0.5 ${listClassName}`}>{children}</ul>
+		</nav>
 	);
 }
 
 /* -------------------------------------------------------------------------- */
-/* Link */
+/* Link                                                                       */
 /* -------------------------------------------------------------------------- */
 
 function FooterLink({ href, onClick, icon: Icon, label, external = true }: { href?: string; onClick?: () => void; icon: React.ElementType; label?: string; external?: boolean }) {
 	const className =
-		'group inline-flex items-center rounded-lg text-(--text-muted) transition-all duration-200 hover:translate-x-0.5 hover:bg-[color-mix(in_srgb,var(--accent)_15%,transparent)] hover:text-(--text) cursor-pointer text-left';
-
-	const linkStyle = {
-		padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-		gap: 'calc(var(--ui-gap) * 0.75)',
-	};
+		'group flex min-h-8 w-full min-w-0 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-left text-sm text-(--text-muted) transition-all duration-150 hover:translate-x-0.5 hover:bg-(--accent)/10 hover:text-(--text) focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--accent)';
 
 	const content = (
 		<>
-			<Icon size={16} className="transition-colors group-hover:text-(--text) shrink-0" />
-			<span className="text-sm">{label}</span>
+			<Icon size={15} aria-hidden="true" className="shrink-0 text-(--text-muted)/80 transition-colors group-hover:text-(--accent)" />
+			<span className="min-w-0 leading-snug">{label}</span>
 		</>
 	);
 
-	if (onClick) {
-		return (
-			<button type="button" onClick={onClick} className={className} style={linkStyle}>
-				{content}
-			</button>
-		);
-	}
-
 	return (
-		<Link suppressHydrationWarning href={href || '#'} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className={className} style={linkStyle}>
-			{content}
-		</Link>
+		<li className="min-w-0">
+			{onClick ? (
+				<button type="button" onClick={onClick} className={className}>
+					{content}
+				</button>
+			) : (
+				<Link suppressHydrationWarning href={href || '#'} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className={className}>
+					{content}
+				</Link>
+			)}
+		</li>
 	);
 }

@@ -4,7 +4,7 @@
 import { ArrowLeft, CheckCircle2, ClipboardList, EyeOff, LogIn, Send, Server, ShieldAlert } from 'lucide-react';
 import { Badge, Button } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
-import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
@@ -51,6 +51,11 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
+	const { hide } = useSidebar();
+
+	useEffect(() => {
+		hide();
+	}, [hide]);
 
 	const [data, setData] = useState<FormPortalResponse | null>(null);
 	const [loading, setLoading] = useState(true);

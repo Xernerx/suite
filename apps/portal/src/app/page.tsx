@@ -33,7 +33,7 @@ function PortalPageContent() {
 	const { data: session, status } = useSession();
 	const { getEnvUrl, isReady: envReady } = useEnvironment();
 	const { t } = useDictionary();
-	const { setNavItems, clearNavItems, show, setView } = useSidebar();
+	const { setNavItems, clearNavItems, show, hide, setView } = useSidebar();
 	const { toast, remind } = useToast();
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -91,6 +91,7 @@ function PortalPageContent() {
 			if (!isCrawler) {
 				window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
 			} else {
+				hide();
 				setLoading(false);
 			}
 			return;

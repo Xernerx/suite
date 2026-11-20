@@ -2,6 +2,35 @@
 
 # www
 
+## 0.30.0
+
+### Minor Changes
+
+- ## Developer Policy, Subsection TOC Scroll Sync & Legal Coverage Audit
+  
+  Introduced the official Internal Developer Policy (/developer-policy), upgraded all six legal and security policy pages with expandable subsection navigation, and refreshed interactive desktop preview and branding assets.
+  
+  ### Added
+  
+  - **Internal Developer Policy (`/developer-policy`)**: Added a 10-section policy page covering internal contributor scope, confidentiality, credential security, production data ethics, development-to-production bot standards (including the mandatory `/info` command), and open-source SDK stewardship.
+  - **Interactive Policy Subsection TOC**: Added typographic `X.Y` policy subsections and a scroll-synced sticky Table of Contents that automatically expands active subsections while reading or clicking.
+  - **Interactive Desktop Preview & Trust Surfaces**: Added modular interactive preview stages, comparison tables, and studio trust proof strips across the landing and download experiences.
+  
+  ### Changed
+  
+  - **Comprehensive 6-Policy Audit**: Expanded Terms of Service, Privacy Policy, Cookie Policy, Platform & Bot Security, and License pages to cover the Xernerx Mobile App (biometric hardware keystores & number-matching login approvals), Desktop Privacy Shield & 60-second clipboard guard, Quick Capture & bug report uploads, giveaways, chargeback protection, force majeure, DMCA/DSA safe harbor, and aggregate liability caps.
+  - **26-Accent Brand Kit Assets**: Synchronized the full 26-color SVG and PNG banner, icon, and logo suite across `xernerx.com`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.20.0
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 0.29.1
 
 ### Patch Changes

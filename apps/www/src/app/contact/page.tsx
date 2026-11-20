@@ -78,6 +78,8 @@ export default function ContactPage() {
 					{"'"}
 					{t('www.contact.description2')}
 				</p>
+
+				<p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-(--text-muted)">{t('www.contact.studioIdentity')}</p>
 			</motion.div>
 
 			<motion.div

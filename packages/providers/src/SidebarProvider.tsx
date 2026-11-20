@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 export type SidebarNavItem = {
@@ -17,6 +17,7 @@ export type SidebarSlotRenderer = React.ReactNode | ((opts: { isCollapsed: boole
 
 type SidebarContextType = {
 	state: 'open' | 'closed' | 'hidden';
+	isResolved: boolean;
 	isMobileOpen: boolean;
 	toggle: () => void;
 	setMobileOpen: (open: boolean) => void;
@@ -49,6 +50,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
 
 	const [state, setState] = useState<'open' | 'closed' | 'hidden'>('hidden');
+	const [resolvedPath, setResolvedPath] = useState<string | null>(null);
 	const [prevState, setPrevState] = useState<'open' | 'closed'>(() => {
 		if (typeof window !== 'undefined') {
 			try {
@@ -57,6 +59,10 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 		}
 		return 'open';
 	});
+	const pathnameRef = useRef(pathname);
+	pathnameRef.current = pathname;
+	const prevStateRef = useRef(prevState);
+	prevStateRef.current = prevState;
 	const [isMobileOpen, setMobileOpen] = useState(false);
 
 	const [navItems, setNavItems] = useState<SidebarNavItem[]>([]);
@@ -135,17 +141,26 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 		[pathname]
 	);
 
+	const isResolved = resolvedPath === pathname;
+	const effectiveState: 'open' | 'closed' | 'hidden' = isResolved ? state : 'hidden';
+
 	const toggle = useCallback(() => {
+		if (pathnameRef.current !== pathname) return;
 		setState((s) => (s === 'open' ? 'closed' : 'open'));
-	}, []);
+		setResolvedPath(pathname);
+	}, [pathname]);
 
 	const hide = useCallback(() => {
+		if (pathnameRef.current !== pathname) return;
 		setState('hidden');
-	}, []);
+		setResolvedPath(pathname);
+	}, [pathname]);
 
 	const show = useCallback(() => {
-		setState((s) => (s === 'hidden' ? prevState : s));
-	}, [prevState]);
+		if (pathnameRef.current !== pathname) return;
+		setState((s) => (s === 'hidden' ? prevStateRef.current : s));
+		setResolvedPath(pathname);
+	}, [pathname]);
 
 	const clearNavItems = useCallback(() => {
 		setNavItems([]);
@@ -158,12 +173,12 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 			const isInput = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable;
 
 			if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && !isInput) {
-				if (state !== 'hidden') {
+				if (isResolved && effectiveState !== 'hidden') {
 					e.preventDefault();
 					setState((s) => (s === 'open' ? 'closed' : 'open'));
 				}
 			} else if (e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey && /^[1-9]$/.test(e.key) && !isInput) {
-				if (state !== 'hidden' && navItems.length > 0) {
+				if (isResolved && effectiveState !== 'hidden' && navItems.length > 0) {
 					const idx = parseInt(e.key, 10) - 1;
 					const targetItem = navItems[idx];
 					if (targetItem) {
@@ -184,7 +199,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [state, navItems, setView, router]);
+	}, [isResolved, effectiveState, navItems, setView, router]);
 
 	// 1. Handle URL or Path changes
 	useEffect(() => {
@@ -227,7 +242,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 	return (
 		<SidebarContext.Provider
 			value={{
-				state,
+				state: effectiveState,
+				isResolved,
 				isMobileOpen,
 				toggle,
 				setMobileOpen,
@@ -256,6 +272,10 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 			{children}
 		</SidebarContext.Provider>
 	);
+}
+
+export function useOptionalSidebar() {
+	return useContext(SidebarContext);
 }
 
 export function useSidebar() {

@@ -65,6 +65,32 @@ function buildBotSeoObject(params: {
 			price: '0',
 			priceCurrency: 'USD',
 		},
+		...(params.guildCount > 0 || params.userCount > 0
+			? {
+					interactionStatistic: [
+						...(params.guildCount > 0
+							? [
+									{
+										'@type': 'InteractionCounter',
+										interactionType: 'https://schema.org/InstallAction',
+										userInteractionCount: params.guildCount,
+										name: 'Discord Servers',
+									},
+								]
+							: []),
+						...(params.userCount > 0
+							? [
+									{
+										'@type': 'InteractionCounter',
+										interactionType: 'https://schema.org/UseAction',
+										userInteractionCount: params.userCount,
+										name: 'Discord Users',
+									},
+								]
+							: []),
+					],
+				}
+			: {}),
 		...(params.reviewCount > 0
 			? {
 					aggregateRating: {
@@ -380,7 +406,7 @@ export async function buildBotMetadata(id: string): Promise<Metadata> {
 		title: pageTitle,
 		description: baseDescription,
 		keywords: [seo.name, `${seo.name} Discord Bot`, `${seo.name} commands`, 'Discord Bot', 'Xernerx Studios', ...seo.tags],
-		alternates: { canonical: resolvedCanonicalPath },
+		alternates: { canonical: currentUrl },
 		openGraph: {
 			siteName: 'Xernerx Studios',
 			type: 'website',

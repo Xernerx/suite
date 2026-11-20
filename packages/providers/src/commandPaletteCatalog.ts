@@ -371,6 +371,16 @@ export const SUITE_DEEP_PORTALS: Array<{ id: string; section: PaletteSectionKey;
 		icon: FileText,
 	},
 	{
+		id: 'www-developer-policy',
+		section: 'support',
+		baseUrl: 'https://www.xernerx.com',
+		path: '/developer-policy',
+		label: 'Internal Developer Policy',
+		subtitle: 'xernerx.com/developer-policy • Engineering governance, secret hygiene, 3-tier privacy & 5-gate Canary releases',
+		keywords: 'developer policy internal engineering governance secrets canary soak branches changesets rbac legal',
+		icon: FileText,
+	},
+	{
 		id: 'www-terms',
 		section: 'support',
 		baseUrl: 'https://www.xernerx.com',
