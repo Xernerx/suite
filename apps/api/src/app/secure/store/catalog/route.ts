@@ -7,9 +7,7 @@ import { database } from '@xernerx/lib/server';
 import { getServerSession } from 'next-auth';
 import { ensureStoreSeed } from '@/lib/storeSeed';
 
-const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
-	apiVersion: '2026-10-28.endive',
-});
+const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder');
 
 const VIRTUE_PUBLIC_APP_ID = '1484880634844287138';
 const VIRTUE_DEFAULT_SKU_ID = '1568740534753693860';

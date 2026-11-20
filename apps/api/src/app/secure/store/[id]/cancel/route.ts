@@ -6,9 +6,7 @@ import Stripe from 'stripe';
 import { database } from '@xernerx/lib/server';
 import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
-const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
-	apiVersion: '2026-10-28.endive',
-});
+const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder');
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
