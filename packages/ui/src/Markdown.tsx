@@ -78,6 +78,20 @@ function MarkdownImage({ src, alt, className = '', ...props }: React.ImgHTMLAttr
 	const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0, moved: false });
 	const srcStr = typeof src === 'string' ? src : '';
 	const altStr = typeof alt === 'string' ? alt : '';
+	const resolvedAlt = (() => {
+		const trimmed = altStr.trim();
+		if (trimmed) return trimmed;
+		try {
+			const lastSegment = new URL(srcStr, 'https://www.xernerx.com').pathname.split('/').pop() || '';
+			const stem = decodeURIComponent(lastSegment)
+				.replace(/\.[a-z0-9]{2,5}$/i, '')
+				.replace(/[-_]+/g, ' ')
+				.trim();
+			return stem && !/^[0-9a-f]{12,}$/i.test(stem) ? stem : 'Embedded preview image';
+		} catch {
+			return 'Embedded preview image';
+		}
+	})();
 
 	const updateZoom = (nextZoom: number) => {
 		const clamped = Math.min(4, Math.max(1, Number(nextZoom.toFixed(2))));
@@ -198,7 +212,7 @@ function MarkdownImage({ src, alt, className = '', ...props }: React.ImgHTMLAttr
 			<img
 				{...props}
 				src={srcStr}
-				alt={altStr}
+				alt={resolvedAlt}
 				loading="lazy"
 				onClick={handleImageClick}
 				className={`not-prose rounded-2xl border border-(--border)/15 max-h-[560px] max-w-full my-3 object-contain shadow-sm cursor-zoom-in transition-all hover:brightness-105 ${className}`.trim()}
@@ -289,7 +303,7 @@ function MarkdownImage({ src, alt, className = '', ...props }: React.ImgHTMLAttr
 						<div className="relative flex-1 flex items-center justify-center w-full max-w-[96vw] max-h-[86vh] overflow-hidden">
 							<img
 								src={srcStr}
-								alt={altStr}
+								alt={resolvedAlt}
 								draggable={false}
 								onMouseDown={handleMouseDown}
 								onClick={handleLightboxImageClick}

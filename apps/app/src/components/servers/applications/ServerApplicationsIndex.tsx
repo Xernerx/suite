@@ -4,7 +4,7 @@
 import { ArrowRight, Ban, ClipboardList, FileSpreadsheet, HelpCircle, Inbox, LogIn, Send, Server, ShieldAlert } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Modal } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
-import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
@@ -53,6 +53,11 @@ export default function ServerApplicationsIndex({ guildId }: { guildId: string }
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
+	const { hide } = useSidebar();
+
+	useEffect(() => {
+		hide();
+	}, [hide]);
 
 	const [data, setData] = useState<PortalOverviewResponse | null>(null);
 	const [privateInfo, setPrivateInfo] = useState<{ privateServer: boolean; authenticated: boolean } | null>(null);

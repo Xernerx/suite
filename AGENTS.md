@@ -6,7 +6,7 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@12.21.0`, Node `>=24`),
 
 > **Modular Instructions — Read On Demand:**
 >
-> - **UI, Styling, Tokens & Components:** Read [`DESIGN.md`](./DESIGN.md) before creating, editing, or styling any UI.
+> - **UI, Styling, Tokens & Brand Kit:** Read [`DESIGN.md`](./DESIGN.md) and [`../.github/BRAND.md`](../.github/BRAND.md) ([`packages/public/brand.json`](./packages/public/brand.json)) before creating, editing, or styling any UI or brand/application imagery.
 > - **Task Runbooks (Auto-Discovered Skills in `.agents/skills/`):**
 >     - `xernerx-localization` — `useDictionary()`, `en-GB.json`, stale-locale pruning, `generate-locales`.
 >     - `xernerx-api-and-docs` — 3-route frontend `/api` rule, `/v1/*` → `/v2/*` breaking-change policy, `apps/docs` sync.

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 		default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 		template: 'Xernerx Studios | %s',
 	},
-	description: 'Xernerx Studios builds Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
+	description: 'Xernerx Studios builds Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), TypeScript SDKs, and the unified Xernerx Suite.',
 	keywords: [
 		'Xernerx',
 		'Xernerx Studios',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			template: 'Xernerx Studios | %s',
 		},
-		description: 'Xernerx Studios builds Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
+		description: 'Xernerx Studios builds Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), TypeScript SDKs, and the unified Xernerx Suite.',
 		url: 'https://www.xernerx.com',
 		siteName: 'Xernerx Studios',
 		images: [
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			template: 'Xernerx Studios | %s',
 		},
-		description: 'Xernerx Studios builds Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
+		description: 'Xernerx Studios builds Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), TypeScript SDKs, and the unified Xernerx Suite.',
 		images: ['/banner.png'],
 	},
 
@@ -91,12 +91,33 @@ const structuredData = {
 			'@type': 'Organization',
 			'@id': 'https://www.xernerx.com/#organization',
 			name: 'Xernerx Studios',
-			alternateName: ['Xernerx', 'Xernerx Suite'],
+			legalName: 'Xernerx Studios',
+			alternateName: ['Xernerx', 'Xernerx Suite', 'Amethyst Development'],
+			foundingDate: '2020-03',
+			areaServed: 'Worldwide',
 			url: 'https://www.xernerx.com',
 			logo: 'https://www.xernerx.com/logo.png',
+			email: 'info@xernerx.com',
 			slogan: '1 Account, 1 Place, 1 Setup',
 			description:
-				'Xernerx Studios is a development studio focused on consumer and developer simplicity. With 1 Xernerx Account, users configure in-house Discord services (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac) and discover communities in 1 unified dashboard, while bot developers use open-source frameworks (@xernerx/framework, @xernerx/stats) and the public v1 Stats API to track bot statistics, publicly list their bots, and promote them.',
+				'Xernerx Studios is a development studio focused on consumer and developer simplicity. With 1 Xernerx Account, users configure in-house Discord services (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac) and discover communities in 1 unified dashboard, while bot developers use open-source TypeScript frameworks (@xernerx/framework, @xernerx/stats) and the public v1 Stats API to track bot statistics, publicly list their bots, and promote them.',
+			contactPoint: [
+				{
+					'@type': 'ContactPoint',
+					contactType: 'customer support',
+					email: 'support@xernerx.com',
+					url: 'https://www.xernerx.com/contact',
+					availableLanguage: ['English', 'Dutch', 'Spanish', 'French', 'Russian', 'Swedish'],
+					areaServed: 'Worldwide',
+				},
+				{
+					'@type': 'ContactPoint',
+					contactType: 'security',
+					email: 'security@xernerx.com',
+					url: 'https://www.xernerx.com/security',
+					areaServed: 'Worldwide',
+				},
+			],
 			sameAs: [
 				'https://github.com/xernerx',
 				'https://www.npmjs.com/org/xernerx',
@@ -107,6 +128,8 @@ const structuredData = {
 			],
 			knowsAbout: [
 				'Discord Bots',
+				'TypeScript Frameworks',
+				'Open-Source SDKs',
 				'Discord Bot Statistics Tracking',
 				'Public Discord Bot Directory & Promotion',
 				'Unified Discord Server Dashboard',
@@ -115,7 +138,7 @@ const structuredData = {
 				'To-Do List Bot',
 				'Metamorphosis Discord Bot',
 				'Zodiac Discord Bot',
-				'Open-Source Discord Bot Frameworks',
+				'Zero Message Content Logging',
 			],
 		},
 		{
@@ -136,6 +159,34 @@ const structuredData = {
 			operatingSystem: 'Web, Windows, macOS, Linux',
 			url: 'https://app.xernerx.com',
 			author: { '@id': 'https://www.xernerx.com/#organization' },
+			offers: [
+				{
+					'@type': 'Offer',
+					name: 'Free Tier',
+					price: '0',
+					priceCurrency: 'EUR',
+				},
+				{
+					'@type': 'Offer',
+					name: 'Xernerx Ultra Ecosystem Bundle',
+					price: '10',
+					priceCurrency: 'EUR',
+				},
+			],
+			interactionStatistic: [
+				{
+					'@type': 'InteractionCounter',
+					interactionType: 'https://schema.org/InstallAction',
+					userInteractionCount: 26400,
+					name: 'Active Discord Servers',
+				},
+				{
+					'@type': 'InteractionCounter',
+					interactionType: 'https://schema.org/UseAction',
+					userInteractionCount: 2650000,
+					name: 'Discord Users Reached',
+				},
+			],
 			description:
 				'Version 5 of the Xernerx platform: a unified dashboard for configuring Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac, discovering Discord bots and servers, tracking automated bot telemetry, and managing developer organizations with 1 Xernerx Account.',
 		},
@@ -183,7 +234,8 @@ const structuredData = {
 			operatingSystem: 'Discord, Web',
 			url: 'https://app.xernerx.com/bots/metamorphosis',
 			author: { '@id': 'https://www.xernerx.com/#organization' },
-			description: 'Dynamic temporary voice channels and automated community management Discord bot developed by Xernerx Studios.',
+			description:
+				'Real-time multilingual Discord translation bot developed by Xernerx Studios supporting automatic channel translation, slash-command translation, and global community localization.',
 		},
 		{
 			'@type': 'SoftwareApplication',

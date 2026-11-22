@@ -2,6 +2,34 @@
 
 # app
 
+## 2.27.0
+
+### Minor Changes
+
+- ## Relative Onboarding Spotlight, Bot Profile Client & SEO Discovery
+  
+  Upgraded the interactive dashboard tour to use zoom-accurate relative spotlights, modularized bot profile views, and improved search and AI discovery metadata.
+  
+  ### Added
+  
+  - **Modular Bot Profile View**: Extracted a dedicated interactive bot profile client view with rich metadata and structured JSON-LD discovery.
+  
+  ### Changed
+  
+  - **Dashboard Bot Tour Spotlight**: Migrated dashboard tour targets to the relative Framer Motion spotlight portal so highlights stay locked to controls at any UI zoom scale.
+  - **Sitemap, LLMs & Avatar Fallbacks**: Improved sitemap generation, `llms.txt` discovery routes, server application form polish, and `SafeAvatar` fallback handling.
+  - **26-Accent Brand Kit Assets**: Synchronized the 26-color banner, icon, and logo asset suite.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.20.0
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 2.26.1
 
 ### Patch Changes

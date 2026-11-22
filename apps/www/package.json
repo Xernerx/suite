@@ -1,6 +1,6 @@
 {
 	"name": "www",
-	"version": "0.29.1",
+	"version": "0.30.0",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"

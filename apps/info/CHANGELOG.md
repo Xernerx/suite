@@ -2,6 +2,25 @@
 
 # info
 
+## 1.13.5
+
+### Patch Changes
+
+- ## Feedback Hub Filter Polish & Brand Asset Sync
+  
+  Refined the issues, roadmap, and suggestions views on the Info hub and synchronized the 26-accent brand asset kit.
+  
+  ### Changed
+  
+  - **Issues, Roadmap & Suggestions Views**: Polished header and filter controls across `/issues`, `/roadmap`, and `/suggestions` and synchronized all 26 accent brand assets.
+- Updated dependencies
+  - @xernerx/components@0.20.0
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 1.13.4
 
 ### Patch Changes

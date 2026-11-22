@@ -4,6 +4,18 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
 	poweredByHeader: false,
+	async headers() {
+		return [
+			{
+				source: '/invites/:id/:option',
+				headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+			},
+			{
+				source: '/invite/:id/:option',
+				headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+			},
+		];
+	},
 	async redirects() {
 		return [
 			{
@@ -40,6 +52,16 @@ const nextConfig: NextConfig = {
 			{
 				source: '/desktop',
 				destination: '/download',
+				permanent: false,
+			},
+			{
+				source: '/dev-policy',
+				destination: '/developer-policy',
+				permanent: false,
+			},
+			{
+				source: '/internal-developer-policy',
+				destination: '/developer-policy',
 				permanent: false,
 			},
 		];

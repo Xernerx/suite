@@ -19,8 +19,9 @@ export interface TooltipProps {
 export function Tooltip({ content, children, position = 'top', className = '', contentClassName = '', delay = 100 }: TooltipProps) {
 	const [mounted, setMounted] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
-	const [coords, setCoords] = useState<{ centerX: number; anchorY: number; effectivePos: 'top' | 'bottom' } | null>(null);
+	const [coords, setCoords] = useState<{ centerX: number; anchorY: number; arrowOffset: number; effectivePos: 'top' | 'bottom' } | null>(null);
 	const triggerRef = useRef<HTMLDivElement>(null);
+	const popupRef = useRef<HTMLDivElement>(null);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
@@ -46,9 +47,21 @@ export function Tooltip({ content, children, position = 'top', className = '', c
 			effectivePos = 'top';
 		}
 
-		const centerX = Math.max(24, Math.min(vw - 24, rLeft + rWidth / 2));
+		const rawCenter = rLeft + rWidth / 2;
+		const popupRect = popupRef.current?.getBoundingClientRect();
+		const popupWidth = popupRect && popupRect.width > 0 ? popupRect.width / scale : 0;
+		const edgeMargin = 12;
+		const halfW = popupWidth > 0 ? popupWidth / 2 : 24;
+		const centerX = popupWidth > 0 && popupWidth + edgeMargin * 2 < vw ? Math.max(halfW + edgeMargin, Math.min(vw - halfW - edgeMargin, rawCenter)) : Math.max(24, Math.min(vw - 24, rawCenter));
+		const maxArrowShift = popupWidth > 0 ? Math.max(0, halfW - 14) : 0;
+		const arrowOffset = Math.max(-maxArrowShift, Math.min(maxArrowShift, rawCenter - centerX));
 		const anchorY = effectivePos === 'top' ? vh - rTop + 10 : rBottom + 10;
-		setCoords({ centerX, anchorY, effectivePos });
+		setCoords((prev) => {
+			if (prev && Math.abs(prev.centerX - centerX) < 0.5 && Math.abs(prev.anchorY - anchorY) < 0.5 && Math.abs(prev.arrowOffset - arrowOffset) < 0.5 && prev.effectivePos === effectivePos) {
+				return prev;
+			}
+			return { centerX, anchorY, arrowOffset, effectivePos };
+		});
 	}, [position]);
 
 	useIsomorphicLayoutEffect(() => {
@@ -61,6 +74,12 @@ export function Tooltip({ content, children, position = 'top', className = '', c
 			window.removeEventListener('resize', updatePosition);
 		};
 	}, [isOpen, updatePosition]);
+
+	const hasCoords = Boolean(coords);
+	useIsomorphicLayoutEffect(() => {
+		if (!isOpen || !hasCoords) return;
+		updatePosition();
+	}, [isOpen, hasCoords, updatePosition]);
 
 	const show = () => {
 		if (timerRef.current) clearTimeout(timerRef.current);
@@ -103,13 +122,20 @@ export function Tooltip({ content, children, position = 'top', className = '', c
 								}}
 							>
 								<div
+									ref={popupRef}
 									className={`relative px-4 py-2 bg-(--background)/95 text-(--text) backdrop-blur-xl border border-(--border)/20 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.35)] text-xs w-max max-w-[380px] sm:max-w-[460px] text-center text-balance leading-relaxed ${contentClassName}`}
 								>
 									{content}
 									{effectivePos === 'top' ? (
-										<div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 rotate-45 bg-(--background)/95 border-r border-b border-(--border)/20" />
+										<div
+											style={{ left: `calc(50% + ${coords.arrowOffset}px)` }}
+											className="absolute top-full -translate-x-1/2 -mt-1 w-2 h-2 rotate-45 bg-(--background)/95 border-r border-b border-(--border)/20"
+										/>
 									) : (
-										<div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-1 w-2 h-2 rotate-45 bg-(--background)/95 border-l border-t border-(--border)/20" />
+										<div
+											style={{ left: `calc(50% + ${coords.arrowOffset}px)` }}
+											className="absolute bottom-full -translate-x-1/2 -mb-1 w-2 h-2 rotate-45 bg-(--background)/95 border-l border-t border-(--border)/20"
+										/>
 									)}
 								</div>
 							</motion.div>

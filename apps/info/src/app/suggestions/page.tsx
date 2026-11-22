@@ -2,7 +2,7 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
+import { useEnvironment, useUser, useToast, useDictionary, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Selector, MultiSelector, Input } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,6 +27,11 @@ export default function SuggestionsPage() {
 	const { user } = useUser();
 	const { toast } = useToast();
 	const { t } = useDictionary();
+	const { hide } = useSidebar();
+
+	useEffect(() => {
+		hide();
+	}, [hide]);
 	const [suggestions, setSuggestions] = useState<any[]>([]);
 	const [products, setProducts] = useState<string[]>([]);
 	const [orgBots, setOrgBots] = useState<{ id: string; name: string; avatarUrl: string | null }[]>([]);

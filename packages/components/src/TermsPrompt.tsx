@@ -16,8 +16,8 @@ export function TermsPrompt() {
 	const [submitting, setSubmitting] = useState(false);
 
 	// These dates are automatically bumped by the `suite commit` script
-	const TERMS_VERSION = new Date('2026-11-17T00:00:00Z').getTime();
-	const PRIVACY_VERSION = new Date('2026-11-17T00:00:00Z').getTime();
+	const TERMS_VERSION = new Date('2026-11-20T00:00:00Z').getTime();
+	const PRIVACY_VERSION = new Date('2026-11-20T00:00:00Z').getTime();
 
 	useEffect(() => {
 		// Don't block the screen if they are currently trying to read the policies!
@@ -27,7 +27,8 @@ export function TermsPrompt() {
 				window.location.pathname === '/terms' ||
 				window.location.pathname === '/cookies' ||
 				window.location.pathname === '/security' ||
-				window.location.pathname === '/license')
+				window.location.pathname === '/license' ||
+				window.location.pathname === '/developer-policy')
 		) {
 			setIsOpen(false);
 			return;

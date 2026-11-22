@@ -3,13 +3,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { Ban, LogOut, ShieldAlert, Trash2 } from 'lucide-react';
-import { signOut, useDictionary, useEnvironment, useUser } from '@xernerx/providers';
+import { signOut, useDictionary, useEnvironment, useSidebar, useUser } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
 
 export function BlacklistGate({ children }: { children: React.ReactNode }) {
 	const { user, loading } = useUser();
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
+	const { hide } = useSidebar();
 	const [isAllowedLocation, setIsAllowedLocation] = useState(true);
 
 	useEffect(() => {
@@ -28,6 +29,12 @@ export function BlacklistGate({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	const isBlacklisted = !loading && Boolean((user as any)?.blacklisted);
+
+	useEffect(() => {
+		if (isBlacklisted && !isAllowedLocation) {
+			hide();
+		}
+	}, [isBlacklisted, isAllowedLocation, hide]);
 
 	if (!isBlacklisted || isAllowedLocation) {
 		return <>{children}</>;

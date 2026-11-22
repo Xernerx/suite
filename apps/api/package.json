@@ -1,6 +1,6 @@
 {
 	"name": "api",
-	"version": "0.38.2",
+	"version": "0.38.3",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"

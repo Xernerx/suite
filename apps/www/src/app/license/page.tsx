@@ -2,11 +2,12 @@
 'use client';
 
 import { Check, Copy, Download, Scale } from 'lucide-react';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { ReadingProgressBar } from '@xernerx/components';
 import { useDictionary, useSidebar, useToast } from '@xernerx/providers';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@xernerx/ui';
 import { PageFaqSection } from '@/components/PageFaqSection';
+import { PolicySubsection, PolicyTocSidebar } from '@/components/PolicySubsection';
 
 const PLAIN_TEXT_LICENSE = `XERNERX STUDIOS PROPRIETARY & SAAS LICENSE
 Version 1.0 — November 2026
@@ -137,14 +138,14 @@ export default function LicensePage() {
 			content: (
 				<div className="space-y-4">
 					<p>{t('www.license.sections.overview.content')}</p>
-					<ul className="list-disc pl-6 space-y-4">
-						<li>
-							<strong className="text-(--text)">{t('www.license.sections.overview.proprietaryTitle')}</strong> {t('www.license.sections.overview.proprietaryDesc')}
-						</li>
-						<li>
-							<strong className="text-(--text)">{t('www.license.sections.overview.openSourceTitle')}</strong> {t('www.license.sections.overview.openSourceDesc')}
-						</li>
-					</ul>
+					<div className="space-y-3">
+						<PolicySubsection code="1.1" id="overview-1-1" title={t('www.license.sections.overview.proprietaryTitle')}>
+							{t('www.license.sections.overview.proprietaryDesc')}
+						</PolicySubsection>
+						<PolicySubsection code="1.2" id="overview-1-2" title={t('www.license.sections.overview.openSourceTitle')}>
+							{t('www.license.sections.overview.openSourceDesc')}
+						</PolicySubsection>
+					</div>
 				</div>
 			),
 		},
@@ -193,23 +194,6 @@ export default function LicensePage() {
 		title: `${idx + 1}. ${String(section.title).replace(/^\d+\.\s*/, '')}`,
 	}));
 
-	const containerRef = useRef<HTMLElement | null>(null);
-	const [ready, setReady] = useState(false);
-
-	useEffect(() => {
-		const el = document.getElementById('main-scroll-container');
-		if (el) {
-			containerRef.current = el;
-			setReady(true);
-		}
-	}, []);
-
-	const { scrollYProgress } = useScroll(ready ? { container: containerRef } : {});
-	const scaleX = useSpring(scrollYProgress, {
-		stiffness: 100,
-		damping: 30,
-	});
-
 	const [active, setActive] = useState<string | null>(null);
 	const sectionIdsKey = sections.map((s) => s.id).join(',');
 
@@ -237,30 +221,11 @@ export default function LicensePage() {
 
 	return (
 		<div className="relative">
-			<motion.div
-				style={{
-					scaleX,
-					top: 'calc(50px + env(safe-area-inset-top, 0px))',
-				}}
-				className="fixed left-0 right-0 h-0.75 origin-left bg-(--accent) z-50"
-			/>
+			<ReadingProgressBar />
 
 			<div className="min-h-screen px-6 py-32">
 				<div className="max-w-(--page-width) mx-auto w-full grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
-					<aside className="hidden lg:block sticky top-32 self-start">
-						<div className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.license.toc')}</div>
-						<nav className="space-y-4 text-sm">
-							{sections.map((section) => (
-								<a
-									key={section.id}
-									href={`#${section.id}`}
-									className={`block transition ${active === section.id ? 'text-(--accent) font-medium' : 'text-(--text-muted) hover:text-(--text)'}`}
-								>
-									{section.title}
-								</a>
-							))}
-						</nav>
-					</aside>
+					<PolicyTocSidebar tocTitle={t('www.license.toc')} sections={sections} activeSectionId={active} onSelectSection={setActive} />
 
 					<div className="space-y-16">
 						<header className="text-center mb-16 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm">

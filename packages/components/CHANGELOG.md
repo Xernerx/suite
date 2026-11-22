@@ -2,6 +2,33 @@
 
 # @xernerx/components
 
+## 0.20.0
+
+### Minor Changes
+
+- ## Relative Onboarding Spotlight Portal, Forced App Drawer Switch & Policy Links
+  
+  Added a zoom-invariant relative Framer Motion spotlight portal for interactive tours, enforced real Header/Sidebar App Drawer interaction during onboarding, and wired the Internal Developer Policy into global navigation.
+  
+  ### Added
+  
+  - **Relative Onboarding Spotlight Portal (`<OnboardingSpotlightPortal />`)**: Portals a spring-animated spotlight ring, dual expanding pulse ripples, and a directional beacon pill directly inside the highlighted target element so highlights remain pixel-locked under any CSS `--ui-zoom` setting.
+  - **Reading Progress Bar (`<ReadingProgressBar />`)**: Added a scroll-linked top reading progress indicator for long-form content.
+  
+  ### Changed
+  
+  - **Hands-On App Drawer Onboarding Step**: Removed shortcut drawer buttons from the onboarding popup and bottom stage dock during the App Drawer switch step so users interact directly with the highlighted Header or Sidebar App Drawer button.
+  - **Footer, Omnibar & Terms Prompt Policy Sync**: Added `/developer-policy` to the global Footer and Omnibar route catalog and bumped `TERMS_VERSION` and `PRIVACY_VERSION` timestamps.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 0.19.2
 
 ### Patch Changes

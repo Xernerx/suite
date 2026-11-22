@@ -56,9 +56,9 @@ const OFFICIAL_BOTS: OfficialBotDefault[] = [
 		id: '881678826906730547',
 		slug: 'metamorphosis',
 		name: 'Metamorphosis',
-		description: 'Dynamic temporary voice channels, automated room management, and community moderation Discord bot by Xernerx Studios.',
-		info: 'Metamorphosis is an official Discord utility and voice automation bot by Xernerx Studios that creates on-demand custom voice channels, room permissions, and streamlined server management.',
-		tags: ['Voice Channels', 'Automation', 'Moderation', 'Utility'],
+		description: 'Real-time multilingual Discord translation bot by Xernerx Studios for automatic channel translation, slash commands, and global communities.',
+		info: 'Metamorphosis is an official multilingual translation Discord bot by Xernerx Studios enabling real-time channel translation, on-demand message translation, and seamless cross-language community communication.',
+		tags: ['Translation', 'Multilingual', 'Localization', 'Utility', 'Community'],
 	},
 	{
 		id: '950251264095162418',

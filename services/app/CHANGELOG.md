@@ -2,6 +2,13 @@
 
 # `@xernerx/app`
 
+## 2.7.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.30.0
+
 ## 2.7.5
 
 ### Patch Changes

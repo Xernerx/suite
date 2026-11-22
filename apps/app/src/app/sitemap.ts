@@ -13,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		{ url: baseUrl, lastModified: now, changeFrequency: 'daily', priority: 1.0 },
 		{ url: `${baseUrl}/bots`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: `${baseUrl}/bots/virtue`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+		{ url: `${baseUrl}/bots/yourapps`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
 		{ url: `${baseUrl}/bots/todo`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
 		{ url: `${baseUrl}/bots/metamorphosis`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
 		{ url: `${baseUrl}/bots/zodiac`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
@@ -23,129 +24,157 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 	const officialIdToSlug: Record<string, string> = {
 		'1484880634844287138': 'virtue',
+		'619328560141697036': 'yourapps',
 		'782105629572464652': 'todo',
 		'881678826906730547': 'metamorphosis',
 		'950251264095162418': 'zodiac',
 	};
-	const seenBotSlugs = new Set<string>(['virtue', 'todo', 'metamorphosis', 'zodiac']);
+	const seenBotSlugs = new Set<string>(['virtue', 'yourapps', 'todo', 'metamorphosis', 'zodiac']);
+	const seenGuildSlugs = new Set<string>();
+	const seenUserSlugs = new Set<string>();
+	const seenOrgSlugs = new Set<string>();
 
-	try {
-		const db = await database('xernerx');
-		const BotModel = (db.models.bots as any)?.Bot;
-		const GuildModel = (db.models.guilds as any)?.Guild;
-		const UserModel = (db.models.users as any)?.User;
-		const OrganizationModel = (db.models.organizations as any)?.Organization;
-
-		const [publicBots, publicServers, publicUsers, publicOrgs] = await Promise.all([
-			BotModel
-				? BotModel.find({ privacy: 'public' })
-						.select('id vanitySlug updatedAt')
-						.limit(2000)
-						.lean()
-						.catch(() => [])
-				: [],
-			GuildModel
-				? GuildModel.find({ privacy: 'public' })
-						.select('id vanitySlug updatedAt')
-						.limit(2000)
-						.lean()
-						.catch(() => [])
-				: [],
-			UserModel
-				? UserModel.find({ privacy: 'public', blacklisted: { $ne: true } })
-						.select('id vanitySlug updatedAt')
-						.limit(2000)
-						.lean()
-						.catch(() => [])
-				: [],
-			OrganizationModel
-				? OrganizationModel.find({ $or: [{ privacy: 'public' }, { 'config.privacy': 'public' }] })
-						.select('_id vanitySlug updatedAt')
-						.limit(1000)
-						.lean()
-						.catch(() => [])
-				: [],
-		]);
-
-		for (const bot of publicBots) {
-			const slugOrId = bot.vanitySlug || officialIdToSlug[String(bot.id)] || bot.id;
+	const appendBots = (list: any[]) => {
+		for (const bot of list) {
+			if (bot?.privacy && bot.privacy !== 'public') continue;
+			const slugOrId = bot?.vanitySlug || officialIdToSlug[String(bot?.id || '')] || bot?.id;
 			if (!slugOrId || seenBotSlugs.has(String(slugOrId).toLowerCase())) continue;
 			seenBotSlugs.add(String(slugOrId).toLowerCase());
 			entries.push({
 				url: `${baseUrl}/bots/${encodeURIComponent(String(slugOrId))}`,
-				lastModified: bot.updatedAt ? new Date(bot.updatedAt) : now,
+				lastModified: bot?.updatedAt ? new Date(bot.updatedAt) : now,
 				changeFrequency: 'weekly',
 				priority: 0.8,
 			});
 		}
+	};
 
-		for (const guild of publicServers) {
-			const slugOrId = guild.vanitySlug || guild.id;
-			if (!slugOrId) continue;
+	const appendServers = (list: any[]) => {
+		for (const guild of list) {
+			if (guild?.privacy && guild.privacy !== 'public') continue;
+			const slugOrId = guild?.vanitySlug || guild?.id;
+			if (!slugOrId || seenGuildSlugs.has(String(slugOrId).toLowerCase())) continue;
+			seenGuildSlugs.add(String(slugOrId).toLowerCase());
 			entries.push({
 				url: `${baseUrl}/servers/${encodeURIComponent(String(slugOrId))}`,
-				lastModified: guild.updatedAt ? new Date(guild.updatedAt) : now,
+				lastModified: guild?.updatedAt ? new Date(guild.updatedAt) : now,
 				changeFrequency: 'weekly',
 				priority: 0.8,
 			});
 		}
+	};
 
-		for (const user of publicUsers) {
-			const slugOrId = user.vanitySlug || user.id;
-			if (!slugOrId) continue;
+	const appendUsers = (list: any[]) => {
+		for (const user of list) {
+			if ((user?.privacy && user.privacy !== 'public') || user?.blacklisted) continue;
+			const slugOrId = user?.vanitySlug || user?.id;
+			if (!slugOrId || seenUserSlugs.has(String(slugOrId).toLowerCase())) continue;
+			seenUserSlugs.add(String(slugOrId).toLowerCase());
 			entries.push({
 				url: `${baseUrl}/users/${encodeURIComponent(String(slugOrId))}`,
-				lastModified: user.updatedAt ? new Date(user.updatedAt) : now,
+				lastModified: user?.updatedAt ? new Date(user.updatedAt) : now,
 				changeFrequency: 'weekly',
 				priority: 0.7,
 			});
 		}
+	};
 
-		for (const org of publicOrgs) {
-			const slugOrId = org.vanitySlug || (org._id ? String(org._id) : '');
-			if (!slugOrId) continue;
+	const appendOrgs = (list: any[]) => {
+		for (const org of list) {
+			const privacy = org?.config?.privacy || org?.privacy;
+			if (privacy && privacy !== 'public') continue;
+			const slugOrId = org?.vanitySlug || (org?._id ? String(org._id) : org?.id ? String(org.id) : '');
+			if (!slugOrId || seenOrgSlugs.has(String(slugOrId).toLowerCase())) continue;
+			seenOrgSlugs.add(String(slugOrId).toLowerCase());
 			entries.push({
 				url: `${baseUrl}/organization/${encodeURIComponent(String(slugOrId))}`,
-				lastModified: org.updatedAt ? new Date(org.updatedAt) : now,
+				lastModified: org?.updatedAt ? new Date(org.updatedAt) : now,
 				changeFrequency: 'weekly',
 				priority: 0.75,
 			});
 		}
-	} catch {
+	};
+
+	let loadedDynamic = false;
+
+	if (process.env.MONGO_XERNERX) {
 		try {
-			const [botsRes, guildsRes] = await Promise.all([
-				fetch('https://api.xernerx.com/secure/bots?limit=500', { headers: { Origin: baseUrl }, next: { revalidate: 3600 } }).catch(() => null),
-				fetch('https://api.xernerx.com/secure/guilds?limit=500', { headers: { Origin: baseUrl }, next: { revalidate: 3600 } }).catch(() => null),
+			const db = await database('xernerx');
+			const BotModel = (db.models.bots as any)?.Bot;
+			const GuildModel = (db.models.guilds as any)?.Guild;
+			const UserModel = (db.models.users as any)?.User;
+			const OrganizationModel = (db.models.organizations as any)?.Organization;
+
+			const [publicBots, publicServers, publicUsers, publicOrgs] = await Promise.all([
+				BotModel
+					? BotModel.find({ privacy: 'public' })
+							.select('id vanitySlug updatedAt')
+							.limit(2000)
+							.lean()
+							.catch(() => [])
+					: [],
+				GuildModel
+					? GuildModel.find({ privacy: 'public' })
+							.select('id vanitySlug updatedAt')
+							.limit(2000)
+							.lean()
+							.catch(() => [])
+					: [],
+				UserModel
+					? UserModel.find({ privacy: 'public', blacklisted: { $ne: true } })
+							.select('id vanitySlug updatedAt')
+							.limit(2000)
+							.lean()
+							.catch(() => [])
+					: [],
+				OrganizationModel
+					? OrganizationModel.find({ $or: [{ privacy: 'public' }, { 'config.privacy': 'public' }] })
+							.select('_id vanitySlug updatedAt')
+							.limit(1000)
+							.lean()
+							.catch(() => [])
+					: [],
+			]);
+
+			appendBots(publicBots);
+			appendServers(publicServers);
+			appendUsers(publicUsers);
+			appendOrgs(publicOrgs);
+
+			if (publicBots.length > 0 || publicServers.length > 0 || publicOrgs.length > 0) {
+				loadedDynamic = true;
+			}
+		} catch {
+			// Fall through to HTTP API lookup
+		}
+	}
+
+	if (!loadedDynamic) {
+		try {
+			const [botsRes, guildsRes, orgsRes] = await Promise.all([
+				fetch('https://api.xernerx.com/secure/bots?limit=500', {
+					headers: { Origin: baseUrl },
+					signal: AbortSignal.timeout(4000),
+					next: { revalidate: 3600 },
+				}).catch(() => null),
+				fetch('https://api.xernerx.com/secure/guilds?limit=500', {
+					headers: { Origin: baseUrl },
+					signal: AbortSignal.timeout(4000),
+					next: { revalidate: 3600 },
+				}).catch(() => null),
+				fetch('https://api.xernerx.com/secure/organizations?limit=500', {
+					headers: { Origin: baseUrl },
+					signal: AbortSignal.timeout(4000),
+					next: { revalidate: 3600 },
+				}).catch(() => null),
 			]);
 			const publicBots = botsRes?.ok ? await botsRes.json().catch(() => []) : [];
 			const publicServers = guildsRes?.ok ? await guildsRes.json().catch(() => []) : [];
+			const publicOrgs = orgsRes?.ok ? await orgsRes.json().catch(() => []) : [];
 
-			if (Array.isArray(publicBots)) {
-				for (const bot of publicBots) {
-					const slugOrId = bot.vanitySlug || officialIdToSlug[String(bot.id)] || bot.id;
-					if (!slugOrId || seenBotSlugs.has(String(slugOrId).toLowerCase())) continue;
-					seenBotSlugs.add(String(slugOrId).toLowerCase());
-					entries.push({
-						url: `${baseUrl}/bots/${encodeURIComponent(String(slugOrId))}`,
-						lastModified: bot.updatedAt ? new Date(bot.updatedAt) : now,
-						changeFrequency: 'weekly',
-						priority: 0.8,
-					});
-				}
-			}
-
-			if (Array.isArray(publicServers)) {
-				for (const guild of publicServers) {
-					const slugOrId = guild.vanitySlug || guild.id;
-					if (!slugOrId) continue;
-					entries.push({
-						url: `${baseUrl}/servers/${encodeURIComponent(String(slugOrId))}`,
-						lastModified: guild.updatedAt ? new Date(guild.updatedAt) : now,
-						changeFrequency: 'weekly',
-						priority: 0.8,
-					});
-				}
-			}
+			if (Array.isArray(publicBots)) appendBots(publicBots);
+			if (Array.isArray(publicServers)) appendServers(publicServers);
+			if (Array.isArray(publicOrgs)) appendOrgs(publicOrgs);
 		} catch {
 			// Gracefully fall back to static entries if API is unreachable during build
 		}

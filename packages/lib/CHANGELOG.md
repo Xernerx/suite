@@ -2,6 +2,22 @@
 
 # @xernerx/lib
 
+## 1.30.0
+
+### Minor Changes
+
+- ## Internal Developer Policy & Comprehensive 6-Policy Localization Suite
+  
+  Added full localization dictionaries for the new Internal Developer Policy (`/developer-policy`) and expanded all six legal and security policy dictionaries following the codebase security audit.
+  
+  ### Added
+  
+  - **Internal Developer Policy Dictionary (`www.developerPolicy`)**: Added localized titles, 10 sections, and `X.Y` numbered subsections covering internal engineering governance, `/info` bot command standards, and `@xernerx/*` SDK stewardship.
+  
+  ### Changed
+  
+  - **6-Policy Legal & Security Audit Strings**: Expanded `www.terms`, `www.privacy`, `www.cookies`, `www.security`, and `www.license` with numbered subsections, mobile companion app disclosures, desktop privacy shield coverage, giveaway rules, DMCA/DSA takedown procedures, and liability caps, and pruned modified keys across non-source locale files.
+
 ## 1.29.1
 
 ### Patch Changes

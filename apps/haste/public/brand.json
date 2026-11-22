@@ -1,0 +1,1161 @@
+{
+	"name": "Xernerx Studios",
+	"slogan": "1 Account, 1 Place, 1 Setup",
+	"website": "https://www.xernerx.com",
+	"docs": "https://docs.xernerx.com",
+	"github": "https://github.com/Xernerx",
+	"brandGuide": "https://github.com/Xernerx/.github/blob/main/BRAND.md",
+	"defaultAccent": {
+		"key": "purple",
+		"name": "Xernerx Purple (Xerple)",
+		"alias": "Xerple",
+		"hex": "#8b7cf6",
+		"rgb": "rgb(139, 124, 246)",
+		"cssVariable": "--accent"
+	},
+	"typography": {
+		"primary": {
+			"family": "Fredoka",
+			"role": "Primary UI, Headings & Display Typeface",
+			"cssVariable": "--font-fredoka",
+			"fallback": "system-ui, -apple-system, sans-serif",
+			"weights": [300, 400, 500, 600, 700],
+			"googleFontsUrl": "https://fonts.google.com/specimen/Fredoka",
+			"stylesheetUrl": "https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap"
+		},
+		"monospace": {
+			"family": "Cascadia Code",
+			"role": "Code Blocks, CLI Output, Keybinds & Technical Identifiers",
+			"cssVariable": "--font-cascadia",
+			"fallback": "ui-monospace, SFMono-Regular, Menlo, monospace",
+			"weights": [400, 600, 700],
+			"googleFontsUrl": "https://fonts.google.com/specimen/Cascadia+Code",
+			"stylesheetUrl": "https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@400..700&display=swap"
+		}
+	},
+	"surfaces": [
+		{
+			"key": "bg-dark",
+			"name": "Background (Dark)",
+			"cssVar": "--background-dark",
+			"hex": "#09090b",
+			"rgb": "rgb(9, 9, 11)"
+		},
+		{
+			"key": "fg-dark",
+			"name": "Foreground / Card (Dark)",
+			"cssVar": "--foreground-dark",
+			"hex": "#18181b",
+			"rgb": "rgb(24, 24, 27)"
+		},
+		{
+			"key": "badge-dark",
+			"name": "Icon Badge Surface (Dark)",
+			"cssVar": "N/A (Icon Fill)",
+			"hex": "#191a1e",
+			"rgb": "rgb(25, 26, 30)"
+		},
+		{
+			"key": "border-dark",
+			"name": "Border (Dark)",
+			"cssVar": "--border-dark",
+			"hex": "#f4f4f5",
+			"rgb": "rgb(244, 244, 245)"
+		},
+		{
+			"key": "text-dark",
+			"name": "Primary Text (Dark)",
+			"cssVar": "--text",
+			"hex": "#fafafa",
+			"rgb": "rgb(250, 250, 250)"
+		},
+		{
+			"key": "text-muted-dark",
+			"name": "Muted Text (Dark)",
+			"cssVar": "--text-muted",
+			"hex": "#a1a1aa",
+			"rgb": "rgb(161, 161, 170)"
+		},
+		{
+			"key": "bg-light",
+			"name": "Background (Light)",
+			"cssVar": "--background-light",
+			"hex": "#fafafa",
+			"rgb": "rgb(250, 250, 250)"
+		},
+		{
+			"key": "fg-light",
+			"name": "Foreground / Card (Light)",
+			"cssVar": "--foreground-light",
+			"hex": "#f4f4f5",
+			"rgb": "rgb(244, 244, 245)"
+		},
+		{
+			"key": "border-light",
+			"name": "Border (Light)",
+			"cssVar": "--border-light",
+			"hex": "#53535b",
+			"rgb": "rgb(83, 83, 91)"
+		},
+		{
+			"key": "text-light",
+			"name": "Primary Text (Light)",
+			"cssVar": "--text",
+			"hex": "#09090b",
+			"rgb": "rgb(9, 9, 11)"
+		},
+		{
+			"key": "text-muted-light",
+			"name": "Muted Text (Light)",
+			"cssVar": "--text-muted",
+			"hex": "#52525b",
+			"rgb": "rgb(82, 82, 91)"
+		}
+	],
+	"colors": [
+		{
+			"key": "purple",
+			"name": "Purple (Xerple — Default Brand Accent)",
+			"alias": "Xerple",
+			"hex": "#8b7cf6",
+			"rgb": "rgb(139, 124, 246)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-purple.svg",
+					"png": "https://www.xernerx.com/logo-purple.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-purple.svg",
+					"png": "https://www.xernerx.com/icon-purple.png",
+					"ico": "https://www.xernerx.com/icon-purple.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-purple.svg",
+					"png": "https://www.xernerx.com/banner-purple.png"
+				}
+			}
+		},
+		{
+			"key": "violet",
+			"name": "Violet",
+			"hex": "#7c3aed",
+			"rgb": "rgb(124, 58, 237)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-violet.svg",
+					"png": "https://www.xernerx.com/logo-violet.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-violet.svg",
+					"png": "https://www.xernerx.com/icon-violet.png",
+					"ico": "https://www.xernerx.com/icon-violet.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-violet.svg",
+					"png": "https://www.xernerx.com/banner-violet.png"
+				}
+			}
+		},
+		{
+			"key": "indigo",
+			"name": "Indigo",
+			"hex": "#6366f1",
+			"rgb": "rgb(99, 102, 241)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-indigo.svg",
+					"png": "https://www.xernerx.com/logo-indigo.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-indigo.svg",
+					"png": "https://www.xernerx.com/icon-indigo.png",
+					"ico": "https://www.xernerx.com/icon-indigo.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-indigo.svg",
+					"png": "https://www.xernerx.com/banner-indigo.png"
+				}
+			}
+		},
+		{
+			"key": "cobalt",
+			"name": "Cobalt",
+			"hex": "#2563eb",
+			"rgb": "rgb(37, 99, 235)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-cobalt.svg",
+					"png": "https://www.xernerx.com/logo-cobalt.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-cobalt.svg",
+					"png": "https://www.xernerx.com/icon-cobalt.png",
+					"ico": "https://www.xernerx.com/icon-cobalt.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-cobalt.svg",
+					"png": "https://www.xernerx.com/banner-cobalt.png"
+				}
+			}
+		},
+		{
+			"key": "blue",
+			"name": "Blue",
+			"hex": "#3b82f6",
+			"rgb": "rgb(59, 130, 246)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-blue.svg",
+					"png": "https://www.xernerx.com/logo-blue.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-blue.svg",
+					"png": "https://www.xernerx.com/icon-blue.png",
+					"ico": "https://www.xernerx.com/icon-blue.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-blue.svg",
+					"png": "https://www.xernerx.com/banner-blue.png"
+				}
+			}
+		},
+		{
+			"key": "sky",
+			"name": "Sky",
+			"hex": "#38bdf8",
+			"rgb": "rgb(56, 189, 248)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-sky.svg",
+					"png": "https://www.xernerx.com/logo-sky.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-sky.svg",
+					"png": "https://www.xernerx.com/icon-sky.png",
+					"ico": "https://www.xernerx.com/icon-sky.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-sky.svg",
+					"png": "https://www.xernerx.com/banner-sky.png"
+				}
+			}
+		},
+		{
+			"key": "cyan",
+			"name": "Cyan",
+			"hex": "#06b6d4",
+			"rgb": "rgb(6, 182, 212)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-cyan.svg",
+					"png": "https://www.xernerx.com/logo-cyan.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-cyan.svg",
+					"png": "https://www.xernerx.com/icon-cyan.png",
+					"ico": "https://www.xernerx.com/icon-cyan.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-cyan.svg",
+					"png": "https://www.xernerx.com/banner-cyan.png"
+				}
+			}
+		},
+		{
+			"key": "mint",
+			"name": "Mint",
+			"hex": "#2dd4bf",
+			"rgb": "rgb(45, 212, 191)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-mint.svg",
+					"png": "https://www.xernerx.com/logo-mint.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-mint.svg",
+					"png": "https://www.xernerx.com/icon-mint.png",
+					"ico": "https://www.xernerx.com/icon-mint.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-mint.svg",
+					"png": "https://www.xernerx.com/banner-mint.png"
+				}
+			}
+		},
+		{
+			"key": "emerald",
+			"name": "Emerald",
+			"hex": "#10b981",
+			"rgb": "rgb(16, 185, 129)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-emerald.svg",
+					"png": "https://www.xernerx.com/logo-emerald.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-emerald.svg",
+					"png": "https://www.xernerx.com/icon-emerald.png",
+					"ico": "https://www.xernerx.com/icon-emerald.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-emerald.svg",
+					"png": "https://www.xernerx.com/banner-emerald.png"
+				}
+			}
+		},
+		{
+			"key": "green",
+			"name": "Green",
+			"hex": "#a4b795",
+			"rgb": "rgb(164, 183, 149)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-green.svg",
+					"png": "https://www.xernerx.com/logo-green.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-green.svg",
+					"png": "https://www.xernerx.com/icon-green.png",
+					"ico": "https://www.xernerx.com/icon-green.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-green.svg",
+					"png": "https://www.xernerx.com/banner-green.png"
+				}
+			}
+		},
+		{
+			"key": "neon",
+			"name": "Neon",
+			"hex": "#39ff14",
+			"rgb": "rgb(57, 255, 20)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-neon.svg",
+					"png": "https://www.xernerx.com/logo-neon.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-neon.svg",
+					"png": "https://www.xernerx.com/icon-neon.png",
+					"ico": "https://www.xernerx.com/icon-neon.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-neon.svg",
+					"png": "https://www.xernerx.com/banner-neon.png"
+				}
+			}
+		},
+		{
+			"key": "lime",
+			"name": "Lime",
+			"hex": "#acc813",
+			"rgb": "rgb(172, 200, 19)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-lime.svg",
+					"png": "https://www.xernerx.com/logo-lime.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-lime.svg",
+					"png": "https://www.xernerx.com/icon-lime.png",
+					"ico": "https://www.xernerx.com/icon-lime.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-lime.svg",
+					"png": "https://www.xernerx.com/banner-lime.png"
+				}
+			}
+		},
+		{
+			"key": "yellow",
+			"name": "Yellow",
+			"hex": "#eab308",
+			"rgb": "rgb(234, 179, 8)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-yellow.svg",
+					"png": "https://www.xernerx.com/logo-yellow.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-yellow.svg",
+					"png": "https://www.xernerx.com/icon-yellow.png",
+					"ico": "https://www.xernerx.com/icon-yellow.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-yellow.svg",
+					"png": "https://www.xernerx.com/banner-yellow.png"
+				}
+			}
+		},
+		{
+			"key": "gold",
+			"name": "Gold",
+			"hex": "#f59e0b",
+			"rgb": "rgb(245, 158, 11)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-gold.svg",
+					"png": "https://www.xernerx.com/logo-gold.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-gold.svg",
+					"png": "https://www.xernerx.com/icon-gold.png",
+					"ico": "https://www.xernerx.com/icon-gold.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-gold.svg",
+					"png": "https://www.xernerx.com/banner-gold.png"
+				}
+			}
+		},
+		{
+			"key": "orange",
+			"name": "Orange",
+			"hex": "#f97316",
+			"rgb": "rgb(249, 115, 22)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-orange.svg",
+					"png": "https://www.xernerx.com/logo-orange.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-orange.svg",
+					"png": "https://www.xernerx.com/icon-orange.png",
+					"ico": "https://www.xernerx.com/icon-orange.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-orange.svg",
+					"png": "https://www.xernerx.com/banner-orange.png"
+				}
+			}
+		},
+		{
+			"key": "peach",
+			"name": "Peach",
+			"hex": "#fdba74",
+			"rgb": "rgb(253, 186, 116)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-peach.svg",
+					"png": "https://www.xernerx.com/logo-peach.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-peach.svg",
+					"png": "https://www.xernerx.com/icon-peach.png",
+					"ico": "https://www.xernerx.com/icon-peach.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-peach.svg",
+					"png": "https://www.xernerx.com/banner-peach.png"
+				}
+			}
+		},
+		{
+			"key": "coral",
+			"name": "Coral",
+			"hex": "#fb7185",
+			"rgb": "rgb(251, 113, 133)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-coral.svg",
+					"png": "https://www.xernerx.com/logo-coral.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-coral.svg",
+					"png": "https://www.xernerx.com/icon-coral.png",
+					"ico": "https://www.xernerx.com/icon-coral.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-coral.svg",
+					"png": "https://www.xernerx.com/banner-coral.png"
+				}
+			}
+		},
+		{
+			"key": "crimson",
+			"name": "Crimson",
+			"hex": "#ef4444",
+			"rgb": "rgb(239, 68, 68)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-crimson.svg",
+					"png": "https://www.xernerx.com/logo-crimson.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-crimson.svg",
+					"png": "https://www.xernerx.com/icon-crimson.png",
+					"ico": "https://www.xernerx.com/icon-crimson.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-crimson.svg",
+					"png": "https://www.xernerx.com/banner-crimson.png"
+				}
+			}
+		},
+		{
+			"key": "red",
+			"name": "Red",
+			"hex": "#ef4444",
+			"rgb": "rgb(239, 68, 68)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-red.svg",
+					"png": "https://www.xernerx.com/logo-red.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-red.svg",
+					"png": "https://www.xernerx.com/icon-red.png",
+					"ico": "https://www.xernerx.com/icon-red.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-red.svg",
+					"png": "https://www.xernerx.com/banner-red.png"
+				}
+			}
+		},
+		{
+			"key": "berry",
+			"name": "Berry",
+			"hex": "#e11d48",
+			"rgb": "rgb(225, 29, 72)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-berry.svg",
+					"png": "https://www.xernerx.com/logo-berry.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-berry.svg",
+					"png": "https://www.xernerx.com/icon-berry.png",
+					"ico": "https://www.xernerx.com/icon-berry.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-berry.svg",
+					"png": "https://www.xernerx.com/banner-berry.png"
+				}
+			}
+		},
+		{
+			"key": "pink",
+			"name": "Pink",
+			"hex": "#ec4899",
+			"rgb": "rgb(236, 72, 153)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-pink.svg",
+					"png": "https://www.xernerx.com/logo-pink.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-pink.svg",
+					"png": "https://www.xernerx.com/icon-pink.png",
+					"ico": "https://www.xernerx.com/icon-pink.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-pink.svg",
+					"png": "https://www.xernerx.com/banner-pink.png"
+				}
+			}
+		},
+		{
+			"key": "magenta",
+			"name": "Magenta",
+			"hex": "#d946ef",
+			"rgb": "rgb(217, 70, 239)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-magenta.svg",
+					"png": "https://www.xernerx.com/logo-magenta.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-magenta.svg",
+					"png": "https://www.xernerx.com/icon-magenta.png",
+					"ico": "https://www.xernerx.com/icon-magenta.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-magenta.svg",
+					"png": "https://www.xernerx.com/banner-magenta.png"
+				}
+			}
+		},
+		{
+			"key": "lavender",
+			"name": "Lavender",
+			"hex": "#c084fc",
+			"rgb": "rgb(192, 132, 252)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-lavender.svg",
+					"png": "https://www.xernerx.com/logo-lavender.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-lavender.svg",
+					"png": "https://www.xernerx.com/icon-lavender.png",
+					"ico": "https://www.xernerx.com/icon-lavender.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-lavender.svg",
+					"png": "https://www.xernerx.com/banner-lavender.png"
+				}
+			}
+		},
+		{
+			"key": "slate",
+			"name": "Slate",
+			"hex": "#64748b",
+			"rgb": "rgb(100, 116, 139)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-slate.svg",
+					"png": "https://www.xernerx.com/logo-slate.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-slate.svg",
+					"png": "https://www.xernerx.com/icon-slate.png",
+					"ico": "https://www.xernerx.com/icon-slate.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-slate.svg",
+					"png": "https://www.xernerx.com/banner-slate.png"
+				}
+			}
+		},
+		{
+			"key": "charcoal",
+			"name": "Charcoal",
+			"hex": "#27272a",
+			"rgb": "rgb(39, 39, 42)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-charcoal.svg",
+					"png": "https://www.xernerx.com/logo-charcoal.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-charcoal.svg",
+					"png": "https://www.xernerx.com/icon-charcoal.png",
+					"ico": "https://www.xernerx.com/icon-charcoal.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-charcoal.svg",
+					"png": "https://www.xernerx.com/banner-charcoal.png"
+				}
+			}
+		},
+		{
+			"key": "white",
+			"name": "White",
+			"hex": "#ffffff",
+			"rgb": "rgb(255, 255, 255)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-white.svg",
+					"png": "https://www.xernerx.com/logo-white.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-white.svg",
+					"png": "https://www.xernerx.com/icon-white.png",
+					"ico": "https://www.xernerx.com/icon-white.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-white.svg",
+					"png": "https://www.xernerx.com/banner-white.png"
+				}
+			}
+		},
+		{
+			"key": "black",
+			"name": "Black",
+			"hex": "#09090b",
+			"rgb": "rgb(9, 9, 11)",
+			"assets": {
+				"logo": {
+					"svg": "https://www.xernerx.com/logo-black.svg",
+					"png": "https://www.xernerx.com/logo-black.png"
+				},
+				"icon": {
+					"svg": "https://www.xernerx.com/icon-black.svg",
+					"png": "https://www.xernerx.com/icon-black.png",
+					"ico": "https://www.xernerx.com/icon-black.ico"
+				},
+				"banner": {
+					"svg": "https://www.xernerx.com/banner-black.svg",
+					"png": "https://www.xernerx.com/banner-black.png"
+				}
+			}
+		}
+	],
+	"bots": [
+		{
+			"id": "virtue",
+			"name": "Virtue",
+			"botId": "1484880634844287138",
+			"slogan": "Track. Grow. Ascend.",
+			"primaryColorKey": "gold",
+			"primaryHex": "#f59e0b",
+			"primaryRgb": "rgb(245, 158, 11)",
+			"description": "Next-generation global & per-server Discord leveling bot featuring Text & Voice XP progression, Dynamic Hoist Roles, `/boost` multipliers, automated cycle resets, and customizable `/level` rank cards.",
+			"url": "https://app.xernerx.com/bots/virtue",
+			"palette": [
+				{
+					"key": "virtue-gold",
+					"name": "Celestial Gold (Primary Accent)",
+					"xernerxColor": "gold",
+					"hex": "#f59e0b",
+					"role": "Primary Halo, Wing Radiance & Level Accent",
+					"rgb": "rgb(245, 158, 11)"
+				},
+				{
+					"key": "virtue-champagne",
+					"name": "Warm Champagne",
+					"xernerxColor": "peach",
+					"hex": "#fdba74",
+					"role": "Inner Feather Glow & Secondary Highlight",
+					"rgb": "rgb(253, 186, 116)"
+				},
+				{
+					"key": "virtue-ivory",
+					"name": "Radiant Ivory",
+					"xernerxColor": "white",
+					"hex": "#fff7ed",
+					"role": "Core Diamond Crest & Typography Highlight",
+					"rgb": "rgb(255, 247, 237)"
+				},
+				{
+					"key": "virtue-obsidian",
+					"name": "Obsidian Void",
+					"xernerxColor": "black",
+					"hex": "#18191d",
+					"role": "Celestial Dark Canvas Background",
+					"rgb": "rgb(24, 25, 29)"
+				}
+			],
+			"assets": {
+				"icon": {
+					"png": "https://www.xernerx.com/bots/virtue/icon.png",
+					"ico": "https://www.xernerx.com/bots/virtue/icon.ico",
+					"betaPng": "https://www.xernerx.com/bots/virtue/icon-beta.png",
+					"betaIco": "https://www.xernerx.com/bots/virtue/icon-beta.ico"
+				},
+				"banner": {
+					"png": "https://www.xernerx.com/bots/virtue/banner.png",
+					"betaPng": "https://www.xernerx.com/bots/virtue/banner-beta.png"
+				}
+			}
+		},
+		{
+			"id": "yourapps",
+			"name": "YourApps",
+			"botId": "619328560141697036",
+			"slogan": "Discord Forms & Applications",
+			"primaryColorKey": "orange",
+			"primaryHex": "#f97316",
+			"primaryRgb": "rgb(249, 115, 22)",
+			"description": "Discord-native forms, staff recruitment, and community applications bot featuring 13-type Modals V2 & conditional web forms, resumable drafts, auto-synced Components V2 Apply panels, consensus voting, and automated role & archive workflows.",
+			"url": "https://app.xernerx.com/bots/yourapps",
+			"palette": [
+				{
+					"key": "yourapps-orange",
+					"name": "Paper Plane Orange (Primary Accent)",
+					"xernerxColor": "orange",
+					"hex": "#f97316",
+					"role": "Paper Airplane Emblem & Primary CTA Accent",
+					"rgb": "rgb(249, 115, 22)"
+				},
+				{
+					"key": "yourapps-peach",
+					"name": "Sparkle Peach",
+					"xernerxColor": "peach",
+					"hex": "#fdba74",
+					"role": "Flight Trail Arc & Four-Point Star Sparkles",
+					"rgb": "rgb(253, 186, 116)"
+				},
+				{
+					"key": "yourapps-teal",
+					"name": "Ocean Teal",
+					"xernerxColor": "cyan",
+					"hex": "#1e5f74",
+					"role": "Atmospheric Gradient Midtone & Form Card Accent",
+					"rgb": "rgb(30, 95, 116)"
+				},
+				{
+					"key": "yourapps-navy",
+					"name": "Deep Navy Canvas",
+					"xernerxColor": "charcoal",
+					"hex": "#162238",
+					"role": "Primary Deep Canvas & Vector Outline Base",
+					"rgb": "rgb(22, 34, 56)"
+				}
+			],
+			"assets": {
+				"icon": {
+					"png": "https://www.xernerx.com/bots/yourapps/icon.png",
+					"ico": "https://www.xernerx.com/bots/yourapps/icon.ico",
+					"betaPng": "https://www.xernerx.com/bots/yourapps/icon-beta.png",
+					"betaIco": "https://www.xernerx.com/bots/yourapps/icon-beta.ico"
+				},
+				"banner": {
+					"png": "https://www.xernerx.com/bots/yourapps/banner.png",
+					"betaPng": "https://www.xernerx.com/bots/yourapps/banner-beta.png"
+				}
+			}
+		},
+		{
+			"id": "todo",
+			"name": "To-Do List Bot (TDL)",
+			"botId": "782105629572464652",
+			"slogan": "Collaborative Discord Task Boards & Checklists",
+			"primaryColorKey": "lime",
+			"primaryHex": "#71cc2e",
+			"primaryRgb": "rgb(113, 204, 46)",
+			"description": "Collaborative Discord task boards, personal checklists, reminders, and productivity bot featuring priority tracking and seamless Xernerx Dashboard synchronization.",
+			"url": "https://app.xernerx.com/bots/todo",
+			"palette": [
+				{
+					"key": "todo-primary",
+					"name": "TDL Leaf Green (Official Bot Color)",
+					"xernerxColor": "lime",
+					"hex": "#71cc2e",
+					"role": "Official Bot Brand & Embed Accent Color",
+					"rgb": "rgb(113, 204, 46)"
+				},
+				{
+					"key": "todo-coral",
+					"name": "Checkmark Coral",
+					"xernerxColor": "coral",
+					"hex": "#ff6363",
+					"role": "Completed Task Checkmarks & Active Task Highlight",
+					"rgb": "rgb(255, 99, 99)"
+				},
+				{
+					"key": "todo-gold",
+					"name": "Clipboard Gold",
+					"xernerxColor": "yellow",
+					"hex": "#f5b82e",
+					"role": "Top Clipboard Clasp & Priority Highlight",
+					"rgb": "rgb(245, 184, 46)"
+				},
+				{
+					"key": "todo-mint",
+					"name": "Mint Sage Gradient",
+					"xernerxColor": "mint",
+					"hex": "#8de0a6",
+					"role": "Lower-Right Fresh Productivity Gradient Wash",
+					"rgb": "rgb(141, 224, 166)"
+				},
+				{
+					"key": "todo-sky",
+					"name": "Sky Azure Gradient",
+					"xernerxColor": "sky",
+					"hex": "#4392c7",
+					"role": "Upper-Left Sky Gradient Base",
+					"rgb": "rgb(67, 146, 199)"
+				}
+			],
+			"assets": {
+				"icon": {
+					"png": "https://www.xernerx.com/bots/todo/icon.png",
+					"ico": "https://www.xernerx.com/bots/todo/icon.ico",
+					"betaPng": "https://www.xernerx.com/bots/todo/icon-beta.png",
+					"betaIco": "https://www.xernerx.com/bots/todo/icon-beta.ico"
+				},
+				"banner": {
+					"png": "https://www.xernerx.com/bots/todo/banner.png",
+					"betaPng": "https://www.xernerx.com/bots/todo/banner-beta.png"
+				}
+			}
+		},
+		{
+			"id": "zodiac",
+			"name": "Zodiac",
+			"botId": "950251264095162418",
+			"slogan": "Daily Horoscopes, Sign Profiles & Cosmic Compatibility",
+			"primaryColorKey": "gold",
+			"primaryHex": "#8b520f",
+			"primaryRgb": "rgb(139, 82, 15)",
+			"description": "Daily horoscopes, zodiac sign profiles, cosmic compatibility readings, and automated astrology channels Discord bot by Xernerx Studios.",
+			"url": "https://app.xernerx.com/bots/zodiac",
+			"palette": [
+				{
+					"key": "zodiac-primary",
+					"name": "Zodiac Bronze (Official Bot Color)",
+					"xernerxColor": "gold",
+					"hex": "#8b520f",
+					"role": "Official Bot Brand & Embed Accent Color",
+					"rgb": "rgb(139, 82, 15)"
+				},
+				{
+					"key": "zodiac-amber",
+					"name": "Crescent Amber Gold",
+					"xernerxColor": "orange",
+					"hex": "#fbb040",
+					"role": "Crescent Moon & Four-Point Star Emblem",
+					"rgb": "rgb(251, 176, 64)"
+				},
+				{
+					"key": "zodiac-periwinkle",
+					"name": "Constellation Periwinkle",
+					"xernerxColor": "indigo",
+					"hex": "#6d78ad",
+					"role": "Radial Zodiac Sign Wheel Glyphs",
+					"rgb": "rgb(109, 120, 173)"
+				},
+				{
+					"key": "zodiac-midnight",
+					"name": "Midnight Cosmos Navy",
+					"xernerxColor": "cobalt",
+					"hex": "#00104a",
+					"role": "Deep Night Sky Canvas Background",
+					"rgb": "rgb(0, 16, 74)"
+				}
+			],
+			"assets": {
+				"icon": {
+					"png": "https://www.xernerx.com/bots/zodiac/icon.png",
+					"ico": "https://www.xernerx.com/bots/zodiac/icon.ico",
+					"betaPng": "https://www.xernerx.com/bots/zodiac/icon-beta.png",
+					"betaIco": "https://www.xernerx.com/bots/zodiac/icon-beta.ico"
+				},
+				"banner": {
+					"png": "https://www.xernerx.com/bots/zodiac/banner.png",
+					"betaPng": "https://www.xernerx.com/bots/zodiac/banner-beta.png"
+				}
+			}
+		},
+		{
+			"id": "metamorphosis",
+			"name": "Metamorphosis",
+			"botId": "881678826906730547",
+			"slogan": "Dynamic Voice Channels & Community Automation",
+			"primaryColorKey": "sky",
+			"primaryHex": "#199fd9",
+			"primaryRgb": "rgb(25, 159, 217)",
+			"description": "Dynamic temporary voice channels, automated room management, and community utility Discord bot by Xernerx Studios.",
+			"url": "https://app.xernerx.com/bots/metamorphosis",
+			"palette": [
+				{
+					"key": "metamorphosis-sky",
+					"name": "Dialogue Sky Blue (Primary Accent)",
+					"xernerxColor": "sky",
+					"hex": "#199fd9",
+					"role": "Circular Icon Disc & Primary Brand Accent",
+					"rgb": "rgb(25, 159, 217)"
+				},
+				{
+					"key": "metamorphosis-white",
+					"name": "Crisp White",
+					"xernerxColor": "white",
+					"hex": "#ffffff",
+					"role": "Foreground Speech Bubble & Primary Banner Title",
+					"rgb": "rgb(255, 255, 255)"
+				},
+				{
+					"key": "metamorphosis-black",
+					"name": "Obsidian Black",
+					"xernerxColor": "black",
+					"hex": "#000000",
+					"role": "Counter-Speech Bubble & Banner Canvas",
+					"rgb": "rgb(0, 0, 0)"
+				}
+			],
+			"assets": {
+				"icon": {
+					"png": "https://www.xernerx.com/bots/metamorphosis/icon.png",
+					"ico": "https://www.xernerx.com/bots/metamorphosis/icon.ico",
+					"betaPng": "https://www.xernerx.com/bots/metamorphosis/icon-beta.png",
+					"betaIco": "https://www.xernerx.com/bots/metamorphosis/icon-beta.ico"
+				},
+				"banner": {
+					"png": "https://www.xernerx.com/bots/metamorphosis/banner.png",
+					"betaPng": "https://www.xernerx.com/bots/metamorphosis/banner-beta.png"
+				}
+			}
+		}
+	],
+	"additionalServiceColors": [
+		{
+			"id": "roblox-utilities",
+			"name": "Roblox Utilities",
+			"swatchKey": "roblox-utilities",
+			"hex": "#f5f3f1",
+			"xernerxColor": "white",
+			"role": "Official Warm Alabaster Brand Color for Roblox Utilities",
+			"rgb": "rgb(245, 243, 241)"
+		}
+	],
+	"packages": [
+		{
+			"name": "xernerx",
+			"slug": "xernerx",
+			"scope": "XRX",
+			"colorKey": "purple",
+			"colorLabel": "Purple (Xerple)",
+			"hex": "#8b7cf6",
+			"rgb": "rgb(139, 124, 246)",
+			"description": "All-in-one Xernerx Suite SDK, CLI (`xernerx`), and Discord Bot Framework meta-package.",
+			"docsUrl": "https://docs.xernerx.com/packages/xernerx",
+			"assets": {
+				"banner": {
+					"svg": "https://docs.xernerx.com/packages/banners/xernerx.svg",
+					"png": "https://docs.xernerx.com/packages/banners/xernerx.png"
+				},
+				"icon": {
+					"svg": "https://docs.xernerx.com/packages/icons/xernerx.svg",
+					"png": "https://docs.xernerx.com/packages/icons/xernerx.png",
+					"ico": "https://docs.xernerx.com/packages/icons/xernerx.ico"
+				}
+			}
+		},
+		{
+			"name": "@xernerx/framework",
+			"slug": "framework",
+			"scope": "XF",
+			"colorKey": "indigo",
+			"colorLabel": "Indigo",
+			"hex": "#6366f1",
+			"rgb": "rgb(99, 102, 241)",
+			"description": "Modular class-based Discord.js framework (`XernerxClient`, `XernerxShardClient`, builders, handlers, validators).",
+			"docsUrl": "https://docs.xernerx.com/packages/@xernerx/framework",
+			"assets": {
+				"banner": {
+					"svg": "https://docs.xernerx.com/packages/banners/framework.svg",
+					"png": "https://docs.xernerx.com/packages/banners/framework.png"
+				},
+				"icon": {
+					"svg": "https://docs.xernerx.com/packages/icons/framework.svg",
+					"png": "https://docs.xernerx.com/packages/icons/framework.png",
+					"ico": "https://docs.xernerx.com/packages/icons/framework.ico"
+				}
+			}
+		},
+		{
+			"name": "@xernerx/commands",
+			"slug": "commands",
+			"scope": "XC",
+			"colorKey": "cyan",
+			"colorLabel": "Cyan",
+			"hex": "#06b6d4",
+			"rgb": "rgb(6, 182, 212)",
+			"description": "Developer diagnostic commands (`xc!`) & Slash/Context/Message Commands REST API synchronization SDK.",
+			"docsUrl": "https://docs.xernerx.com/packages/@xernerx/commands",
+			"assets": {
+				"banner": {
+					"svg": "https://docs.xernerx.com/packages/banners/commands.svg",
+					"png": "https://docs.xernerx.com/packages/banners/commands.png"
+				},
+				"icon": {
+					"svg": "https://docs.xernerx.com/packages/icons/commands.svg",
+					"png": "https://docs.xernerx.com/packages/icons/commands.png",
+					"ico": "https://docs.xernerx.com/packages/icons/commands.ico"
+				}
+			}
+		},
+		{
+			"name": "@xernerx/extension-builder",
+			"slug": "extension-builder",
+			"scope": "XE",
+			"colorKey": "gold",
+			"colorLabel": "Gold",
+			"hex": "#f59e0b",
+			"rgb": "rgb(245, 158, 11)",
+			"description": "Official base `ExtensionBuilder` class and lifecycle contract (`main`, `defer`) for `@xernerx/framework` extensions.",
+			"docsUrl": "https://docs.xernerx.com/packages/@xernerx/extension-builder",
+			"assets": {
+				"banner": {
+					"svg": "https://docs.xernerx.com/packages/banners/extension-builder.svg",
+					"png": "https://docs.xernerx.com/packages/banners/extension-builder.png"
+				},
+				"icon": {
+					"svg": "https://docs.xernerx.com/packages/icons/extension-builder.svg",
+					"png": "https://docs.xernerx.com/packages/icons/extension-builder.png",
+					"ico": "https://docs.xernerx.com/packages/icons/extension-builder.ico"
+				}
+			}
+		},
+		{
+			"name": "@xernerx/hooks",
+			"slug": "hooks",
+			"scope": "XH",
+			"colorKey": "emerald",
+			"colorLabel": "Emerald",
+			"hex": "#10b981",
+			"rgb": "rgb(16, 185, 129)",
+			"description": "HMAC-SHA256 webhook receiver (`X-Xernerx-Signature`) & zero-database engagement cache (`voted`, `reviewed`, `tipped`).",
+			"docsUrl": "https://docs.xernerx.com/packages/@xernerx/hooks",
+			"assets": {
+				"banner": {
+					"svg": "https://docs.xernerx.com/packages/banners/hooks.svg",
+					"png": "https://docs.xernerx.com/packages/banners/hooks.png"
+				},
+				"icon": {
+					"svg": "https://docs.xernerx.com/packages/icons/hooks.svg",
+					"png": "https://docs.xernerx.com/packages/icons/hooks.png",
+					"ico": "https://docs.xernerx.com/packages/icons/hooks.ico"
+				}
+			}
+		},
+		{
+			"name": "@xernerx/stats",
+			"slug": "stats",
+			"scope": "XS",
+			"colorKey": "coral",
+			"colorLabel": "Coral",
+			"hex": "#f43f5e",
+			"rgb": "rgb(244, 63, 94)",
+			"description": "Automated Discord bot telemetry extension, shard aggregator, and Stats REST API SDK (`XernerxStats`, `StatsClient`).",
+			"docsUrl": "https://docs.xernerx.com/packages/@xernerx/stats",
+			"assets": {
+				"banner": {
+					"svg": "https://docs.xernerx.com/packages/banners/stats.svg",
+					"png": "https://docs.xernerx.com/packages/banners/stats.png"
+				},
+				"icon": {
+					"svg": "https://docs.xernerx.com/packages/icons/stats.svg",
+					"png": "https://docs.xernerx.com/packages/icons/stats.png",
+					"ico": "https://docs.xernerx.com/packages/icons/stats.ico"
+				}
+			}
+		},
+		{
+			"name": "@xernerx/terminal",
+			"slug": "terminal",
+			"scope": "XT",
+			"colorKey": "magenta",
+			"colorLabel": "Magenta",
+			"hex": "#d946ef",
+			"rgb": "rgb(217, 70, 239)",
+			"description": "Scoped CLI logger, structured ANSI formatter, automatic npm update checker, and interactive TTY spinner.",
+			"docsUrl": "https://docs.xernerx.com/packages/@xernerx/terminal",
+			"assets": {
+				"banner": {
+					"svg": "https://docs.xernerx.com/packages/banners/terminal.svg",
+					"png": "https://docs.xernerx.com/packages/banners/terminal.png"
+				},
+				"icon": {
+					"svg": "https://docs.xernerx.com/packages/icons/terminal.svg",
+					"png": "https://docs.xernerx.com/packages/icons/terminal.png",
+					"ico": "https://docs.xernerx.com/packages/icons/terminal.ico"
+				}
+			}
+		},
+		{
+			"name": "@xernerx/websocket",
+			"slug": "websocket",
+			"scope": "XW",
+			"colorKey": "blue",
+			"colorLabel": "Blue",
+			"hex": "#3b82f6",
+			"rgb": "rgb(59, 130, 246)",
+			"description": "Promise-based real-time bidirectional JSON-RPC client for the Xernerx WebSocket Gateway.",
+			"docsUrl": "https://docs.xernerx.com/packages/@xernerx/websocket",
+			"assets": {
+				"banner": {
+					"svg": "https://docs.xernerx.com/packages/banners/websocket.svg",
+					"png": "https://docs.xernerx.com/packages/banners/websocket.png"
+				},
+				"icon": {
+					"svg": "https://docs.xernerx.com/packages/icons/websocket.svg",
+					"png": "https://docs.xernerx.com/packages/icons/websocket.png",
+					"ico": "https://docs.xernerx.com/packages/icons/websocket.ico"
+				}
+			}
+		}
+	]
+}

@@ -11,6 +11,7 @@ import { redirect } from 'next/navigation';
 import { DesktopPerksBento } from '@/components/DesktopPerksBento';
 import { DesktopInteractivePreview } from '@/components/DesktopInteractivePreview';
 import { PageFaqSection } from '@/components/PageFaqSection';
+import { StudioTrustProofStrip } from '@/components/StudioTrustProofStrip';
 
 export default function Page() {
 	const { t } = useDictionary();
@@ -27,6 +28,7 @@ export default function Page() {
 	const [releaseMeta, setReleaseMeta] = useState<{ version?: string | null; publishedAt?: string | null }>({});
 	const [app, setApp] = useState<Record<string, any> | null>(null);
 	const [show, setShow] = useState(false);
+	const [previewMaximized, setPreviewMaximized] = useState(false);
 	const showChannelSelector = environment === 'canary' || environment === 'dev';
 
 	useEffect(() => {
@@ -78,6 +80,7 @@ export default function Page() {
 	if (type === 'application') return redirect('/');
 
 	const activePlatform = platform === 'windows' || platform === 'macos' || platform === 'linux' ? platform : 'windows';
+	const activePlatformLabel = activePlatform === 'macos' ? 'macOS' : activePlatform === 'linux' ? 'Linux' : 'Windows';
 
 	return (
 		<div
@@ -98,7 +101,10 @@ export default function Page() {
 				}}
 			>
 				{/* Left Column: End-User Pitch + Download CTA */}
-				<div className="lg:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left" style={{ gap: 'calc(var(--ui-gap) * 1.15)' }}>
+				<div
+					className={`${previewMaximized ? 'lg:col-span-12 items-center text-center' : 'lg:col-span-5 items-center lg:items-start text-center lg:text-left'} flex flex-col transition-all`}
+					style={{ gap: 'calc(var(--ui-gap) * 1.15)' }}
+				>
 					<div className="inline-flex items-center gap-2 rounded-full bg-(--accent)/15 border border-(--accent)/30 px-3.5 py-1 text-xs font-bold text-(--accent)">
 						<Laptop size={14} />
 						<span>{t('www.download.badge')}</span>
@@ -130,7 +136,7 @@ export default function Page() {
 									<Download size={18} />
 									<span>{t('www.download.button3')}</span>
 									{activePlatform === 'windows' ? <FaWindows /> : activePlatform === 'macos' ? <FaApple /> : activePlatform === 'linux' ? <FaLinux /> : <FaQuestion />}
-									<span className="capitalize">{activePlatform}</span>
+									<span>{activePlatformLabel}</span>
 								</motion.button>
 							)}
 
@@ -219,8 +225,8 @@ export default function Page() {
 				</div>
 
 				{/* Right Column: Live Clickable Desktop App Window */}
-				<div className="lg:col-span-6 flex flex-col items-center gap-3 w-full">
-					<DesktopInteractivePreview />
+				<div className={`${previewMaximized ? 'lg:col-span-12' : 'lg:col-span-7'} flex flex-col items-center gap-3 w-full transition-all`}>
+					<DesktopInteractivePreview platform={activePlatform} maximized={previewMaximized} onToggleMaximize={() => setPreviewMaximized((v) => !v)} />
 					<span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-(--text-muted)">
 						<Sparkles size={12} className="text-(--accent)" />
 						{t('www.download.tryInteractive')}
@@ -230,20 +236,24 @@ export default function Page() {
 
 			{/* ASYMMETRIC INTERACTIVE DESKTOP PERKS BENTO */}
 			<div className="relative z-10 w-full">
-				<DesktopPerksBento />
+				<DesktopPerksBento platform={activePlatform} />
 			</div>
 
-			{/* DESKTOP FAQ */}
+			{/* STUDIO PROOF & PRICING CALLOUT */}
 			<div className="relative z-10 w-full">
-				<PageFaqSection
-					subtitle={t('www.download.faq.subtitle')}
-					items={[
-						{ question: t('www.download.faq.q1'), answer: t('www.download.faq.a1') },
-						{ question: t('www.download.faq.q2'), answer: t('www.download.faq.a2') },
-						{ question: t('www.download.faq.q3'), answer: t('www.download.faq.a3') },
-					]}
-				/>
+				<StudioTrustProofStrip showComparisonHeading />
 			</div>
+
+			{/* DESKTOP FAQ SCHEMA */}
+			<PageFaqSection
+				subtitle={t('www.download.faq.subtitle')}
+				items={[
+					{ question: t('www.download.faq.q1'), answer: t('www.download.faq.a1') },
+					{ question: t('www.download.faq.q2'), answer: t('www.download.faq.a2') },
+					{ question: t('www.download.faq.q3'), answer: t('www.download.faq.a3') },
+					{ question: t('www.download.faq.q4'), answer: t('www.download.faq.a4') },
+				]}
+			/>
 		</div>
 	);
 }

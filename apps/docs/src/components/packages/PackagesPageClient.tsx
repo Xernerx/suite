@@ -5,6 +5,7 @@ import { ArrowRight, Box, Check, Copy, ExternalLink, FileText, GitBranch, Layers
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
+import { PackageBanner, getPackageVisualMeta } from '@/components/packages/PackageBanner';
 import { PackageInstallBar } from '@/components/packages/PackageInstallBar';
 import { PackagesSearch, SearchIndexItem } from '@/components/packages/PackagesSearch';
 import { PackagesSidebar } from '@/components/packages/PackagesSidebar';
@@ -100,22 +101,29 @@ export function PackagesPageClient({ packages, index }: { packages: any[]; index
 					{filteredPackages.map((pkg) => {
 						const symbolCount = index.filter((item) => item.packageName === pkg.name).length;
 						const isCollection = Boolean(pkg.isCollection);
+						const visual = getPackageVisualMeta(pkg.name);
 
 						return (
 							<div
 								key={pkg.name}
-								className={`flex flex-col justify-between rounded-2xl p-5 transition-all gap-4 ${
+								className={`group/pkg flex flex-col justify-between rounded-2xl p-5 transition-all gap-4 ${
 									isCollection
 										? 'md:col-span-2 bg-(--accent)/8 border-2 border-(--accent)/35 hover:border-(--accent)/60 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
-										: 'bg-(--background)/50 border border-(--border)/10 hover:border-(--accent)/40 hover:bg-(--background)/80'
+										: `bg-(--background)/50 border border-(--border)/10 ${visual.borderHoverClass} hover:bg-(--background)/80`
 								}`}
 							>
-								<div className="flex flex-col gap-2.5">
+								<div className="flex flex-col gap-3">
+									<Link href={`/packages/${pkg.name}/${pkg.versions[0]}`} className="block focus:outline-none">
+										<PackageBanner pkgName={pkg.name} />
+									</Link>
+
 									<div className="flex items-center justify-between gap-2 flex-wrap">
 										<div className="flex items-center gap-2 flex-wrap">
+											<img src={visual.iconPath} alt={`${pkg.name} icon`} className="w-6 h-6 rounded-full border border-(--border)/20 shrink-0" />
 											<Link href={`/packages/${pkg.name}/${pkg.versions[0]}`} className="text-lg font-bold font-mono text-(--accent) hover:underline">
 												{pkg.name}
 											</Link>
+											<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${visual.badgeClass}`}>{visual.scope}</span>
 											<span
 												className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
 													isCollection ? 'bg-(--accent) text-white border-(--accent)' : 'bg-(--foreground)/60 text-(--text-muted) border-(--border)/10'

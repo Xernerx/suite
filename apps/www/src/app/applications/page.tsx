@@ -296,6 +296,7 @@ export default function ApplicationsPage() {
 					{ question: t('www.careers.faq.q1'), answer: t('www.careers.faq.a1') },
 					{ question: t('www.careers.faq.q2'), answer: t('www.careers.faq.a2') },
 					{ question: t('www.careers.faq.q3'), answer: t('www.careers.faq.a3') },
+					{ question: t('www.careers.faq.q4'), answer: t('www.careers.faq.a4') },
 				]}
 			/>
 		</div>

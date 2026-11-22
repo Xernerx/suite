@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
+import { useEnvironment, useUser, useToast, useDictionary, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { AnimatePresence } from 'framer-motion';
 import { IssueSubmitForm } from '@/components/issues/IssueSubmitForm';
@@ -13,6 +13,11 @@ export default function IssuesPage() {
 	const { user } = useUser();
 	const { toast } = useToast();
 	const { t } = useDictionary();
+	const { hide } = useSidebar();
+
+	useEffect(() => {
+		hide();
+	}, [hide]);
 	const [issues, setIssues] = useState<any[]>([]);
 	const [products, setProducts] = useState<string[]>([]);
 	const [orgBots, setOrgBots] = useState<{ id: string; name: string; avatarUrl: string | null }[]>([]);

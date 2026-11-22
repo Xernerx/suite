@@ -5,6 +5,14 @@ import { buildDiscordBotAuthorizeUrl, getEnabledInviteOptions } from '@xernerx/l
 import { database } from '@xernerx/lib/server';
 import { findDefaultOfficialInvite } from '@/lib/defaultOfficialInvites';
 
+function withNoIndexHeaders(res: NextResponse, id?: string): NextResponse {
+	res.headers.set('X-Robots-Tag', 'noindex, nofollow');
+	if (id) {
+		res.headers.set('Link', `<https://www.xernerx.com/invites/${encodeURIComponent(id)}>; rel="canonical"`);
+	}
+	return res;
+}
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string; option: string }> }) {
 	try {
 		const { id, option } = await params;
@@ -39,7 +47,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			invite = findDefaultOfficialInvite(id);
 		}
 		if (!invite) {
-			return new NextResponse('Not Found', { status: 404 });
+			return withNoIndexHeaders(new NextResponse('Not Found', { status: 404 }));
 		}
 
 		const targetSlug = botDoc?.vanitySlug || invite.id || invite.clientId;
@@ -48,7 +56,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 		const matched = enabledOptions.find((o) => o.key === normalizedOption) || (enabledOptions.length === 1 ? enabledOptions[0] : null);
 
 		if (!matched) {
-			return NextResponse.redirect(new URL(`/invites/${encodeURIComponent(id)}`, req.url));
+			return withNoIndexHeaders(NextResponse.redirect(new URL(`/invites/${encodeURIComponent(id)}`, req.url)), id);
 		}
 
 		const host = (req.headers.get('x-forwarded-host') || req.headers.get('host') || '').toLowerCase();
@@ -68,9 +76,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			appBaseUrl,
 		});
 
-		return NextResponse.redirect(discordUrl);
+		return withNoIndexHeaders(NextResponse.redirect(discordUrl), id);
 	} catch (error) {
 		console.error(error);
-		return new NextResponse('Internal Server Error', { status: 500 });
+		return withNoIndexHeaders(new NextResponse('Internal Server Error', { status: 500 }));
 	}
 }

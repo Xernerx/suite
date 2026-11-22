@@ -2,6 +2,32 @@
 
 # blog
 
+## 1.2.0
+
+### Minor Changes
+
+- ## Article Reading Progress, AI Discovery & SEO Metadata
+  
+  Added `llms.txt` discovery, improved article reading layout and structured metadata, and synchronized the 26-accent brand asset kit.
+  
+  ### Added
+  
+  - **AI & Crawler Discovery (`/llms.txt`)**: Added a structured `llms.txt` route and refined `robots.ts` and root layout metadata for official newsroom articles.
+  
+  ### Changed
+  
+  - **Article Reader Experience**: Refined `BlogArticleClient` typography, header spacing, and 26-accent static brand assets.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.20.0
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 1.1.15
 
 ### Patch Changes

@@ -22,7 +22,7 @@ const PORT_APP_APPS = ['www', 'api', 'cdn', 'account', 'app', 'docs', 'admin', '
 
 export function Page({ children }: { children: React.ReactNode }) {
 	const { device } = usePlatform();
-	const { state } = useSidebar();
+	const { state, isResolved } = useSidebar();
 	const { isContentHidden, setContentHidden } = useShortcuts();
 	const { isRightAligned } = useWindowControlsStyle();
 	const { isLoading, message, backgroundMode, dotVariant } = useLoading();
@@ -347,7 +347,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 								? false
 								: backgroundMode === 'blank';
 
-	const showFooter = state === 'hidden' && !introStage.active;
+	const showFooter = isResolved && state === 'hidden' && !introStage.active && !activeLoading;
 
 	return (
 		<div
@@ -431,6 +431,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 							'radial-gradient(circle at 50% 15%, color-mix(in srgb, var(--accent) 30%, var(--foreground)) 0%, var(--foreground) 75%), linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 0%, var(--foreground) 50%, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 100%)',
 					}}
 				>
+					<div id="page-progress-slot" className="sticky top-0 left-0 right-0 z-50 h-0 w-full overflow-visible pointer-events-none" />
 					<div className="sticky top-0 left-0 w-full h-0 overflow-visible pointer-events-none z-0">
 						<div
 							className="relative flex flex-col items-center justify-center w-full transition-[height] duration-500"
@@ -474,10 +475,10 @@ export function Page({ children }: { children: React.ReactNode }) {
 					<div
 						className={`relative z-10 flex flex-col transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${showFooter ? 'min-h-full justify-between' : ''} ${
 							isLivePageTour || isReadyPhase
-								? 'translate-y-0 scale-100 opacity-100 pb-72'
+								? 'opacity-100 pb-72'
 								: activeLoading || effectiveStagePreview || onboardingStage.active
 									? 'translate-y-24 scale-95 opacity-0 pointer-events-none select-none'
-									: 'translate-y-0 scale-100 opacity-100'
+									: 'opacity-100'
 						}`}
 					>
 						<main

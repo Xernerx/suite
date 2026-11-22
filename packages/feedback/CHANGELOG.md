@@ -2,6 +2,21 @@
 
 # @xernerx/feedback
 
+## 0.7.3
+
+### Patch Changes
+
+- ## Error & Not-Found Boundary Layout Polish
+  
+  Refined spacing and typography in the shared `<Error />` and `<NotFound />` route feedback boundaries.
+  
+  ### Changed
+  
+  - **Route Feedback Boundaries**: Polished button alignment and container styling in `<Error />` and `<NotFound />`.
+- Updated dependencies
+  - @xernerx/providers@0.25.0
+  - @xernerx/ui@0.10.3
+
 ## 0.7.2
 
 ### Patch Changes

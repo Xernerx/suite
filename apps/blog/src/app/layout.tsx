@@ -70,6 +70,48 @@ export const metadata: Metadata = {
 	},
 };
 
+const blogStructuredData = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'Blog',
+			'@id': 'https://blog.xernerx.com/#blog',
+			url: 'https://blog.xernerx.com',
+			name: 'Xernerx Blog — Announcements, Security & Engineering',
+			description: 'Official announcements, platform security advisories, product updates, and engineering deep-dives from Xernerx Studios.',
+			inLanguage: 'en-GB',
+			publisher: {
+				'@type': 'Organization',
+				'@id': 'https://www.xernerx.com/#organization',
+				name: 'Xernerx Studios',
+				url: 'https://www.xernerx.com',
+				logo: {
+					'@type': 'ImageObject',
+					url: 'https://www.xernerx.com/logo.png',
+				},
+			},
+		},
+		{
+			'@type': 'BreadcrumbList',
+			'@id': 'https://blog.xernerx.com/#breadcrumb',
+			itemListElement: [
+				{
+					'@type': 'ListItem',
+					position: 1,
+					name: 'Xernerx Studios',
+					item: 'https://www.xernerx.com',
+				},
+				{
+					'@type': 'ListItem',
+					position: 2,
+					name: 'Xernerx Blog',
+					item: 'https://blog.xernerx.com',
+				},
+			],
+		},
+	],
+};
+
 export default async function RootLayout({
 	children,
 }: Readonly<{
@@ -99,6 +141,7 @@ export default async function RootLayout({
 	return (
 		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>
 			<body style={themeProps.style} suppressHydrationWarning>
+				<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogStructuredData) }} />
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict} initialEnvironment={initialEnv} enableAds>
 						<PermissionProvider>{children}</PermissionProvider>

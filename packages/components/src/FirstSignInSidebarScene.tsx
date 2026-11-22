@@ -129,9 +129,19 @@ export function FirstSignInSidebarScene({
 								</div>
 							</div>
 						) : (
-							<div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/35">
+							<motion.div
+								initial={{ scale: 0.78, rotate: -6 }}
+								animate={{ scale: 1, rotate: 0 }}
+								transition={{ type: 'spring', stiffness: 360, damping: 18 }}
+								className="relative flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/35"
+							>
+								<motion.span
+									animate={{ scale: [1, 1.24, 1], opacity: [0.65, 0, 0.65] }}
+									transition={{ duration: 1.9, repeat: Infinity, ease: 'easeOut' }}
+									className="absolute inset-0 rounded-2xl border-2 border-(--accent)"
+								/>
 								<ActiveIcon size={26} />
-							</div>
+							</motion.div>
 						)}
 
 						<div className="flex-1 min-w-0 w-full">
@@ -141,9 +151,14 @@ export function FirstSignInSidebarScene({
 								</h3>
 								<div className="flex items-center gap-2 shrink-0">
 									{activeMeta.kbd && (
-										<kbd className="rounded-xl bg-(--foreground) border border-(--accent)/30 px-2.5 py-0.5 font-mono text-xs font-extrabold text-(--accent) whitespace-nowrap">
+										<motion.kbd
+											initial={{ scale: 0.85, y: -4 }}
+											animate={{ scale: [1, 1.06, 1], y: 0 }}
+											transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+											className="rounded-xl bg-(--foreground) border border-(--accent)/40 px-2.5 py-0.5 font-mono text-xs font-extrabold text-(--accent) whitespace-nowrap shadow-[0_0_14px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
+										>
 											{activeMeta.kbd}
-										</kbd>
+										</motion.kbd>
 									)}
 									<div className="flex items-center gap-1.5">
 										{sidebarSteps.map((stepId, idx) => (

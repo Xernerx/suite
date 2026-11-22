@@ -14,6 +14,7 @@ import { FirstSignInHeaderScene, FirstSignInSetupScene, type HeaderBuildStepId, 
 import { FirstSignInSidebarScene, type SidebarBuildStepId } from './FirstSignInSidebarScene';
 import { DASHBOARD_TOUR_STEPS, EXPLORE_TOUR_STEPS, FirstSignInNavPromptScene, FirstSignInPageTourScene, PORTAL_TOUR_STEPS, type PageTourStepId, type TourNavTargetPhase } from './FirstSignInPageTours';
 import { FirstSignInReadyScene, FirstSignInStageDock, FirstSignInTourChoiceScene, FirstSignInWelcomeScene, FirstSignInWhoWeAreScene } from './FirstSignInWelcomeAndPersonaScenes';
+import { OnboardingSpotlightPortal } from './OnboardingSpotlightPortal';
 
 export type OnboardingStagePhase = 'welcome' | 'who-we-are' | 'setup' | 'tour-choice' | 'header' | 'sidebar' | 'dashboard' | 'portal' | 'explore' | 'ready';
 export type OnboardingPersona = 'user' | 'developer' | 'both';
@@ -37,7 +38,7 @@ export function FirstSignInOnboarding() {
 	const { user, mutate, loading } = useUser();
 	const { getEnvUrl } = useEnvironment();
 	const { preferences, setPreference } = useTheme();
-	const { state: sidebarState, toggle, hide, show, setMobileOpen, navItems, setNavItems, clearNavItems } = useSidebar();
+	const { state: sidebarState, isResolved: isSidebarResolved, toggle, hide, show, setMobileOpen, navItems, setNavItems, clearNavItems } = useSidebar();
 	const { setNavOpen } = useShortcuts();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -92,11 +93,11 @@ export function FirstSignInOnboarding() {
 	const headerSteps: HeaderBuildStepId[] = [
 		'logo',
 		...(isMobileViewport ? (['mobile-tray'] as HeaderBuildStepId[]) : []),
-		'search',
 		...(isBotUser ? (['dashboard'] as HeaderBuildStepId[]) : []),
 		...(isDeveloper ? (['portal'] as HeaderBuildStepId[]) : []),
 		'store',
 		'drawer',
+		'search',
 		'alerts',
 		'profile',
 	];
@@ -174,7 +175,7 @@ export function FirstSignInOnboarding() {
 
 	// Orchestrate real Sidebar visibility across all onboarding phases
 	useEffect(() => {
-		if (!isOpen || !user) return;
+		if (!isOpen || !user || !isSidebarResolved) return;
 		if (initialSidebarHiddenRef.current === null) {
 			initialSidebarHiddenRef.current = sidebarState === 'hidden';
 		}
@@ -248,7 +249,24 @@ export function FirstSignInOnboarding() {
 				toggle();
 			}
 		}
-	}, [isOpen, user, currentPhase, activeSidebarStepId, isMobileViewport, persona, hide, show, toggle, setMobileOpen, clearNavItems, navItems.length, setNavItems, sidebarState, t]);
+	}, [
+		isOpen,
+		user,
+		isSidebarResolved,
+		currentPhase,
+		activeSidebarStepId,
+		isMobileViewport,
+		persona,
+		hide,
+		show,
+		toggle,
+		setMobileOpen,
+		clearNavItems,
+		navItems.length,
+		setNavItems,
+		sidebarState,
+		t,
+	]);
 
 	const restoreOriginalSidebar = (forceHide = false) => {
 		const hadInjectedDemoNav = injectedDemoNavRef.current;
@@ -382,7 +400,7 @@ export function FirstSignInOnboarding() {
 		if (isManualReplay) return;
 
 		const isExcludedRoute =
-			/^\/(?:terms|privacy|cookies|security|login|logout|overlay)(?:\/|$)/i.test(path) ||
+			/^\/(?:terms|privacy|cookies|security|license|developer-policy|login|logout|overlay)(?:\/|$)/i.test(path) ||
 			search.has('xrx_bot_tour') ||
 			(/^\/bots\/[^/]+$/i.test(path) && (search.has('guild_id') || search.has('code') || search.get('onboarding') === '1'));
 
@@ -729,6 +747,123 @@ export function FirstSignInOnboarding() {
 
 	const isFullBleedIntro = currentPhase === 'welcome' && isIntroPlaying && !navPromptTarget;
 
+	const spotlightConfig = (() => {
+		if (!isOpen || !user) return { active: false, selectors: [] as string[] };
+		if (navPromptTarget) {
+			return {
+				active: true,
+				selectors: ['[data-onboarding-target="sidebar-drawer"]', '[data-onboarding-target="header-drawer"]'],
+				label: t('components.firstSignIn.navigation.appDrawerTitle'),
+				kbd: 'Ctrl + Space',
+			};
+		}
+		if (currentPhase === 'header') {
+			const headerSelectMap: Record<HeaderBuildStepId, { selectors: string[]; label: string; kbd?: string }> = {
+				logo: {
+					selectors: ['[data-onboarding-target="header-logo"]'],
+					label: t('components.firstSignIn.navigation.sub0Title'),
+					kbd: 'Ctrl + .',
+				},
+				'mobile-tray': {
+					selectors: ['[data-onboarding-target="header-mobile-tray"]'],
+					label: t('components.firstSignIn.navigation.mobileTrayTitle'),
+				},
+				dashboard: {
+					selectors: ['[data-onboarding-target="header-dashboard"]'],
+					label: t('components.firstSignIn.navigation.shortcutDashboardTitle'),
+				},
+				portal: {
+					selectors: ['[data-onboarding-target="header-portal"]'],
+					label: t('components.firstSignIn.navigation.shortcutPortalTitle'),
+				},
+				store: {
+					selectors: ['[data-onboarding-target="header-shortcuts-group"]', '[data-onboarding-target="header-store"]'],
+					label: t('components.firstSignIn.navigation.shortcutStoreTitle'),
+				},
+				drawer: {
+					selectors: ['[data-onboarding-target="header-drawer"]'],
+					label: t('components.firstSignIn.navigation.appDrawerTitle'),
+					kbd: 'Ctrl + Space',
+				},
+				search: {
+					selectors: ['[data-onboarding-target="header-search"]'],
+					label: t('components.firstSignIn.navigation.paletteTitle'),
+					kbd: 'Ctrl + K',
+				},
+				alerts: {
+					selectors: ['[data-onboarding-target="header-alerts"]'],
+					label: t('components.firstSignIn.navigation.alertsTitle'),
+					kbd: 'Ctrl + I',
+				},
+				profile: {
+					selectors: ['[data-onboarding-target="header-profile"]'],
+					label: t('components.firstSignIn.navigation.profileTitle'),
+					kbd: 'Ctrl + ,',
+				},
+			};
+			const cfg = headerSelectMap[activeHeaderStepId];
+			return cfg ? { active: true, ...cfg } : { active: false, selectors: [] };
+		}
+		if (currentPhase === 'sidebar') {
+			const sidebarSelectMap: Record<SidebarBuildStepId, { selectors: string[]; label: string; kbd?: string }> = {
+				toggle: {
+					selectors: ['[data-onboarding-target="sidebar-toggle"]'],
+					label: t('components.firstSignIn.dashboard.subToggleTitle'),
+					kbd: 'Ctrl + B',
+				},
+				views: {
+					selectors: ['[data-onboarding-target="sidebar-views"]'],
+					label:
+						persona === 'both'
+							? t('components.firstSignIn.dashboard.bothWorkspaceTitle')
+							: persona === 'developer'
+								? t('components.firstSignIn.dashboard.devWorkspaceTitle')
+								: t('components.firstSignIn.dashboard.serverHubTitle'),
+					kbd: 'Alt + 1..9',
+				},
+				'moved-dock': {
+					selectors: ['[data-onboarding-target="sidebar-moved-dock"]'],
+					label: t('components.firstSignIn.dashboard.dockedNavTitle'),
+				},
+				collapse: {
+					selectors: ['[data-onboarding-target="sidebar-collapse"]'],
+					label: t('components.firstSignIn.dashboard.subCollapseTitle'),
+					kbd: 'Ctrl + B',
+				},
+			};
+			const cfg = sidebarSelectMap[activeSidebarStepId];
+			return cfg ? { active: true, ...cfg } : { active: false, selectors: [] };
+		}
+		if (isLivePageTour && activePageTourTarget) {
+			if (activePageTourTarget === 'dash-sidebar') {
+				return {
+					active: true,
+					selectors: ['[data-onboarding-target="sidebar-views"]'],
+					label: t('components.firstSignIn.pageTours.dashboard.sidebarTitle'),
+					kbd: 'Alt + 1..9',
+				};
+			}
+			const kbd = activePageTourTarget === 'dash-config' ? 'Ctrl + S' : activePageTourTarget === 'explore-bar' ? 'Ctrl + K' : undefined;
+			return {
+				active: true,
+				selectors: [`[data-tour="${activePageTourTarget}"]`],
+				kbd,
+			};
+		}
+		if (currentPhase === 'ready') {
+			return {
+				active: true,
+				selectors: ['[data-onboarding-target="support-fab"]'],
+				label: t('components.firstSignIn.steps.support'),
+			};
+		}
+		return { active: false, selectors: [] as string[] };
+	})();
+
+	function isItemRevealedInHeader(id: string) {
+		return revealedHeaderItems.includes(id);
+	}
+
 	return (
 		<div
 			className={`w-full h-full flex flex-col items-center justify-between overflow-hidden ${isFullBleedIntro ? 'p-0' : 'px-3 py-3 sm:px-8 sm:py-5'} transition-all duration-500 ${
@@ -737,6 +872,7 @@ export function FirstSignInOnboarding() {
 					: 'pointer-events-auto'
 			}`}
 		>
+			<OnboardingSpotlightPortal active={spotlightConfig.active} selectors={spotlightConfig.selectors} label={(spotlightConfig as any).label} kbd={(spotlightConfig as any).kbd} />
 			{/* Center Stage Choreography (or Bottom-Anchored Tour Card on Live Page Tours / Ready / Mobile Sidebar) */}
 			<div className={`w-full flex-1 min-h-0 flex flex-col items-center ${isBottomAnchored ? 'justify-end overflow-visible pb-1' : isFullBleedIntro ? 'overflow-hidden' : 'overflow-y-auto'}`}>
 				<div
@@ -746,7 +882,7 @@ export function FirstSignInOnboarding() {
 				>
 					<AnimatePresence mode="wait">
 						{navPromptTarget ? (
-							<FirstSignInNavPromptScene key={`scene-nav-prompt-${navPromptTarget}`} targetPhase={navPromptTarget} onOpenNavMenu={() => setNavOpen(true)} />
+							<FirstSignInNavPromptScene key={`scene-nav-prompt-${navPromptTarget}`} targetPhase={navPromptTarget} />
 						) : (
 							<>
 								{currentPhase === 'welcome' && isIntroPlaying && (

@@ -2,6 +2,25 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.7.7
+
+### Patch Changes
+
+- ## Developer Portal Overview Polish & Brand Asset Sync
+  
+  Refined the Developer Portal dashboard overview and synchronized the 26-accent brand asset suite.
+  
+  ### Changed
+  
+  - **Portal Dashboard & Brand Assets**: Polished the portal landing page and updated `public/` with the 26-color SVG and PNG banner, icon, and logo kit.
+- Updated dependencies
+  - @xernerx/components@0.20.0
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 1.7.6
 
 ### Patch Changes

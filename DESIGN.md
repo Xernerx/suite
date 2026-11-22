@@ -5,6 +5,8 @@
 > Canonical visual, token, layout, and component specification for all **Xernerx Suite** web applications (`apps/*`), shared UI packages (`@xernerx/ui`, `@xernerx/components`, `@xernerx/feedback`), the Electron companion client (`clients/desktop`), and the native React Native (Expo) companion (`clients/mobile`, mirrored via `clients/mobile/src/theme/tokens.ts` and `clients/mobile/src/components/ui/`).
 >
 > **Core Aesthetic:** **Modern Round Glassmorphism Pop** — tactile rounded geometry, translucent frosted layers, dynamic user-chosen `--accent` identity, seamless Light/Dark adaptation, and user-controlled layout/text scaling.
+>
+> **Official Brand & Press Kit (`BRAND.md`):** For the organization-wide brand identity, **27-color Xernerx accent palette**, official logos/icons/banners (`logo-*`, `icon-*`, `banner-*`), first-party Discord application palettes & imagery (**Virtue** & **YourApps**), and `@xernerx/*` SDK package media assets, see **[`../.github/BRAND.md`](../.github/BRAND.md)** ([`github.com/Xernerx/.github/blob/main/BRAND.md`](https://github.com/Xernerx/.github/blob/main/BRAND.md)) and the machine-readable manifest at **[`./packages/public/brand.json`](./packages/public/brand.json)** ([`../.github/brand/brand.json`](../.github/brand/brand.json)).
 
 ---
 
@@ -23,21 +25,21 @@
 
 Never hardcode dark-only or light-only surface classes (`bg-black`, `bg-zinc-900`, `text-white` on non-accent backgrounds, `border-white/10`). Always bind to theme-aware CSS custom properties:
 
-| Token               | Light Mode (`:root`)                                        | Dark Mode (`html.dark`)         | Usage                                                                                           |
-| :------------------ | :---------------------------------------------------------- | :------------------------------ | :---------------------------------------------------------------------------------------------- |
-| `--background`      | `#fafafa`                                                   | `#09090b`                       | Root canvas & recessed wells                                                                    |
-| `--foreground`      | `#f4f4f5`                                                   | `#18181b`                       | Elevated cards, modals, panels, bars                                                            |
-| `--border`          | `#53535b`                                                   | `#f4f4f5`                       | Subtle borders via `border-(--border)/10` (or `/15`–`/20`)                                      |
-| `--text`            | `#09090b`                                                   | `#fafafa`                       | Primary copy & headings                                                                         |
-| `--text-muted`      | `#52525b`                                                   | `#a1a1aa`                       | Secondary labels, hints, metadata                                                               |
-| `--accent`          | `#8b7cf6` _(user-customizable)_                             | `#8b7cf6` _(user-customizable)_ | Primary brand/user interactive identity                                                         |
-| `--accent-readable` | Dynamic contrast-safe accent                                | Dynamic contrast-safe accent    | Auto-applied to `.text-(--accent)` & `.border-(--accent)*` so monochrome accents remain legible |
-| `--accent-contrast` | `#fafafa`                                                   | `#fafafa`                       | Foreground text on solid `bg-(--accent)` surfaces                                               |
-| `--hover-accent`    | `color-mix(in srgb, var(--accent) 85%, white 15%)`          | Same                            | Hover state on accent buttons/controls                                                          |
-| `--active-accent`   | `color-mix(in srgb, var(--accent-readable) 85%, black 15%)` | Same                            | Active/pressed state on accent controls                                                         |
-| `--accent-green`    | `#16a34a`                                                   | `#39ff14`                       | **Semantic only:** success, online, operational                                                 |
-| `--accent-orange`   | `#ff6600`                                                   | `#ff6600`                       | **Semantic only:** warnings, degraded states                                                    |
-| `--accent-red`      | `#ff3333`                                                   | `#ff3333`                       | **Semantic only:** destructive actions, errors, down states                                     |
+| Token               | Light Mode (`:root`)                                        | Dark Mode (`html.dark`)                  | Usage                                                                                           |
+| :------------------ | :---------------------------------------------------------- | :--------------------------------------- | :---------------------------------------------------------------------------------------------- |
+| `--background`      | `#fafafa`                                                   | `#09090b`                                | Root canvas & recessed wells                                                                    |
+| `--foreground`      | `#f4f4f5`                                                   | `#18181b`                                | Elevated cards, modals, panels, bars                                                            |
+| `--border`          | `#53535b`                                                   | `#f4f4f5`                                | Subtle borders via `border-(--border)/10` (or `/15`–`/20`)                                      |
+| `--text`            | `#09090b`                                                   | `#fafafa`                                | Primary copy & headings                                                                         |
+| `--text-muted`      | `#52525b`                                                   | `#a1a1aa`                                | Secondary labels, hints, metadata                                                               |
+| `--accent`          | `#8b7cf6` _(Xerple — user-customizable)_                    | `#8b7cf6` _(Xerple — user-customizable)_ | Primary brand/user interactive identity                                                         |
+| `--accent-readable` | Dynamic contrast-safe accent                                | Dynamic contrast-safe accent             | Auto-applied to `.text-(--accent)` & `.border-(--accent)*` so monochrome accents remain legible |
+| `--accent-contrast` | `#fafafa`                                                   | `#fafafa`                                | Foreground text on solid `bg-(--accent)` surfaces                                               |
+| `--hover-accent`    | `color-mix(in srgb, var(--accent) 85%, white 15%)`          | Same                                     | Hover state on accent buttons/controls                                                          |
+| `--active-accent`   | `color-mix(in srgb, var(--accent-readable) 85%, black 15%)` | Same                                     | Active/pressed state on accent controls                                                         |
+| `--accent-green`    | `#16a34a`                                                   | `#39ff14`                                | **Semantic only:** success, online, operational                                                 |
+| `--accent-orange`   | `#ff6600`                                                   | `#ff6600`                                | **Semantic only:** warnings, degraded states                                                    |
+| `--accent-red`      | `#ff3333`                                                   | `#ff3333`                                | **Semantic only:** destructive actions, errors, down states                                     |
 
 ### Accent Discipline (No Off-Palette Rainbows)
 
@@ -47,6 +49,22 @@ Never hardcode dark-only or light-only surface classes (`bg-black`, `bg-zinc-900
     - `#1` Gold: `amber-400` / `amber-500`
     - `#2` Silver: `slate-300` / `slate-400`
     - `#3` Bronze: `amber-600` / `amber-700`
+
+### Official 27-Color Palette, Applications & SDK Brand Assets ([`../.github/BRAND.md`](../.github/BRAND.md))
+
+All static brand marks, application imagery, and SDK package graphics live canonically in [`packages/public/`](./packages/public) (synced to every web app via `pnpm suite initialize`) and are mirrored in [`../.github/brand/`](../.github/brand) alongside [`../.github/BRAND.md`](../.github/BRAND.md):
+
+- **27 Official Xernerx Preset Accents (`logo-<color>.{svg,png}`, `icon-<color>.{svg,png,ico}`, `banner-<color>.{svg,png}`):**
+    - `purple` (`#8b7cf6` — _Xerple_, default), `violet` (`#7c3aed`), `indigo` (`#6366f1`), `cobalt` (`#2563eb`), `blue` (`#3b82f6`), `sky` (`#38bdf8`), `cyan` (`#06b6d4`), `mint` (`#2dd4bf`), `emerald` (`#10b981`), `green` (`#a4b795`), `neon` (`#39ff14`), `lime` (`#acc813`), `yellow` (`#eab308`), `gold` (`#f59e0b`), `orange` (`#f97316`), `peach` (`#fdba74`), `coral` (`#fb7185`), `crimson` (`#ef4444`), `red` (`#ef4444`), `berry` (`#e11d48`), `pink` (`#ec4899`), `magenta` (`#d946ef`), `lavender` (`#c084fc`), `slate` (`#64748b`), `charcoal` (`#27272a`), `white` (`#ffffff`), `black` (`#09090b`).
+- **First-Party Discord Bots (`packages/public/bots/{virtue,yourapps,todo,zodiac,metamorphosis}/` & `../.github/brand/bots/`, directory pages at `https://app.xernerx.com/bots/<bot>`):**
+    - **Virtue** (_"Track. Grow. Ascend."_): Primary accent **Celestial Gold** (`gold` `#f59e0b`), **Warm Champagne** (`peach` `#fdba74`), **Radiant Ivory** (`#fff7ed`), and **Obsidian Void** (`#18191d`), with production and grayscale beta/canary assets (`icon.png`, `icon.ico`, `banner.png`, `icon-beta.png`, `icon-beta.ico`, `banner-beta.png`).
+    - **YourApps** (_"Discord Forms & Applications"_): Primary accent **Paper Plane Orange** (`orange` `#f97316`), **Sparkle Peach** (`peach` `#fdba74`), **Ocean Teal** (`#1e5f74`), and **Deep Navy Canvas** (`#162238`), with production and grayscale beta/canary assets (`icon.png`, `icon.ico`, `banner.png`, `icon-beta.png`, `icon-beta.ico`, `banner-beta.png`).
+    - **To-Do List Bot (TDL)** (_"Collaborative Discord Task Boards & Checklists"_): Official bot color **TDL Leaf Green** (`#71cc2e`), **Checkmark Coral** (`coral` `#ff6363`), **Clipboard Gold** (`yellow` `#f5b82e`), **Mint Sage Gradient** (`mint` `#8de0a6`), and **Sky Azure Gradient** (`sky` `#4392c7`), with production and grayscale beta/canary assets.
+    - **Zodiac** (_"Daily Horoscopes & Astrology"_): Official bot color **Zodiac Bronze** (`#8b520f`), **Crescent Amber Gold** (`#fbb040`), **Constellation Periwinkle** (`#6d78ad`), and **Midnight Cosmos Navy** (`#00104a`), with production and grayscale beta/canary assets.
+    - **Metamorphosis** (_"Dynamic Voice & Community Automation"_): Primary accent **Dialogue Sky Blue** (`#199fd9`), **Crisp White** (`#ffffff`), and **Obsidian Black** (`#000000`), with production and grayscale beta/canary assets.
+    - **Roblox Utilities** (_Additional Service Brand Color_): Official **Warm Alabaster** (`#f5f3f1`).
+- **Official SDK Package Media (`packages/public/packages/{banners,icons}/` & `../.github/brand/packages/`):**
+    - `xernerx` (`XRX` · `purple` / _Xerple_ `#8b7cf6`), `@xernerx/framework` (`XF` · `indigo` `#6366f1`), `@xernerx/commands` (`XC` · `cyan` `#06b6d4`), `@xernerx/extension-builder` (`XE` · `gold` `#f59e0b`), `@xernerx/hooks` (`XH` · `emerald` `#10b981`), `@xernerx/stats` (`XS` · `coral` `#f43f5e`), `@xernerx/terminal` (`XT` · `magenta` `#d946ef`), `@xernerx/websocket` (`XW` · `blue` `#3b82f6`).
 
 ### Typography
 

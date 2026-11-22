@@ -134,6 +134,15 @@ export function buildWwwStaticSearchEntries(params: {
 			href: '/license',
 		},
 		{
+			id: 'page-developer-policy',
+			category: 'pages',
+			title: t('www.developerPolicy.header.title'),
+			description: t('www.developerPolicy.header.subtitle'),
+			subLabel: 'xernerx.com/developer-policy',
+			keywords: 'developer policy internal engineering governance secrets canary soak branches changesets rbac legal',
+			href: '/developer-policy',
+		},
+		{
 			id: 'page-privacy',
 			category: 'pages',
 			title: t('www.privacy.header.title'),

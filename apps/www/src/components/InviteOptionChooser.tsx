@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowUpRight, Check, Copy, Layers, Link as LinkIcon, ShieldCheck, Sliders } from 'lucide-react';
 import type { InviteOptionKey, ResolvedInviteOption } from '@xernerx/lib';
 import { useDictionary, useSidebar, useToast } from '@xernerx/providers';
+import { PageFaqSection } from '@/components/PageFaqSection';
 
 export interface InviteChooserOptionItem extends ResolvedInviteOption {
 	discordUrl: string;
@@ -236,6 +237,8 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 
 								<a
 									href={opt.discordUrl}
+									target="_blank"
+									rel="nofollow noopener noreferrer"
 									className={`w-full mt-auto h-10 px-4 text-sm inline-flex items-center justify-center gap-2 rounded-2xl font-medium transition-colors active:scale-95 ${
 										isPrimary
 											? 'bg-(--accent) text-(--accent-contrast) border border-(--border)/15 shadow-sm hover:bg-(--hover-accent) hover:shadow-[0_0_15px_color-mix(in_srgb,var(--accent-readable,var(--accent))_40%,transparent)]'
@@ -249,6 +252,27 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 						);
 					})}
 				</div>
+
+				<section className="w-full rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 p-6 sm:p-7 shadow-sm flex flex-col gap-3">
+					<div className="inline-flex items-center gap-2 self-start rounded-full bg-(--accent)/10 border border-(--accent)/30 px-3 py-1 text-xs font-bold text-(--accent)">
+						<ShieldCheck size={13} className="shrink-0" />
+						<span>{t('www.trustProof.proofBadge')}</span>
+					</div>
+					<h2 className="text-xl sm:text-2xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.trustProof.entityHeading')}
+					</h2>
+					<p className="text-sm text-(--text-muted) leading-relaxed max-w-4xl">{t('www.trustProof.entityDesc')}</p>
+				</section>
+
+				<PageFaqSection
+					subtitle={t('www.invites.chooserFaq.subtitle', { bot: botName })}
+					items={[
+						{ question: t('www.invites.chooserFaq.q1', { bot: botName }), answer: t('www.invites.chooserFaq.a1', { bot: botName }) },
+						{ question: t('www.invites.chooserFaq.q2', { bot: botName }), answer: t('www.invites.chooserFaq.a2', { bot: botName }) },
+						{ question: t('www.invites.chooserFaq.q3', { bot: botName }), answer: t('www.invites.chooserFaq.a3', { bot: botName }) },
+						{ question: t('www.invites.chooserFaq.q4', { bot: botName }), answer: t('www.invites.chooserFaq.a4', { bot: botName }) },
+					]}
+				/>
 			</div>
 		</div>
 	);

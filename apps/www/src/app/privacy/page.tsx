@@ -1,11 +1,12 @@
 /** @format */
 'use client';
 
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { ReadingProgressBar } from '@xernerx/components';
 import Link from 'next/link';
 import { useDictionary, useSidebar } from '@xernerx/providers';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PageFaqSection } from '@/components/PageFaqSection';
+import { PolicySubsection, PolicyTocSidebar } from '@/components/PolicySubsection';
 type Section = {
 	id: string;
 	title: string;
@@ -27,32 +28,32 @@ export default function Page() {
 			id: 'data-collected',
 			title: t('www.privacy.sections.dataCollected.title'),
 			content: (
-				<ul className="list-disc pl-6 space-y-4">
-					<li>
-						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.account.title')}</strong> {t('www.privacy.sections.dataCollected.account.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.connections.title')}</strong> {t('www.privacy.sections.dataCollected.connections.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.developers.title')}</strong> {t('www.privacy.sections.dataCollected.developers.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.botUsers.title')}</strong> {t('www.privacy.sections.dataCollected.botUsers.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.cdnAndContent.title')}</strong> {t('www.privacy.sections.dataCollected.cdnAndContent.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.desktop.title')}</strong> {t('www.privacy.sections.dataCollected.desktop.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.usage.title')}</strong> {t('www.privacy.sections.dataCollected.usage.desc')}
-					</li>
-					<li>
-						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.integration.title')}</strong> {t('www.privacy.sections.dataCollected.integration.desc')}
-					</li>
-				</ul>
+				<div className="space-y-3">
+					<PolicySubsection code="2.1" id="data-collected-2-1" title={t('www.privacy.sections.dataCollected.account.title')}>
+						{t('www.privacy.sections.dataCollected.account.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.2" id="data-collected-2-2" title={t('www.privacy.sections.dataCollected.connections.title')}>
+						{t('www.privacy.sections.dataCollected.connections.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.3" id="data-collected-2-3" title={t('www.privacy.sections.dataCollected.developers.title')}>
+						{t('www.privacy.sections.dataCollected.developers.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.4" id="data-collected-2-4" title={t('www.privacy.sections.dataCollected.botUsers.title')}>
+						{t('www.privacy.sections.dataCollected.botUsers.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.5" id="data-collected-2-5" title={t('www.privacy.sections.dataCollected.cdnAndContent.title')}>
+						{t('www.privacy.sections.dataCollected.cdnAndContent.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.6" id="data-collected-2-6" title={t('www.privacy.sections.dataCollected.desktop.title')}>
+						{t('www.privacy.sections.dataCollected.desktop.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.7" id="data-collected-2-7" title={t('www.privacy.sections.dataCollected.usage.title')}>
+						{t('www.privacy.sections.dataCollected.usage.desc')}
+					</PolicySubsection>
+					<PolicySubsection code="2.8" id="data-collected-2-8" title={t('www.privacy.sections.dataCollected.integration.title')}>
+						{t('www.privacy.sections.dataCollected.integration.desc')}
+					</PolicySubsection>
+				</div>
 			),
 		},
 		{
@@ -69,24 +70,40 @@ export default function Page() {
 			id: 'usage',
 			title: t('www.privacy.sections.usage.title'),
 			content: (
-				<ul className="list-disc pl-6 space-y-2">
-					<li>{t('www.privacy.sections.usage.items.0')}</li>
-					<li>{t('www.privacy.sections.usage.items.1')}</li>
-					<li>{t('www.privacy.sections.usage.items.2')}</li>
-					<li>{t('www.privacy.sections.usage.items.3')}</li>
-				</ul>
+				<div className="space-y-3">
+					<PolicySubsection code="5.1" id="usage-5-1">
+						{t('www.privacy.sections.usage.items.0')}
+					</PolicySubsection>
+					<PolicySubsection code="5.2" id="usage-5-2">
+						{t('www.privacy.sections.usage.items.1')}
+					</PolicySubsection>
+					<PolicySubsection code="5.3" id="usage-5-3">
+						{t('www.privacy.sections.usage.items.2')}
+					</PolicySubsection>
+					<PolicySubsection code="5.4" id="usage-5-4">
+						{t('www.privacy.sections.usage.items.3')}
+					</PolicySubsection>
+				</div>
 			),
 		},
 		{
 			id: 'sharing',
 			title: t('www.privacy.sections.sharing.title'),
 			content: (
-				<ul className="list-disc pl-6 space-y-2">
-					<li>{t('www.privacy.sections.sharing.items.0')}</li>
-					<li>{t('www.privacy.sections.sharing.items.1')}</li>
-					<li>{t('www.privacy.sections.sharing.items.2')}</li>
-					<li>{t('www.privacy.sections.sharing.items.3')}</li>
-				</ul>
+				<div className="space-y-3">
+					<PolicySubsection code="6.1" id="sharing-6-1">
+						{t('www.privacy.sections.sharing.items.0')}
+					</PolicySubsection>
+					<PolicySubsection code="6.2" id="sharing-6-2">
+						{t('www.privacy.sections.sharing.items.1')}
+					</PolicySubsection>
+					<PolicySubsection code="6.3" id="sharing-6-3">
+						{t('www.privacy.sections.sharing.items.2')}
+					</PolicySubsection>
+					<PolicySubsection code="6.4" id="sharing-6-4">
+						{t('www.privacy.sections.sharing.items.3')}
+					</PolicySubsection>
+				</div>
 			),
 		},
 		{
@@ -105,12 +122,20 @@ export default function Page() {
 			content: (
 				<div className="space-y-4">
 					<p>{t('www.privacy.sections.rights.content')}</p>
-					<ul className="list-disc pl-6 space-y-2">
-						<li>{t('www.privacy.sections.rights.items.0')}</li>
-						<li>{t('www.privacy.sections.rights.items.1')}</li>
-						<li>{t('www.privacy.sections.rights.items.2')}</li>
-						<li>{t('www.privacy.sections.rights.items.3')}</li>
-					</ul>
+					<div className="space-y-3">
+						<PolicySubsection code="9.1" id="rights-9-1">
+							{t('www.privacy.sections.rights.items.0')}
+						</PolicySubsection>
+						<PolicySubsection code="9.2" id="rights-9-2">
+							{t('www.privacy.sections.rights.items.1')}
+						</PolicySubsection>
+						<PolicySubsection code="9.3" id="rights-9-3">
+							{t('www.privacy.sections.rights.items.2')}
+						</PolicySubsection>
+						<PolicySubsection code="9.4" id="rights-9-4">
+							{t('www.privacy.sections.rights.items.3')}
+						</PolicySubsection>
+					</div>
 				</div>
 			),
 		},
@@ -156,20 +181,6 @@ export default function Page() {
 		...section,
 		title: `${idx + 1}. ${String(section.title).replace(/^\d+\.\s*/, '')}`,
 	}));
-	const containerRef = useRef<HTMLElement | null>(null);
-	const [ready, setReady] = useState(false);
-	useEffect(() => {
-		const el = document.getElementById('main-scroll-container');
-		if (el) {
-			containerRef.current = el;
-			setReady(true);
-		}
-	}, []);
-	const { scrollYProgress } = useScroll(ready ? { container: containerRef } : {});
-	const scaleX = useSpring(scrollYProgress, {
-		stiffness: 100,
-		damping: 30,
-	});
 	const [active, setActive] = useState<string | null>(null);
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -193,32 +204,12 @@ export default function Page() {
 	}, [sections]);
 	return (
 		<div className="relative">
-			<motion.div
-				style={{
-					scaleX,
-					top: 'calc(50px + env(safe-area-inset-top, 0px))',
-				}}
-				className="fixed left-0 right-0 h-0.75 origin-left bg-(--accent) z-50"
-			/>
+			<ReadingProgressBar />
 
 			<div className="min-h-screen px-6 py-32">
 				<div className="max-w-(--page-width) mx-auto w-full grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
 					{/* TOC */}
-					<aside className="hidden lg:block sticky top-32 self-start">
-						<div className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.privacy.toc')}</div>
-
-						<nav className="space-y-4 text-sm">
-							{sections.map((section) => (
-								<a
-									key={section.id}
-									href={`#${section.id}`}
-									className={`block transition ${active === section.id ? 'text-(--accent) font-medium' : 'text-(--text-muted) hover:text-(--text)'}`}
-								>
-									{section.title}
-								</a>
-							))}
-						</nav>
-					</aside>
+					<PolicyTocSidebar tocTitle={t('www.privacy.toc')} sections={sections} activeSectionId={active} onSelectSection={setActive} />
 
 					{/* MAIN */}
 					<div className="space-y-16">
@@ -231,7 +222,7 @@ export default function Page() {
 							>
 								{t('www.privacy.header.title')}
 							</h1>
-							<div className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.privacy.header.effectiveDate')} 17 November 2026</div>
+							<div className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.privacy.header.effectiveDate')} 20 November 2026</div>
 						</header>
 
 						<div className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm space-y-16">

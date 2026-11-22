@@ -2,6 +2,20 @@
 
 # @xernerx/ui
 
+## 0.10.3
+
+### Patch Changes
+
+- ## Markdown Renderer & Tooltip Positioning Polish
+  
+  Refined Markdown link and code block rendering and improved Tooltip portal positioning.
+  
+  ### Changed
+  
+  - **`<Markdown />` & `<Tooltip />` Primitives**: Improved inline code and link styling in `Markdown.tsx` and refined viewport-aware positioning in `Tooltip.tsx`.
+- Updated dependencies
+  - @xernerx/providers@0.25.0
+
 ## 0.10.2
 
 ### Patch Changes

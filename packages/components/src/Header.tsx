@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { headerSubdomainsCatalog } from '@xernerx/lib';
 import { DEFAULT_HEADER_SUBDOMAINS, useDictionary, useEnvironment, useNotifications, usePermissions, usePlatform, useShortcuts, useSidebar, useTheme, useUser } from '@xernerx/providers';
+import { Tooltip } from '@xernerx/ui';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -39,7 +40,7 @@ export { SubSelector };
 const deviceIcons = { desktop: Monitor, mobile: Smartphone, tablet: Tablet } as const;
 
 export function Header() {
-	const { state, toggle, setMobileOpen, isMobileOpen, view } = useSidebar();
+	const { state, isResolved, toggle, setMobileOpen, isMobileOpen, view } = useSidebar();
 	const { t } = useDictionary();
 	const { type, device } = usePlatform();
 	const { getEnvUrl, isDev, isCanary } = useEnvironment();
@@ -127,13 +128,17 @@ export function Header() {
 	const isSidebarBuildMode = onboardingStage.active && onboardingStage.phase === 'sidebar';
 	const isNavPromptActive = onboardingStage.active && Boolean((onboardingStage as any).navPromptTarget);
 	const isSidebarBeforeDockMove = isSidebarBuildMode && Array.isArray(onboardingStage.revealedSidebarItems) && !onboardingStage.revealedSidebarItems.includes('moved-dock');
-	const showControlsInHeader = state === 'hidden' || isHeaderBuildMode || isSidebarBeforeDockMove;
+	const showControlsInHeader = (isResolved && state === 'hidden') || isHeaderBuildMode || isSidebarBeforeDockMove;
 	const hasRevealedList = Array.isArray(onboardingStage.revealedHeaderItems) && onboardingStage.revealedHeaderItems.length > 0;
 	const isItemRevealed = (id: string) => !isHeaderBuildMode || !hasRevealedList || onboardingStage.revealedHeaderItems!.includes(id);
 	const isItemHighlighted = (id: string) => isHeaderBuildMode && onboardingStage.headerStepId === id;
 	const isShortcutHighlighted = (subId: string) => isHeaderBuildMode && (onboardingStage.headerStepId === subId || (onboardingStage.headerStepId === 'store' && isItemRevealed(subId)));
-	const effectiveOptionsOpen = isHeaderBuildMode ? isItemRevealed('search') : isNavPromptActive ? true : optionsOpen;
-	const activeRingClass = 'ring-2 ring-(--accent) shadow-[0_0_18px_color-mix(in_srgb,var(--accent)_70%,transparent)] scale-110 transition-all duration-300';
+	const effectiveOptionsOpen = isHeaderBuildMode
+		? ['dashboard', 'portal', 'store', 'drawer', 'search', 'alerts', 'profile'].some((id) => isItemRevealed(id))
+		: isNavPromptActive
+			? true
+			: optionsOpen;
+	const activeRingClass = 'scale-105 transition-all duration-300';
 
 	const { setNavOpen, setSearchOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
 	const pathname = usePathname();
@@ -243,6 +248,13 @@ export function Header() {
 		};
 	}, [isMounted, isApp, device]);
 
+	useEffect(() => {
+		if (!isDesktopRunning) return;
+		setIsExpanded(true);
+		const timer = setTimeout(() => setIsExpanded(false), 2000);
+		return () => clearTimeout(timer);
+	}, [isDesktopRunning]);
+
 	const handleOpenInDesktop = async () => {
 		if (typeof window === 'undefined') return;
 		const currentUrl = window.location.href;
@@ -267,7 +279,7 @@ export function Header() {
 	}, []);
 
 	useEffect(() => {
-		if (state !== 'hidden' || !activeUser || onboardingStage.active) return;
+		if (!isResolved || state !== 'hidden' || !activeUser || onboardingStage.active) return;
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
 				e.preventDefault();
@@ -281,7 +293,7 @@ export function Header() {
 		};
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [state, activeUser, onboardingStage.active]);
+	}, [isResolved, state, activeUser, onboardingStage.active]);
 
 	useEffect(() => {
 		setUserMenuOpen(false);
@@ -398,6 +410,30 @@ export function Header() {
 		macos: 'h-8 w-8 rounded-xl bg-(--foreground)/25 hover:bg-(--foreground)/60 border border-(--border)/10 flex items-center justify-center text-(--text-muted) hover:text-(--accent) transition-all cursor-pointer',
 	};
 	const headerIconBtnClass = btnClassMap[effectiveControls] || 'flex items-center text-(--text) cursor-pointer hover:text-(--accent) transition-colors';
+	const visibleHeaderSubdomains = headerSubdomainsCatalog.filter(
+		(sub) =>
+			(!sub.adminOnly || hasPermission(sub.requiredPermission || 'access')) &&
+			(isHeaderBuildMode ? isItemRevealed(sub.id) : (Array.isArray(preferences.headerSubdomains) ? preferences.headerSubdomains : DEFAULT_HEADER_SUBDOMAINS).includes(sub.id))
+	);
+	const showAppDrawerBtn =
+		(showControlsInHeader || isNavPromptActive) && (preferences.showHeaderAppDrawer || isHeaderBuildMode || isSidebarBeforeDockMove || isNavPromptActive) && isItemRevealed('drawer');
+	const showSearchBtn = (preferences.showHeaderCommandPalette || isHeaderBuildMode) && isItemRevealed('search');
+	const showNotificationsBtn =
+		isMounted && showControlsInHeader && Boolean(activeUser) && (preferences.showHeaderNotifications || isHeaderBuildMode || isSidebarBeforeDockMove) && isItemRevealed('alerts');
+	const showProfileBtn = isMounted && showControlsInHeader && Boolean(activeUser) && isItemRevealed('profile');
+	const hasNavGroup = visibleHeaderSubdomains.length > 0 || showAppDrawerBtn;
+	const hasToolsGroup = showSearchBtn || showNotificationsBtn || showProfileBtn;
+	const showNavToolsDivider = hasNavGroup && hasToolsGroup;
+	const renderHeaderTooltip = (label: string, shortcut?: string) => (
+		<span className="inline-flex items-center gap-2 font-semibold whitespace-nowrap">
+			<span>{label}</span>
+			{shortcut && preferences.showShortcutHints && (
+				<kbd className="inline-flex items-center rounded-full bg-(--foreground)/80 border border-(--border)/20 px-1.5 py-0.5 text-[10px] font-mono font-bold text-(--text-muted)">
+					{shortcut}
+				</kbd>
+			)}
+		</span>
+	);
 
 	return (
 		<div className="relative flex flex-col w-full z-[9999] shrink-0 bg-(--background)" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
@@ -421,31 +457,35 @@ export function Header() {
 						</div>
 					)}
 
-					{state !== 'hidden' && !isHeaderBuildMode && (
-						<button
-							type="button"
-							disabled={onboardingStage.active}
-							aria-label={t('components.sidebar.title')}
-							title={t('components.sidebar.title')}
-							onClick={() => (window.innerWidth < 768 ? setMobileOpen(!isMobileOpen) : toggle())}
-							className={`relative z-10 ${effectiveControls === 'windows' ? 'p-2' : ''} ${headerIconBtnClass} ${
-								(isSidebarBuildMode && (onboardingStage.sidebarStepId === 'toggle' || onboardingStage.sidebarStepId === 'collapse')) ||
-								(onboardingStage.active && ((onboardingStage as any).pageTourTarget === 'dash-sidebar' || (onboardingStage as any).pageTourTarget === 'portal-orgs'))
-									? activeRingClass
-									: ''
-							} ${onboardingStage.active ? 'pointer-events-none select-none' : ''}`}
-							style={isRightAligned ? { marginLeft: 'var(--ui-gap)' } : { marginRight: 'var(--ui-gap)' }}
-						>
-							{state == 'open' ? (
-								<SidebarOpen size={effectiveControls === 'windows' ? 20 : 16} strokeWidth={2.5} className={isRightAligned ? 'scale-x-[-1]' : ''} />
-							) : (
-								<SidebarClose size={effectiveControls === 'windows' ? 20 : 16} strokeWidth={2.5} className={isRightAligned ? 'scale-x-[-1]' : ''} />
-							)}
-						</button>
+					{isResolved && state !== 'hidden' && !isHeaderBuildMode && (
+						<div style={isRightAligned ? { marginLeft: 'var(--ui-gap)' } : { marginRight: 'var(--ui-gap)' }}>
+							<Tooltip position="bottom" contentClassName="!px-2.5 !py-1.5" content={onboardingStage.active ? '' : renderHeaderTooltip(t('components.sidebar.title'), 'Ctrl B')}>
+								<button
+									type="button"
+									data-onboarding-target="sidebar-toggle"
+									disabled={onboardingStage.active}
+									aria-label={t('components.sidebar.title')}
+									onClick={() => (window.innerWidth < 768 ? setMobileOpen(!isMobileOpen) : toggle())}
+									className={`relative z-10 ${effectiveControls === 'windows' ? 'p-2' : ''} ${headerIconBtnClass} ${
+										(isSidebarBuildMode && (onboardingStage.sidebarStepId === 'toggle' || onboardingStage.sidebarStepId === 'collapse')) ||
+										(onboardingStage.active && ((onboardingStage as any).pageTourTarget === 'dash-sidebar' || (onboardingStage as any).pageTourTarget === 'portal-orgs'))
+											? activeRingClass
+											: ''
+									} ${onboardingStage.active ? 'pointer-events-none select-none' : ''}`}
+								>
+									{state == 'open' ? (
+										<SidebarOpen size={effectiveControls === 'windows' ? 20 : 16} strokeWidth={2.5} className={isRightAligned ? 'scale-x-[-1]' : ''} />
+									) : (
+										<SidebarClose size={effectiveControls === 'windows' ? 20 : 16} strokeWidth={2.5} className={isRightAligned ? 'scale-x-[-1]' : ''} />
+									)}
+								</button>
+							</Tooltip>
+						</div>
 					)}
 
 					<Link
 						href={'/'}
+						data-onboarding-target="header-logo"
 						aria-label="Xernerx Studios"
 						onClick={(e) => {
 							if (onboardingStage.active) e.preventDefault();
@@ -486,36 +526,46 @@ export function Header() {
 						} shrink-0 ${onboardingStage.active ? 'pointer-events-none select-none' : ''}`}
 					>
 						{!onboardingStage.active && !isApp && preferences.showHeaderDownload && (
-							<div className="hidden sm:flex [.is-electron_&]:!hidden items-center gap-2">
-								{isDesktopRunning && (
-									<button
-										type="button"
-										onClick={handleOpenInDesktop}
-										title={t('components.header.openInDesktop')}
-										className="flex items-center gap-1.5 rounded-full bg-(--accent)/10 hover:bg-(--accent)/20 border border-(--accent)/30 px-2.5 py-1 text-xs font-bold text-(--accent) transition-colors cursor-pointer whitespace-nowrap"
-									>
-										<Monitor size={13} className="shrink-0" />
-										<span className="hidden lg:inline">{t('components.header.openInDesktop')}</span>
-									</button>
-								)}
+							<div className="hidden sm:flex [.is-electron_&]:!hidden items-center">
 								<motion.div
 									animate={{ width: isExpanded ? 'auto' : '20px' }}
 									onHoverStart={() => setIsExpanded(true)}
 									onHoverEnd={() => setIsExpanded(false)}
+									onFocus={() => setIsExpanded(true)}
+									onBlur={() => setIsExpanded(false)}
 									className="flex items-center overflow-hidden"
 								>
-									<Link
-										suppressHydrationWarning
-										href={getEnvUrl('https://www.xernerx.com/download')}
-										className="flex items-center gap-2 text-(--text) cursor-pointer hover:text-(--accent) transition-colors whitespace-nowrap"
-									>
-										<Download size={20} className="shrink-0" />
-										<motion.span animate={{ opacity: isExpanded ? 1 : 0 }} className="font-medium">
-											{t('components.header.text1')}
-										</motion.span>
-									</Link>
+									{isDesktopRunning ? (
+										<button
+											type="button"
+											onClick={handleOpenInDesktop}
+											aria-label={t('components.header.openInDesktop')}
+											className={`flex ${isRightAligned ? 'flex-row-reverse' : ''} items-center gap-2 text-(--accent) cursor-pointer hover:text-(--hover-accent) transition-colors whitespace-nowrap`}
+										>
+											<Monitor size={20} className="shrink-0" />
+											<motion.span animate={{ opacity: isExpanded ? 1 : 0 }} className="font-medium">
+												{t('components.header.openInDesktop')}
+											</motion.span>
+										</button>
+									) : (
+										<Link
+											suppressHydrationWarning
+											href={getEnvUrl('https://www.xernerx.com/download')}
+											aria-label={t('components.header.text1')}
+											className={`flex ${isRightAligned ? 'flex-row-reverse' : ''} items-center gap-2 text-(--text) cursor-pointer hover:text-(--accent) transition-colors whitespace-nowrap`}
+										>
+											<Download size={20} className="shrink-0" />
+											<motion.span animate={{ opacity: isExpanded ? 1 : 0 }} className="font-medium">
+												{t('components.header.text1')}
+											</motion.span>
+										</Link>
+									)}
 								</motion.div>
 							</div>
+						)}
+
+						{!onboardingStage.active && !isApp && preferences.showHeaderDownload && (hasNavGroup || hasToolsGroup) && (
+							<span aria-hidden="true" className="hidden sm:block [.is-electron_&]:!hidden h-4 w-px bg-(--border)/15 shrink-0 mx-0.5" />
 						)}
 
 						{!onboardingStage.active &&
@@ -523,192 +573,198 @@ export function Header() {
 							isApp &&
 							desktopUpdateState?.outdated &&
 							(desktopUpdateState.downloaded || (!desktopUpdateState.downloading && Boolean(desktopUpdateState.downloadUrl))) && (
-								<button
-									type="button"
-									onClick={() => window.dispatchEvent(new CustomEvent('xernerx:open-desktop-updater'))}
-									aria-label={
+								<Tooltip
+									position="bottom"
+									contentClassName="!px-2.5 !py-1.5"
+									content={renderHeaderTooltip(
 										desktopUpdateState.downloaded
 											? t('components.header.updateReady', { version: desktopUpdateState.latestVersion || '' })
 											: t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })
-									}
-									title={
-										desktopUpdateState.downloaded
-											? t('components.header.updateReady', { version: desktopUpdateState.latestVersion || '' })
-											: t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })
-									}
-									className={`relative ${headerIconBtnClass} ${desktopUpdateState.downloaded ? 'text-(--accent-green)' : 'text-(--accent-orange)'}`}
-								>
-									{desktopUpdateState.checking ? (
-										<RefreshCw size={effectiveControls === 'windows' ? 20 : 16} className="animate-spin text-(--accent)" />
-									) : (
-										<Download size={effectiveControls === 'windows' ? 20 : 16} />
 									)}
-									<span
-										className={`absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ${
-											desktopUpdateState.downloaded ? 'bg-(--accent-green)' : 'bg-(--accent-orange)'
-										} border-2 border-(--background) animate-pulse`}
-									/>
-								</button>
+								>
+									<button
+										type="button"
+										onClick={() => window.dispatchEvent(new CustomEvent('xernerx:open-desktop-updater'))}
+										aria-label={
+											desktopUpdateState.downloaded
+												? t('components.header.updateReady', { version: desktopUpdateState.latestVersion || '' })
+												: t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })
+										}
+										className={`relative ${headerIconBtnClass} ${desktopUpdateState.downloaded ? 'text-(--accent-green)' : 'text-(--accent-orange)'}`}
+									>
+										{desktopUpdateState.checking ? (
+											<RefreshCw size={effectiveControls === 'windows' ? 20 : 16} className="animate-spin text-(--accent)" />
+										) : (
+											<Download size={effectiveControls === 'windows' ? 20 : 16} />
+										)}
+										<span
+											className={`absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ${
+												desktopUpdateState.downloaded ? 'bg-(--accent-green)' : 'bg-(--accent-orange)'
+											} border-2 border-(--background) animate-pulse`}
+										/>
+									</button>
+								</Tooltip>
 							)}
 
-						{(preferences.showHeaderCommandPalette || isHeaderBuildMode) && isItemRevealed('search') && (
-							<button
-								type="button"
-								onClick={() => setSearchOpen(true)}
-								aria-label={t('components.header.commandPalette')}
-								title={t('components.header.commandPalette')}
-								className={`${
-									effectiveControls === 'xernerx'
-										? 'flex items-center gap-2 h-8 px-3 rounded-full bg-(--foreground)/50 border border-(--border)/15 text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--text) transition-all cursor-pointer'
-										: effectiveControls === 'squircle'
-											? 'flex items-center gap-2 h-8 px-3 rounded-xl bg-(--foreground)/50 border border-(--border)/15 text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--text) transition-all cursor-pointer'
-											: effectiveControls === 'capsule'
-												? 'flex items-center gap-2 h-7 px-2.5 rounded-full hover:bg-(--accent)/20 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
-												: effectiveControls === 'minimal'
-													? 'flex items-center gap-2 h-8 px-3 rounded-full bg-(--accent)/8 hover:bg-(--accent)/20 border border-(--accent)/20 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
-													: effectiveControls === 'macos'
-														? 'flex items-center gap-2 h-8 px-3 rounded-xl bg-(--foreground)/25 hover:bg-(--foreground)/60 border border-(--border)/10 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
-														: 'flex items-center gap-2 px-2.5 py-1 rounded-full bg-(--foreground)/40 hover:bg-(--foreground) border border-(--border)/10 hover:border-(--accent)/40 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
-								} animate-in fade-in zoom-in-75 duration-300 ${isItemHighlighted('search') ? activeRingClass : ''}`}
+						{visibleHeaderSubdomains.length > 0 && (
+							<div
+								data-onboarding-target="header-shortcuts-group"
+								className={`relative flex ${isRightAligned ? 'flex-row-reverse' : ''} items-center ${
+									effectiveControls === 'windows' ? 'gap-4' : effectiveControls === 'capsule' ? 'gap-1.5' : 'gap-2'
+								} shrink-0`}
 							>
-								<Search size={15} className="text-(--accent)" />
-								{preferences.showShortcutHints && <kbd className="hidden md:inline-flex items-center text-[10px] font-mono font-bold text-(--text-muted)">Ctrl K</kbd>}
-							</button>
+								{visibleHeaderSubdomains.map((sub) => {
+									const SubIcon = sub.icon;
+									const label = t(sub.label);
+									const resolvedHref = getEnvUrl(sub.href);
+									const isCurrent =
+										isMounted &&
+										(sub.id === 'dashboard'
+											? urlState.pre === 'app' && Boolean(pathname?.startsWith('/dashboard'))
+											: sub.id === 'app'
+												? urlState.pre === 'app' && !pathname?.startsWith('/dashboard')
+												: urlState.pre === sub.id);
+									const openCompanionIfModified = (e: React.MouseEvent, isMiddle = false) => {
+										const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+										if (bridge?.openCompanionWindow && (isMiddle ? e.button === 1 : e.ctrlKey || e.metaKey || e.shiftKey)) {
+											e.preventDefault();
+											bridge.openCompanionWindow(resolvedHref);
+										}
+									};
+									return (
+										<Tooltip key={sub.id} position="bottom" contentClassName="!px-2.5 !py-1.5" content={renderHeaderTooltip(label)}>
+											<Link
+												suppressHydrationWarning
+												href={resolvedHref}
+												data-onboarding-target={`header-${sub.id}`}
+												aria-label={label}
+												onClick={(e) => openCompanionIfModified(e, false)}
+												onAuxClick={(e) => openCompanionIfModified(e, true)}
+												className={`relative ${headerIconBtnClass} ${isCurrent ? 'text-(--accent)' : ''} animate-in fade-in zoom-in-75 duration-300 ${
+													isShortcutHighlighted(sub.id) ? activeRingClass : ''
+												}`}
+											>
+												<SubIcon size={effectiveControls === 'windows' ? 20 : 16} />
+												<span className="sr-only">{label}</span>
+											</Link>
+										</Tooltip>
+									);
+								})}
+							</div>
 						)}
 
-						{headerSubdomainsCatalog
-							.filter(
-								(sub) =>
-									(!sub.adminOnly || hasPermission(sub.requiredPermission || 'access')) &&
-									(isHeaderBuildMode
-										? isItemRevealed(sub.id)
-										: (Array.isArray(preferences.headerSubdomains) ? preferences.headerSubdomains : DEFAULT_HEADER_SUBDOMAINS).includes(sub.id))
-							)
-							.map((sub) => {
-								const SubIcon = sub.icon;
-								const label = t(sub.label);
-								const resolvedHref = getEnvUrl(sub.href);
-								const isCurrent =
-									isMounted &&
-									(sub.id === 'dashboard'
-										? urlState.pre === 'app' && Boolean(pathname?.startsWith('/dashboard'))
-										: sub.id === 'app'
-											? urlState.pre === 'app' && !pathname?.startsWith('/dashboard')
-											: urlState.pre === sub.id);
-								const openCompanionIfModified = (e: React.MouseEvent, isMiddle = false) => {
-									const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
-									if (bridge?.openCompanionWindow && (isMiddle ? e.button === 1 : e.ctrlKey || e.metaKey || e.shiftKey)) {
-										e.preventDefault();
-										bridge.openCompanionWindow(resolvedHref);
-									}
-								};
-								return (
-									<Link
-										key={sub.id}
-										suppressHydrationWarning
-										href={resolvedHref}
-										aria-label={label}
-										title={label}
-										onClick={(e) => openCompanionIfModified(e, false)}
-										onAuxClick={(e) => openCompanionIfModified(e, true)}
-										className={`${headerIconBtnClass} ${isCurrent ? 'text-(--accent)' : ''} animate-in fade-in zoom-in-75 duration-300 ${
-											isShortcutHighlighted(sub.id) ? activeRingClass : ''
-										}`}
-									>
-										<SubIcon size={effectiveControls === 'windows' ? 20 : 16} />
-										<span className="sr-only">{label}</span>
-									</Link>
-								);
-							})}
-
-						{(showControlsInHeader || isNavPromptActive) &&
-							(preferences.showHeaderAppDrawer || isHeaderBuildMode || isSidebarBeforeDockMove || isNavPromptActive) &&
-							isItemRevealed('drawer') && (
+						{showAppDrawerBtn && (
+							<Tooltip position="bottom" contentClassName="!px-2.5 !py-1.5" content={renderHeaderTooltip(t('components.header.title1'), 'Ctrl Space')}>
 								<button
 									type="button"
-									className={`${headerIconBtnClass} animate-in fade-in zoom-in-75 duration-300 ${isItemHighlighted('drawer') || isNavPromptActive ? activeRingClass : ''} ${
-										isNavPromptActive ? 'pointer-events-auto animate-pulse' : ''
-									}`}
+									data-onboarding-target="header-drawer"
+									className={`${headerIconBtnClass} animate-in fade-in zoom-in-75 duration-300 ${!showControlsInHeader && isNavPromptActive ? 'md:hidden' : ''} ${
+										isItemHighlighted('drawer') || isNavPromptActive ? activeRingClass : ''
+									} ${isNavPromptActive ? 'pointer-events-auto' : ''}`}
 									onClick={() => setNavOpen(true)}
 									aria-label={t('components.header.title1')}
-									title={t('components.header.title1')}
 								>
 									<LayoutGrid size={effectiveControls === 'windows' ? 20 : 16} />
 								</button>
-							)}
+							</Tooltip>
+						)}
 
-						{isMounted && showControlsInHeader && activeUser && (preferences.showHeaderNotifications || isHeaderBuildMode || isSidebarBeforeDockMove) && isItemRevealed('alerts') && (
-							<div ref={notificationsRef} className="relative flex items-center animate-in fade-in zoom-in-75 duration-300">
+						{showNavToolsDivider && <span aria-hidden="true" className="h-4 w-px bg-(--border)/15 shrink-0 mx-0.5" />}
+
+						{showSearchBtn && (
+							<Tooltip position="bottom" contentClassName="!px-2.5 !py-1.5" content={renderHeaderTooltip(t('components.header.commandPalette'), 'Ctrl K')}>
 								<button
 									type="button"
-									onClick={() => setNotificationsOpen((prev) => (!prev && setUserMenuOpen(false), !prev))}
-									aria-label={t('components.header.notifications')}
-									title={t('components.header.notifications')}
-									className={`relative ${headerIconBtnClass} ${notificationsOpen ? 'text-(--accent)' : ''} ${isItemHighlighted('alerts') ? activeRingClass : ''}`}
+									data-onboarding-target="header-search"
+									onClick={() => setSearchOpen(true)}
+									aria-label={t('components.header.commandPalette')}
+									className={`${headerIconBtnClass} animate-in fade-in zoom-in-75 duration-300 ${isItemHighlighted('search') ? activeRingClass : ''}`}
 								>
-									<Bell size={effectiveControls === 'windows' ? 20 : 16} />
-									{hasUnread && (
-										<span className="absolute -top-1.5 -right-1.5 flex min-w-[16px] h-[16px] px-1 items-center justify-center rounded-full bg-(--accent-red) text-[9px] font-extrabold leading-none text-white border-2 border-(--background) shadow-xs">
-											{totalUnreadCount > 9 ? '9+' : totalUnreadCount}
-										</span>
-									)}
+									<Search size={effectiveControls === 'windows' ? 20 : 16} className="text-(--accent)" />
 								</button>
+							</Tooltip>
+						)}
+
+						{showNotificationsBtn && (
+							<div ref={notificationsRef} className="relative flex items-center animate-in fade-in zoom-in-75 duration-300">
+								<Tooltip position="bottom" contentClassName="!px-2.5 !py-1.5" content={notificationsOpen ? '' : renderHeaderTooltip(t('components.header.notifications'), 'Ctrl I')}>
+									<button
+										type="button"
+										data-onboarding-target="header-alerts"
+										onClick={() => setNotificationsOpen((prev) => (!prev && setUserMenuOpen(false), !prev))}
+										aria-label={t('components.header.notifications')}
+										className={`relative ${headerIconBtnClass} ${notificationsOpen ? 'text-(--accent)' : ''} ${isItemHighlighted('alerts') ? activeRingClass : ''}`}
+									>
+										<Bell size={effectiveControls === 'windows' ? 20 : 16} />
+										{hasUnread && (
+											<span className="absolute -top-1.5 -right-1.5 flex min-w-[16px] h-[16px] px-1 items-center justify-center rounded-full bg-(--accent-red) text-[9px] font-extrabold leading-none text-white border-2 border-(--background) shadow-xs">
+												{totalUnreadCount > 9 ? '9+' : totalUnreadCount}
+											</span>
+										)}
+									</button>
+								</Tooltip>
 								<AnimatePresence>{notificationsOpen && <SidebarNotifications isCollapsed={false} placement="top" onClose={() => setNotificationsOpen(false)} />}</AnimatePresence>
 							</div>
 						)}
 
-						{isMounted && showControlsInHeader && activeUser && isItemRevealed('profile') && (
+						{showProfileBtn && (
 							<div ref={userMenuRef} className="relative flex items-center animate-in fade-in zoom-in-75 duration-300">
-								<button
-									type="button"
-									onClick={() => setUserMenuOpen((prev) => (!prev && setNotificationsOpen(false), !prev))}
-									className={`relative flex items-center justify-center rounded-full transition-transform hover:scale-105 cursor-pointer focus:outline-hidden ${
-										isItemHighlighted('profile') ? activeRingClass : ''
-									}`}
-									aria-label={activeUser?.global_name || activeUser?.name || t('components.sidebar.alt')}
-									title={activeUser?.global_name || activeUser?.name || t('components.sidebar.alt')}
+								<Tooltip
+									position="bottom"
+									contentClassName="!px-2.5 !py-1.5"
+									content={userMenuOpen ? '' : renderHeaderTooltip(activeUser?.global_name || activeUser?.name || t('components.sidebar.alt'))}
 								>
-									<div className="relative shrink-0">
-										{avatarUrl && !avatarFailed ? (
-											<div className="relative h-8 w-8">
-												<Image
-													src={avatarUrl}
-													alt={t('components.sidebar.alt')}
-													fill
-													className="rounded-full border border-(--border)/20 object-cover"
-													unoptimized
-													draggable={false}
-													loading="eager"
-													onError={() => setAvatarFailed(true)}
-												/>
-												{decorationUrl && !decorationFailed && (
+									<button
+										type="button"
+										data-onboarding-target="header-profile"
+										onClick={() => setUserMenuOpen((prev) => (!prev && setNotificationsOpen(false), !prev))}
+										className={`relative flex items-center justify-center rounded-full transition-transform hover:scale-105 cursor-pointer focus:outline-hidden ${
+											isItemHighlighted('profile') ? activeRingClass : ''
+										}`}
+										aria-label={activeUser?.global_name || activeUser?.name || t('components.sidebar.alt')}
+									>
+										<div className="relative shrink-0">
+											{avatarUrl && !avatarFailed ? (
+												<div className="relative h-8 w-8">
 													<Image
-														src={decorationUrl}
-														alt={t('components.sidebar.alt2')}
+														src={avatarUrl}
+														alt={t('components.sidebar.alt')}
 														fill
-														className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
+														className="rounded-full border border-(--border)/20 object-cover"
 														unoptimized
 														draggable={false}
-														onError={() => setDecorationFailed(true)}
+														loading="eager"
+														onError={() => setAvatarFailed(true)}
 													/>
-												)}
-											</div>
-										) : (
-											<div className="flex h-8 w-8 items-center justify-center rounded-full bg-(--foreground)/30 border border-(--border)/20">
-												<UserIcon size={16} className="text-(--text-muted)" />
-											</div>
-										)}
-										{DeviceIcon ? <DeviceIcon className={iconStyles} /> : <div className={`${iconStyles} rounded-full`} />}
-										{isGiftReady && (
-											<span
-												title={t('components.cards.sidebaruser.text1')}
-												className="absolute -top-1 -left-1 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-(--accent-orange) text-white shadow-md border border-(--background) animate-pulse"
-											>
-												<Gift size={10} />
-											</span>
-										)}
-									</div>
-								</button>
+													{decorationUrl && !decorationFailed && (
+														<Image
+															src={decorationUrl}
+															alt={t('components.sidebar.alt2')}
+															fill
+															className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
+															unoptimized
+															draggable={false}
+															onError={() => setDecorationFailed(true)}
+														/>
+													)}
+												</div>
+											) : (
+												<div className="flex h-8 w-8 items-center justify-center rounded-full bg-(--foreground)/30 border border-(--border)/20">
+													<UserIcon size={16} className="text-(--text-muted)" />
+												</div>
+											)}
+											{DeviceIcon ? <DeviceIcon className={iconStyles} /> : <div className={`${iconStyles} rounded-full`} />}
+											{isGiftReady && (
+												<span
+													title={t('components.cards.sidebaruser.text1')}
+													className="absolute -top-1 -left-1 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-(--accent-orange) text-white shadow-md border border-(--background) animate-pulse"
+												>
+													<Gift size={10} />
+												</span>
+											)}
+										</div>
+									</button>
+								</Tooltip>
 								<AnimatePresence>{userMenuOpen && <SidebarUserCard activeUser={activeUser} placement="top" onClose={() => setUserMenuOpen(false)} />}</AnimatePresence>
 							</div>
 						)}
@@ -717,6 +773,7 @@ export function Header() {
 					{(!isHeaderBuildMode || isItemRevealed('mobile-tray')) && (
 						<button
 							type="button"
+							data-onboarding-target="header-mobile-tray"
 							disabled={onboardingStage.active}
 							aria-label={t('components.header.title1')}
 							title={t('components.header.title1')}
@@ -732,13 +789,18 @@ export function Header() {
 									isRightAligned ? (effectiveOptionsOpen ? 'text-(--accent)' : 'rotate-180') : effectiveOptionsOpen ? 'rotate-180 text-(--accent)' : ''
 								}`}
 							/>
-							{isMounted && !effectiveOptionsOpen && state === 'hidden' && (hasUnread || isGiftReady) && (
+							{isMounted && !effectiveOptionsOpen && isResolved && state === 'hidden' && (hasUnread || isGiftReady) && (
 								<span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-(--accent) border-2 border-(--background)" />
 							)}
 						</button>
 					)}
 
-					{(isRightAligned || effectiveControls !== 'macos') && <HeaderWindowControls isApp={isApp} effectiveControls={effectiveControls} />}
+					{(isRightAligned || effectiveControls !== 'macos') && (
+						<>
+							{isApp && (hasNavGroup || hasToolsGroup) && <span aria-hidden="true" className="hidden md:block h-4 w-px bg-(--border)/15 shrink-0" />}
+							<HeaderWindowControls isApp={isApp} effectiveControls={effectiveControls} />
+						</>
+					)}
 				</div>
 			</header>
 			<HeaderOmnibar

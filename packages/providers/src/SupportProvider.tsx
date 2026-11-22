@@ -389,6 +389,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 					>
 						<button
 							type="button"
+							data-onboarding-target="support-fab"
 							onClick={() => setPopoverOpen((prev) => !prev)}
 							aria-label={t('common.supportprovider.description')}
 							title={t('common.supportprovider.description')}

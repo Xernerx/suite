@@ -66,10 +66,14 @@ export function FirstSignInWelcomeScene({
 						{displayName.charAt(0).toUpperCase()}
 					</div>
 				)}
-				<div className="absolute -bottom-2 -right-2 flex items-center gap-1 rounded-full bg-(--accent) px-2.5 py-1 text-[11px] font-extrabold text-white shadow-lg">
+				<motion.div
+					animate={{ y: [0, -3, 0], scale: [1, 1.07, 1] }}
+					transition={{ duration: 2.1, repeat: Infinity, ease: 'easeInOut' }}
+					className="absolute -bottom-2 -right-2 flex items-center gap-1 rounded-full bg-(--accent) px-2.5 py-1 text-[11px] font-extrabold text-white shadow-[0_0_18px_color-mix(in_srgb,var(--accent)_80%,transparent)]"
+				>
 					<Coins size={12} />
 					<span>+1,000</span>
-				</div>
+				</motion.div>
 			</div>
 
 			<div className="flex flex-col items-center max-w-2xl [text-shadow:0_2px_18px_var(--background)]">
@@ -111,13 +115,83 @@ export function FirstSignInWelcomeScene({
 						<span className="text-(--accent) shrink-0">↗</span>
 					</Link>
 				</div>
-				<div className="flex items-center gap-3 rounded-2xl bg-(--foreground)/75 hover:bg-(--foreground) border border-(--border)/15 p-3 sm:p-3.5 transition-colors">
+				<div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2.5">
+					<Link
+						href={getEnvUrl('https://www.xernerx.com/cookies')}
+						target="_blank"
+						rel="noopener noreferrer"
+						className={getButtonClasses({
+							variant: 'secondary',
+							className:
+								'w-full justify-between px-3 py-1.5 text-[11px] sm:text-xs font-semibold rounded-xl border border-(--border)/10 bg-(--foreground)/45 hover:bg-(--foreground)/80 text-(--text-muted) hover:text-(--text)',
+						})}
+					>
+						<span className="truncate">{t('components.firstSignIn.welcome.cookiesLink')}</span>
+						<span className="text-(--accent) shrink-0">↗</span>
+					</Link>
+					<Link
+						href={getEnvUrl('https://www.xernerx.com/security')}
+						target="_blank"
+						rel="noopener noreferrer"
+						className={getButtonClasses({
+							variant: 'secondary',
+							className:
+								'w-full justify-between px-3 py-1.5 text-[11px] sm:text-xs font-semibold rounded-xl border border-(--border)/10 bg-(--foreground)/45 hover:bg-(--foreground)/80 text-(--text-muted) hover:text-(--text)',
+						})}
+					>
+						<span className="truncate">{t('components.firstSignIn.welcome.securityLink')}</span>
+						<span className="text-(--accent) shrink-0">↗</span>
+					</Link>
+					<Link
+						href={getEnvUrl('https://www.xernerx.com/license')}
+						target="_blank"
+						rel="noopener noreferrer"
+						className={getButtonClasses({
+							variant: 'secondary',
+							className:
+								'w-full justify-between px-3 py-1.5 text-[11px] sm:text-xs font-semibold rounded-xl border border-(--border)/10 bg-(--foreground)/45 hover:bg-(--foreground)/80 text-(--text-muted) hover:text-(--text)',
+						})}
+					>
+						<span className="truncate">{t('components.firstSignIn.welcome.licenseLink')}</span>
+						<span className="text-(--accent) shrink-0">↗</span>
+					</Link>
+					<Link
+						href={getEnvUrl('https://www.xernerx.com/developer-policy')}
+						target="_blank"
+						rel="noopener noreferrer"
+						className={getButtonClasses({
+							variant: 'secondary',
+							className:
+								'w-full justify-between px-3 py-1.5 text-[11px] sm:text-xs font-semibold rounded-xl border border-(--border)/10 bg-(--foreground)/45 hover:bg-(--foreground)/80 text-(--text-muted) hover:text-(--text)',
+						})}
+					>
+						<span className="truncate">{t('components.firstSignIn.welcome.developerPolicyLink')}</span>
+						<span className="text-(--accent) shrink-0">↗</span>
+					</Link>
+				</div>
+				<motion.div
+					animate={
+						isInitialTermsNull && !termsChecked
+							? {
+									boxShadow: [
+										'0 0 0px 0px color-mix(in srgb, var(--accent) 0%, transparent)',
+										'0 0 22px 2px color-mix(in srgb, var(--accent) 45%, transparent)',
+										'0 0 0px 0px color-mix(in srgb, var(--accent) 0%, transparent)',
+									],
+								}
+							: {}
+					}
+					transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+					className={`flex items-center gap-3 rounded-2xl bg-(--foreground)/75 hover:bg-(--foreground) border p-3 sm:p-3.5 transition-colors ${
+						isInitialTermsNull && !termsChecked ? 'border-(--accent)/65' : 'border-(--border)/15'
+					}`}
+				>
 					<Check
 						checked={termsChecked || !isInitialTermsNull}
 						onCheckedChange={(val) => onTermsCheckedChange(val)}
 						label={<span className="text-xs sm:text-sm font-bold text-(--text) select-none leading-snug">{t('components.firstSignIn.welcome.agreeCheckbox')}</span>}
 					/>
-				</div>
+				</motion.div>
 			</div>
 		</motion.div>
 	);
@@ -156,20 +230,25 @@ export function FirstSignInWhoWeAreScene({
 			</div>
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-3xl text-left">
-				<div
+				<motion.div
+					whileHover={{ y: -4, scale: 1.015 }}
+					whileTap={{ scale: 0.985 }}
+					transition={{ type: 'spring', stiffness: 360, damping: 22 }}
 					onClick={() => onToggleBotUser(!isBotUser)}
 					style={isBotUser ? SOLID_ACCENT_CARD_STYLE : SOLID_CARD_STYLE}
-					className={`flex items-start gap-4 rounded-3xl p-5 border backdrop-blur-2xl transition-all cursor-pointer text-left select-none ${
+					className={`relative flex items-start gap-4 rounded-3xl p-5 border backdrop-blur-2xl transition-colors cursor-pointer text-left select-none ${
 						isBotUser ? 'border-(--accent) shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_25%,transparent)]' : 'border-(--border)/15 hover:border-(--accent)/40'
 					}`}
 				>
-					<div
+					<motion.div
+						animate={isBotUser ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+						transition={{ duration: 2.2, repeat: isBotUser ? Infinity : 0, ease: 'easeInOut' }}
 						className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${
 							isBotUser ? 'bg-(--accent) text-white border-(--accent)' : 'bg-(--accent)/15 text-(--accent) border-(--accent)/30'
 						}`}
 					>
 						<Bot size={24} />
-					</div>
+					</motion.div>
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center justify-between gap-2" onClick={(e) => e.stopPropagation()}>
 							<h3 onClick={() => onToggleBotUser(!isBotUser)} className="text-base font-extrabold text-(--text) cursor-pointer" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -179,22 +258,27 @@ export function FirstSignInWhoWeAreScene({
 						</div>
 						<p className="text-xs text-(--text-muted) mt-1 leading-relaxed">{t('components.firstSignIn.whoWeAre.roleUserDesc')}</p>
 					</div>
-				</div>
+				</motion.div>
 
-				<div
+				<motion.div
+					whileHover={{ y: -4, scale: 1.015 }}
+					whileTap={{ scale: 0.985 }}
+					transition={{ type: 'spring', stiffness: 360, damping: 22 }}
 					onClick={() => onToggleDeveloper(!isDeveloper)}
 					style={isDeveloper ? SOLID_ACCENT_CARD_STYLE : SOLID_CARD_STYLE}
-					className={`flex items-start gap-4 rounded-3xl p-5 border backdrop-blur-2xl transition-all cursor-pointer text-left select-none ${
+					className={`relative flex items-start gap-4 rounded-3xl p-5 border backdrop-blur-2xl transition-colors cursor-pointer text-left select-none ${
 						isDeveloper ? 'border-(--accent) shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_25%,transparent)]' : 'border-(--border)/15 hover:border-(--accent)/40'
 					}`}
 				>
-					<div
+					<motion.div
+						animate={isDeveloper ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+						transition={{ duration: 2.2, repeat: isDeveloper ? Infinity : 0, ease: 'easeInOut' }}
 						className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${
 							isDeveloper ? 'bg-(--accent) text-white border-(--accent)' : 'bg-(--accent)/15 text-(--accent) border-(--accent)/30'
 						}`}
 					>
 						<Code2 size={24} />
-					</div>
+					</motion.div>
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center justify-between gap-2" onClick={(e) => e.stopPropagation()}>
 							<h3 onClick={() => onToggleDeveloper(!isDeveloper)} className="text-base font-extrabold text-(--text) cursor-pointer" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -204,7 +288,7 @@ export function FirstSignInWhoWeAreScene({
 						</div>
 						<p className="text-xs text-(--text-muted) mt-1 leading-relaxed">{t('components.firstSignIn.whoWeAre.roleDevDesc')}</p>
 					</div>
-				</div>
+				</motion.div>
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl text-left">
@@ -291,17 +375,29 @@ export function FirstSignInTourChoiceScene({
 			</div>
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-3xl text-left">
-				<button
+				<motion.button
 					type="button"
+					whileHover={{ y: -4, scale: 1.015 }}
+					whileTap={{ scale: 0.985 }}
+					transition={{ type: 'spring', stiffness: 360, damping: 22 }}
 					onClick={onTakeTour}
 					disabled={submitting || postponing}
 					style={SOLID_ACCENT_CARD_STYLE}
-					className="group flex flex-col justify-between gap-4 rounded-3xl p-5 sm:p-6 border-2 border-(--accent) hover:brightness-105 backdrop-blur-2xl transition-all cursor-pointer text-left shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
+					className="group flex flex-col justify-between gap-4 rounded-3xl p-5 sm:p-6 border-2 border-(--accent) hover:brightness-105 backdrop-blur-2xl transition-colors cursor-pointer text-left shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
 				>
 					<div className="flex items-start gap-4">
-						<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--accent) text-white shadow-md">
+						<motion.div
+							animate={{ scale: [1, 1.09, 1] }}
+							transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut' }}
+							className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--accent) text-white shadow-md"
+						>
+							<motion.span
+								animate={{ scale: [1, 1.32, 1], opacity: [0.65, 0, 0.65] }}
+								transition={{ duration: 1.9, repeat: Infinity, ease: 'easeOut' }}
+								className="absolute inset-0 rounded-2xl border-2 border-(--accent)"
+							/>
 							<Compass size={24} />
-						</div>
+						</motion.div>
 						<div className="min-w-0 flex-1">
 							<div className="flex items-center justify-between gap-2">
 								<h3 className="text-base sm:text-lg font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -318,14 +414,17 @@ export function FirstSignInTourChoiceScene({
 						<span>{t('components.firstSignIn.buttons.takeTour')}</span>
 						<ArrowRight size={15} />
 					</div>
-				</button>
+				</motion.button>
 
-				<button
+				<motion.button
 					type="button"
+					whileHover={{ y: -3, scale: 1.01 }}
+					whileTap={{ scale: 0.985 }}
+					transition={{ type: 'spring', stiffness: 360, damping: 22 }}
 					onClick={onOpenSkipConfirm}
 					disabled={submitting || postponing}
 					style={SOLID_CARD_STYLE}
-					className="group flex flex-col justify-between gap-4 rounded-3xl p-5 sm:p-6 bg-(--background)/94 border border-(--border)/15 hover:border-(--accent)/45 backdrop-blur-2xl transition-all cursor-pointer text-left shadow-xl"
+					className="group flex flex-col justify-between gap-4 rounded-3xl p-5 sm:p-6 bg-(--background)/94 border border-(--border)/15 hover:border-(--accent)/45 backdrop-blur-2xl transition-colors cursor-pointer text-left shadow-xl"
 				>
 					<div className="flex items-start gap-4">
 						<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--foreground) text-(--accent) border border-(--border)/15">
@@ -342,7 +441,7 @@ export function FirstSignInTourChoiceScene({
 						<Clock size={14} />
 						<span>{t('components.firstSignIn.buttons.skipTour')}</span>
 					</div>
-				</button>
+				</motion.button>
 			</div>
 		</motion.div>
 	);
@@ -514,14 +613,13 @@ export function FirstSignInStageDock(props: {
 					</Button>
 				)}
 				{navPromptTarget ? (
-					<Button
-						variant="primary"
-						onClick={onOpenNavMenu}
-						className="gap-1.5 sm:gap-2 px-3.5 sm:px-4 text-xs sm:text-sm whitespace-nowrap shrink-0 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_45%,transparent)] animate-pulse"
+					<div
+						aria-live="polite"
+						className="inline-flex items-center gap-1.5 sm:gap-2 rounded-2xl bg-(--accent)/15 border border-(--accent)/40 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-extrabold text-(--accent) whitespace-nowrap shrink-0 select-none"
 					>
-						<LayoutGrid size={15} className="shrink-0" />
+						<LayoutGrid size={15} className="shrink-0 animate-pulse" />
 						<span>{t('components.firstSignIn.navHandoff.waitingHint')}</span>
-					</Button>
+					</div>
 				) : (
 					<Button
 						variant="primary"

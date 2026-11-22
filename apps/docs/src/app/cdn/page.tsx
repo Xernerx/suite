@@ -53,7 +53,8 @@ export default function CdnDocsPage() {
 	}, [setView, isAdmin]);
 
 	useEffect(() => {
-		if (!loading && !isAdmin) {
+		if (loading) return;
+		if (!isAdmin) {
 			clearNavItems();
 			hide();
 			return;

@@ -2,6 +2,32 @@
 
 # docs
 
+## 1.15.0
+
+### Minor Changes
+
+- ## Dynamic Package Banners & Documentation SEO Discovery
+  
+  Added dynamic vector package banners to the `@xernerx/*` SDK explorer and improved documentation metadata and crawler rules.
+  
+  ### Added
+  
+  - **Dynamic SDK Package Banners**: Added `<PackageBanner />` rendering official vector banners across the packages index and package detail pages.
+  
+  ### Changed
+  
+  - **API & CDN Spec Layout & Robots**: Polished the interactive API and CDN documentation pages, updated `robots.ts` and root metadata, and synchronized the 26-accent brand assets.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.20.0
+  - @xernerx/feedback@0.7.3
+  - @xernerx/lib@1.30.0
+  - @xernerx/providers@0.25.0
+  - @xernerx/styles@0.4.5
+  - @xernerx/ui@0.10.3
+
 ## 1.14.1
 
 ### Patch Changes

@@ -5,8 +5,8 @@
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@xernerx/ui';
 import { ShieldAlert } from 'lucide-react';
-import { useDictionary, useEnvironment } from '@xernerx/providers';
-import { useState } from 'react';
+import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
+import { useEffect, useState } from 'react';
 
 export default function CancelSubscriptionPage() {
 	const router = useRouter();
@@ -14,6 +14,11 @@ export default function CancelSubscriptionPage() {
 	const subscriptionId = params.id as string;
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
+	const { hide } = useSidebar();
+
+	useEffect(() => {
+		hide();
+	}, [hide]);
 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);

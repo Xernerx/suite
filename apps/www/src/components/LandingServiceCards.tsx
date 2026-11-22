@@ -26,6 +26,7 @@ export interface ConsumerServiceCardItem {
 	link: string;
 	tag: string;
 	isPlatform?: boolean;
+	preferLocalAssets?: boolean;
 	defaultAvatarUrl: string;
 	defaultBannerUrl: string;
 }
@@ -36,6 +37,23 @@ export interface DeveloperSoftwareCardItem {
 	desc: string;
 	link: string;
 	tag: string;
+	bannerUrl?: string;
+	iconUrl?: string;
+}
+
+const KNOWN_PACKAGE_SLUGS = new Set(['xernerx', 'framework', 'commands', 'extension-builder', 'hooks', 'stats', 'terminal', 'websocket']);
+
+export function resolvePackageAssetUrls(pkgName?: string): { bannerUrl?: string; iconUrl?: string } {
+	if (!pkgName) return {};
+	const slug = pkgName
+		.trim()
+		.toLowerCase()
+		.replace(/^@xernerx\//, '');
+	if (!KNOWN_PACKAGE_SLUGS.has(slug)) return {};
+	return {
+		bannerUrl: `/packages/banners/${slug}.svg`,
+		iconUrl: `/packages/icons/${slug}.svg`,
+	};
 }
 
 export function buildConsumerServiceItems(t: (path: string, variables?: Record<string, string | number>) => string, getEnvUrl: (url: string) => string): ConsumerServiceCardItem[] {
@@ -58,8 +76,9 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			desc: t('www.applications.todo.desc'),
 			link: getEnvUrl('https://app.xernerx.com/bots/todo'),
 			tag: t('www.tags.discordBot'),
-			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/782105629572464652/d6d658830d9dc233d1a5fda2260d63bd.png?size=512',
-			defaultBannerUrl: 'https://cdn.discordapp.com/banners/782105629572464652/2559346d255761acba683faa54bdeae4.png?size=1024',
+			preferLocalAssets: true,
+			defaultAvatarUrl: '/bots/todo/icon.png',
+			defaultBannerUrl: '/bots/todo/banner.png',
 		},
 		{
 			id: 'virtue',
@@ -68,8 +87,9 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			desc: t('www.applications.virtue.desc'),
 			link: getEnvUrl('https://app.xernerx.com/bots/virtue'),
 			tag: t('www.tags.discordBot'),
-			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/1484880634844287138/bb9495686b0bab5efa38119c8e2f0bb3.png?size=512',
-			defaultBannerUrl: 'https://cdn.discordapp.com/banners/1484880634844287138/34673c3bb1900169de38a5e40a56f34d.png?size=1024',
+			preferLocalAssets: true,
+			defaultAvatarUrl: '/bots/virtue/icon.png',
+			defaultBannerUrl: '/bots/virtue/banner.png',
 		},
 		{
 			id: 'yourapps',
@@ -78,8 +98,9 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			desc: t('www.applications.yourapps.desc'),
 			link: getEnvUrl('https://app.xernerx.com/bots/yourapps'),
 			tag: t('www.tags.discordBot'),
-			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/619328560141697036/bceef453d5f2e3cc94e0ce573111ba4f.png?size=512',
-			defaultBannerUrl: 'https://cdn.discordapp.com/banners/619328560141697036/70c6f76dfbd69054ac5cb91987ac8f90.png?size=1024',
+			preferLocalAssets: true,
+			defaultAvatarUrl: '/bots/yourapps/icon.png',
+			defaultBannerUrl: '/bots/yourapps/banner.png',
 		},
 		{
 			id: 'metamorphosis',
@@ -88,8 +109,9 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			desc: t('www.applications.metamorphosis.desc'),
 			link: getEnvUrl('https://app.xernerx.com/bots/metamorphosis'),
 			tag: t('www.tags.discordBot'),
-			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/881678826906730547/25511e2ef0b8c1b29b487116a9461739.png?size=512',
-			defaultBannerUrl: 'https://cdn.discordapp.com/banners/881678826906730547/abe2e33be8e75cc467f556dfb5c2235b.png?size=1024',
+			preferLocalAssets: true,
+			defaultAvatarUrl: '/bots/metamorphosis/icon.png',
+			defaultBannerUrl: '/bots/metamorphosis/banner.png',
 		},
 		{
 			id: 'zodiac',
@@ -98,8 +120,9 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			desc: t('www.applications.zodiac.desc'),
 			link: getEnvUrl('https://app.xernerx.com/bots/zodiac'),
 			tag: t('www.tags.discordBot'),
-			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/950251264095162418/07a9e067135a204bb0fdc796b44bda63.png?size=512',
-			defaultBannerUrl: 'https://cdn.discordapp.com/banners/950251264095162418/1d84ea69bbfb26fd4cdc2e1bc50073ff.png?size=1024',
+			preferLocalAssets: true,
+			defaultAvatarUrl: '/bots/zodiac/icon.png',
+			defaultBannerUrl: '/bots/zodiac/banner.png',
 		},
 	];
 }
@@ -108,12 +131,22 @@ export function ServiceProfileCard({ item, profile }: { item: ConsumerServiceCar
 	const { t } = useDictionary();
 
 	const avatarCandidates = useMemo(
-		() => Array.from(new Set([profile?.avatarUrl, item.defaultAvatarUrl, '/icon.png'].filter((v): v is string => Boolean(v && v.trim())))),
-		[profile?.avatarUrl, item.defaultAvatarUrl]
+		() =>
+			Array.from(
+				new Set(
+					(item.preferLocalAssets ? [item.defaultAvatarUrl, profile?.avatarUrl, '/icon.png'] : [profile?.avatarUrl, item.defaultAvatarUrl, '/icon.png']).filter((v): v is string =>
+						Boolean(v && v.trim())
+					)
+				)
+			),
+		[item.preferLocalAssets, profile?.avatarUrl, item.defaultAvatarUrl]
 	);
 	const bannerCandidates = useMemo(
-		() => Array.from(new Set([profile?.bannerUrl, item.defaultBannerUrl].filter((v): v is string => Boolean(v && v.trim())))),
-		[profile?.bannerUrl, item.defaultBannerUrl]
+		() =>
+			Array.from(
+				new Set((item.preferLocalAssets ? [item.defaultBannerUrl, profile?.bannerUrl] : [profile?.bannerUrl, item.defaultBannerUrl]).filter((v): v is string => Boolean(v && v.trim())))
+			),
+		[item.preferLocalAssets, profile?.bannerUrl, item.defaultBannerUrl]
 	);
 
 	const [avatarIdx, setAvatarIdx] = useState(0);
@@ -262,38 +295,62 @@ export function ServiceProfileCard({ item, profile }: { item: ConsumerServiceCar
 }
 
 export function DeveloperSoftwareCard({ item, href }: { item: DeveloperSoftwareCardItem; href: string }) {
+	const resolvedAssets = useMemo(() => resolvePackageAssetUrls(item.title), [item.title]);
+	const bannerUrl = item.bannerUrl || resolvedAssets.bannerUrl;
+	const iconUrl = item.iconUrl || resolvedAssets.iconUrl;
+
 	return (
 		<motion.div
 			whileHover={{ y: -8, scale: 1.015 }}
 			transition={{ type: 'spring', stiffness: 320, damping: 24 }}
 			className="group shrink-0 w-[85vw] md:w-[430px] flex flex-col rounded-3xl overflow-hidden bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/50 shadow-xl hover:shadow-[0_16px_50px_-12px_color-mix(in_srgb,var(--accent)_35%,transparent)] transition-colors relative"
 		>
-			{/* Interactive Dot-Matrix Header Ribbon */}
-			<div className="relative h-20 w-full overflow-hidden bg-gradient-to-r from-(--accent)/20 via-(--background)/60 to-(--accent)/10 border-b border-(--border)/10 px-7 flex items-center justify-between">
-				<div
-					className="absolute inset-0 opacity-30 group-hover:opacity-55 transition-opacity duration-500 pointer-events-none"
-					style={{
-						backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
-						backgroundSize: '14px 14px',
-					}}
-				/>
-				<span className="relative z-10 text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--background)/80 border border-(--accent)/30 px-3 py-1 rounded-full backdrop-blur-md">
-					{item.tag}
-				</span>
-				<div className="relative z-10 h-9 w-9 rounded-2xl bg-(--background)/70 border border-(--border)/10 flex items-center justify-center text-(--text-muted) group-hover:text-white group-hover:bg-(--accent) group-hover:border-(--accent) transition-all duration-300">
-					<ArrowUpRight size={17} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+			{bannerUrl ? (
+				<div className="relative w-full aspect-[40/11] overflow-hidden bg-[#0b0d14] border-b border-(--border)/10 shrink-0">
+					<img src={bannerUrl} alt={`${item.title} banner`} className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
 				</div>
-			</div>
+			) : (
+				<div className="relative h-20 w-full overflow-hidden bg-gradient-to-r from-(--accent)/20 via-(--background)/60 to-(--accent)/10 border-b border-(--border)/10 px-7 flex items-center justify-between">
+					<div
+						className="absolute inset-0 opacity-30 group-hover:opacity-55 transition-opacity duration-500 pointer-events-none"
+						style={{
+							backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
+							backgroundSize: '14px 14px',
+						}}
+					/>
+					<span className="relative z-10 text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--background)/80 border border-(--accent)/30 px-3 py-1 rounded-full backdrop-blur-md">
+						{item.tag}
+					</span>
+					<div className="relative z-10 h-9 w-9 rounded-2xl bg-(--background)/70 border border-(--border)/10 flex items-center justify-center text-(--text-muted) group-hover:text-white group-hover:bg-(--accent) group-hover:border-(--accent) transition-all duration-300">
+						<ArrowUpRight size={17} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+					</div>
+				</div>
+			)}
 
 			<div className="flex flex-col flex-1 p-7 relative z-10">
-				<div className="w-13 h-13 rounded-2xl bg-(--accent)/15 border border-(--accent)/25 flex items-center justify-center text-(--accent) mb-5 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
-					{item.icon}
+				{!bannerUrl && (
+					<div className="w-13 h-13 rounded-2xl bg-(--accent)/15 border border-(--accent)/25 flex items-center justify-center text-(--accent) mb-5 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+						{item.icon}
+					</div>
+				)}
+				<div className="flex items-center justify-between gap-3 mb-3">
+					<div className="flex items-center gap-2.5 min-w-0">
+						{iconUrl && <img src={iconUrl} alt={`${item.title} icon`} className="w-8 h-8 rounded-full shrink-0 shadow-sm" />}
+						<h3 className="font-bold text-xl text-(--text) group-hover:text-(--accent) transition-colors font-mono truncate">
+							<Link href={href} className="after:absolute after:inset-0">
+								{item.title}
+							</Link>
+						</h3>
+					</div>
+					{bannerUrl && (
+						<div className="flex items-center gap-2 shrink-0">
+							<span className="text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--accent)/10 border border-(--accent)/25 px-2.5 py-1 rounded-full">{item.tag}</span>
+							<div className="h-8 w-8 rounded-xl bg-(--background)/60 border border-(--border)/10 flex items-center justify-center text-(--text-muted) group-hover:text-white group-hover:bg-(--accent) group-hover:border-(--accent) transition-all duration-300">
+								<ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+							</div>
+						</div>
+					)}
 				</div>
-				<h3 className="font-bold text-xl text-(--text) group-hover:text-(--accent) transition-colors font-mono mb-2.5">
-					<Link href={href} className="after:absolute after:inset-0">
-						{item.title}
-					</Link>
-				</h3>
 				<p className="text-sm text-(--text-muted) leading-relaxed line-clamp-4">{item.desc}</p>
 			</div>
 		</motion.div>

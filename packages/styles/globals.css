@@ -35,6 +35,11 @@
 	max-height: 100dvh;
 }
 
+@utility flex-wrap-balance {
+	flex-wrap: wrap;
+	flex-wrap: balance;
+}
+
 :root {
 	--accent: #8b7cf6;
 	--accent-contrast: #fafafa;
@@ -218,6 +223,44 @@ html.reduce-motion *::after {
 	animation-iteration-count: 1 !important;
 	transition-duration: 0.01ms !important;
 	scroll-behavior: auto !important;
+}
+
+/* Scroll-Driven Reading Progress Indicator */
+@keyframes xrx-grow-progress {
+	from {
+		transform: scaleX(0);
+	}
+	to {
+		transform: scaleX(1);
+	}
+}
+
+.xrx-reading-progress-bar {
+	transform: scaleX(0);
+	transform-origin: 0 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	@supports (animation-timeline: scroll()) {
+		#main-scroll-container {
+			scroll-timeline: --xrx-main-scroll block;
+		}
+
+		html:not(.reduce-motion) .xrx-reading-progress-bar {
+			animation: xrx-grow-progress auto linear both;
+			animation-timeline: --xrx-main-scroll;
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.xrx-reading-progress-track {
+		display: none;
+	}
+}
+
+html.reduce-motion .xrx-reading-progress-track {
+	display: none;
 }
 
 /* Global Application Inputs */

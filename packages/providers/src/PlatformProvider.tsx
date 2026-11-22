@@ -21,27 +21,28 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		const ua = navigator.userAgent.toLowerCase();
+		const uaDataPlatform = String((navigator as any).userAgentData?.platform || '').toLowerCase();
 
 		// 1. Determine Type (strictly require Xernerx Desktop preload bridge, never generic Electron userAgent)
 		const bridge = (window as any).electron;
 		const isElectron = Boolean(bridge && (bridge.isXernerxDesktop || typeof bridge.minimize === 'function' || typeof bridge.close === 'function'));
 		const type = isElectron ? 'application' : 'browser';
 
-		// 2. Determine Platform
+		// 2. Determine Platform (prefer Client Hints userAgentData.platform when available, fallback to userAgent)
 		let platform: PlatformContextType['platform'] = 'other';
-		if (ua.includes('win')) {
+		if (uaDataPlatform.includes('win') || ua.includes('win')) {
 			platform = 'windows';
-		} else if (ua.includes('iphone')) {
+		} else if (uaDataPlatform.includes('ios') || ua.includes('iphone')) {
 			platform = 'iphone';
 		} else if (ua.includes('ipad')) {
 			platform = 'ipad';
-		} else if (ua.includes('mac')) {
+		} else if (uaDataPlatform.includes('mac') || ua.includes('mac')) {
 			// iPads on iOS 13+ spoof their User Agent as "Macintosh".
 			// We check maxTouchPoints to correctly identify newer iPads.
 			platform = navigator.maxTouchPoints && navigator.maxTouchPoints > 2 ? 'ipad' : 'macos';
-		} else if (ua.includes('android')) {
+		} else if (uaDataPlatform.includes('android') || ua.includes('android')) {
 			platform = 'android';
-		} else if (ua.includes('linux')) {
+		} else if (uaDataPlatform.includes('linux') || ua.includes('linux')) {
 			platform = 'linux';
 		}
 
