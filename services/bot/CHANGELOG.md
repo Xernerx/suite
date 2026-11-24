@@ -2,6 +2,20 @@
 
 # bot
 
+## 2.4.7
+
+### Patch Changes
+
+- ## Xernerx Bot SDK & Telemetry Updates
+  
+  Updated the Xernerx Bot daemon's framework, command, stats, and terminal dependencies to the latest releases.
+  
+  ### Changed
+  
+  - **SDK Dependencies**: Updated `@xernerx/framework` to `^1.3.1`, `@xernerx/commands` to `^0.2.11`, `@xernerx/stats` to `^1.0.17`, and `@xernerx/terminal` to `^1.2.4`.
+- Updated dependencies
+  - @xernerx/lib@1.30.1
+
 ## 2.4.6
 
 ### Patch Changes

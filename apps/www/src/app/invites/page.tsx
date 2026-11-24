@@ -38,9 +38,9 @@ export default function InvitesPage() {
 				clientId: inv.clientId,
 				permissions: inv.permissions,
 				options: inv.options,
-				botName: t(`www.applications.${inv.id}.title`),
+				botName: t(`www.applications.${inv.dictionaryKey}.title`),
 				botAvatar: inv.defaultAvatarUrl,
-				description: t(`www.applications.${inv.id}.desc`),
+				description: t(`www.applications.${inv.dictionaryKey}.desc`),
 			})),
 		[t]
 	);
@@ -194,7 +194,7 @@ export default function InvitesPage() {
 														{invite.botName}
 													</button>
 												) : (
-													<Link href={`/invites/${invite.id}`} className="after:absolute after:inset-0">
+													<Link href={`/invites/${invite.id}`} prefetch={false} className="after:absolute after:inset-0">
 														{invite.botName}
 													</Link>
 												)}

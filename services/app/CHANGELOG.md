@@ -2,6 +2,20 @@
 
 # `@xernerx/app`
 
+## 2.7.7
+
+### Patch Changes
+
+- ## Xernerx Bot SDK Updates
+  
+  Updated the Xernerx App daemon's core framework, command, and terminal dependencies to the latest releases.
+  
+  ### Changed
+  
+  - **SDK Dependencies**: Updated `@xernerx/framework` to `^1.3.1`, `@xernerx/commands` to `^0.2.11`, and `@xernerx/terminal` to `^1.2.4`.
+- Updated dependencies
+  - @xernerx/lib@1.30.1
+
 ## 2.7.6
 
 ### Patch Changes

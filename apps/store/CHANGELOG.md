@@ -4,6 +4,17 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.13.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.30.1
+  - @xernerx/components@0.20.1
+  - @xernerx/providers@0.25.1
+  - @xernerx/feedback@0.7.4
+  - @xernerx/ui@0.10.4
+
 ## 0.13.5
 
 ### Patch Changes

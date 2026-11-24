@@ -2,6 +2,24 @@
 
 # @xernerx/lib
 
+## 1.30.1
+
+### Patch Changes
+
+- ## Hardened Database Connection Pooling & Official Invite Localization
+  
+  Improved Mongoose connection reuse across production serverless chunks, added stale-pool reset support for transient network retries, and added Xernerx Bot invite localization strings.
+  
+  ### Added
+  
+  - **Database Connection Reset Helper**: Exported `resetDatabaseConnection` from `@xernerx/lib/server` to tear down stale connections cleanly before retrying transient network failures.
+  - **Xernerx Bot Invite Dictionary Keys**: Added `www.applications.xernerx` title and description entries to `packages/lib/src/dictionaries/en-GB.json`.
+  
+  ### Changed
+  
+  - **Serverless Pool Sharing & Init Coalescing**: Attached Mongoose connection and model caches to `global` in production, coalesced concurrent initialization via `inFlightInit`, added explicit `connectTimeoutMS: 5000` with `disconnected`/`close` cache eviction, and removed an unused `soteriaModels` registry reference.
+  - **Terminal Dependency**: Updated `@xernerx/terminal` to `^1.2.4`.
+
 ## 1.30.0
 
 ### Minor Changes

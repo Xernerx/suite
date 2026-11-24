@@ -1,6 +1,6 @@
 {
 	"name": "info",
-	"version": "1.13.5",
+	"version": "1.13.6",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"
@@ -21,7 +21,7 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/styles": "workspace:*",
-		"@xernerx/terminal": "^1.2.0",
+		"@xernerx/terminal": "^1.2.4",
 		"@xernerx/ui": "workspace:*",
 		"framer-motion": "^14.14.0",
 		"lucide-react": "^1.73.0",

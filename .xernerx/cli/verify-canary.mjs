@@ -20,7 +20,7 @@ function loadLocalEnvFallback() {
 		const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
 		if (!m) continue;
 		const key = m[1];
-		if (!['VERCEL_TOKEN', 'VERCEL_TEAM_ID', 'VERCEL_ORG_ID', 'GITHUB_TOKEN', 'GH_TOKEN', 'GITHUB_PAT'].includes(key)) continue;
+		if (!['VERCEL_TOKEN', 'VERCEL_TEAM_ID', 'VERCEL_ORG_ID', 'GITHUB_TOKEN', 'GH_TOKEN', 'GITHUB_PAT', 'CANARY_VERIFIER_SECRET'].includes(key)) continue;
 		if (!process.env[key]) {
 			process.env[key] = m[2].replace(/^['"]|['"]$/g, '');
 		}
@@ -643,24 +643,46 @@ async function verifyVercelSoakErrors({ requireVercelSoak }) {
 	);
 }
 
+function formatResponseDiagnostics(res) {
+	const parts = [];
+	if (res.server) parts.push(`server=${res.server}`);
+	if (res.cfMitigated) parts.push(`cf-mitigated=${res.cfMitigated}`);
+	if (res.cfRay) parts.push(`cf-ray=${res.cfRay}`);
+	if (res.vercelMitigated) parts.push(`x-vercel-mitigated=${res.vercelMitigated}`);
+	if (res.vercelId) parts.push('reached-vercel=true');
+	else if (res.server?.toLowerCase().includes('cloudflare')) parts.push('reached-vercel=false (blocked at Cloudflare edge)');
+	return parts.length > 0 ? ` (${parts.join(', ')})` : '';
+}
+
 async function fetchWithRetry(url, timeoutMs = 8000, retries = 2) {
+	const verifierSecret = process.env.CANARY_VERIFIER_SECRET?.trim() || '';
+	const headers = {
+		'User-Agent': 'Xernerx-Canary-Verifier/2.0',
+		Accept: 'application/json, text/plain, */*',
+		...(verifierSecret ? { 'X-Canary-Verifier-Secret': verifierSecret } : {}),
+	};
+
 	let lastErr = null;
 	for (let attempt = 0; attempt <= retries; attempt++) {
 		const start = performance.now();
 		try {
 			const res = await fetch(url, {
 				method: 'GET',
-				headers: { 'User-Agent': 'Xernerx-Canary-Verifier/2.0', Accept: 'application/json, text/plain, */*' },
+				headers,
 				signal: AbortSignal.timeout(timeoutMs),
 			});
 			const latencyMs = Math.round(performance.now() - start);
 			const bodyText = await res.text();
 			const vercelId = res.headers.get('x-vercel-id');
+			const vercelMitigated = res.headers.get('x-vercel-mitigated');
+			const server = res.headers.get('server');
+			const cfMitigated = res.headers.get('cf-mitigated');
+			const cfRay = res.headers.get('cf-ray');
 			if (res.status >= 500 && attempt < retries) {
 				await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
 				continue;
 			}
-			return { ok: res.ok, status: res.status, latencyMs, bodyText, vercelId };
+			return { ok: res.ok, status: res.status, latencyMs, bodyText, vercelId, vercelMitigated, server, cfMitigated, cfRay };
 		} catch (err) {
 			lastErr = err;
 			if (attempt < retries) {
@@ -680,7 +702,7 @@ async function verifyCanarySubdomains() {
 				return { app, version: 'sso-protected', latencyMs: res.latencyMs };
 			}
 			if (!res.ok) {
-				throw new Error(`[${app}.canary.xernerx.com] returned HTTP ${res.status}`);
+				throw new Error(`[${app}.canary.xernerx.com] returned HTTP ${res.status}${formatResponseDiagnostics(res)}`);
 			}
 			let parsed;
 			try {
@@ -716,13 +738,14 @@ async function verifyConcurrentStressGate() {
 			status: res.status,
 			ok: res.ok,
 			latencyMs: res.latencyMs,
+			diagnostics: formatResponseDiagnostics(res),
 		}));
 	});
 
 	const outcomes = await Promise.all(tasks);
 	const serverErrors = outcomes.filter((o) => o.status >= 500 || !o.ok);
 	if (serverErrors.length > 0) {
-		throw new Error(`Stress gate failed with ${serverErrors.length} error(s): ${serverErrors.map((e) => `${e.url} (HTTP ${e.status})`).join(', ')}`);
+		throw new Error(`Stress gate failed with ${serverErrors.length} error(s): ${serverErrors.map((e) => `${e.url} (HTTP ${e.status}${e.diagnostics})`).join(', ')}`);
 	}
 
 	const latencies = outcomes.map((o) => o.latencyMs).toSorted((a, b) => a - b);
