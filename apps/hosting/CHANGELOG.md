@@ -2,6 +2,14 @@
 
 # Changelog
 
+## 1.4.4
+
+### Patch Changes
+
+- ## Updated Dependencies
+  
+  Updated Dependencies
+
 ## 1.4.3
 
 ### Patch Changes

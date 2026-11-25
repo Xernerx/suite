@@ -2,6 +2,14 @@
 
 # app
 
+## 2.27.2
+
+### Patch Changes
+
+- ## Updated Dependencies
+  
+  Updated Dependencies
+
 ## 2.27.1
 
 ### Patch Changes

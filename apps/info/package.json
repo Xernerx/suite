@@ -1,6 +1,6 @@
 {
 	"name": "info",
-	"version": "1.13.6",
+	"version": "1.13.7",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"

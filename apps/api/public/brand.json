@@ -1157,5 +1157,19 @@
 				}
 			}
 		}
-	]
+	],
+	"signature": {
+		"name": "Xernerx Studios Frameless Mail Signature",
+		"logicalSize": {
+			"width": 360,
+			"height": 114
+		},
+		"retinaSize": {
+			"width": 1080,
+			"height": 342,
+			"scale": 3
+		},
+		"svg": "https://www.xernerx.com/signature.svg",
+		"png": "https://www.xernerx.com/signature.png"
+	}
 }

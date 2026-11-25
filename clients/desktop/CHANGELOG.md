@@ -2,6 +2,14 @@
 
 # @xernerx/desktop
 
+## 2.6.8
+
+### Patch Changes
+
+- ## Updated Dependencies
+  
+  Updated Dependencies
+
 ## 2.6.7
 
 ### Patch Changes
