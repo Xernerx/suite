@@ -4290,6 +4290,10 @@
 			"yourapps": {
 				"title": "YourApps",
 				"desc": "Discord-native forms, staff recruitment, and community applications—featuring 13-type Modals V2, web application portals, Apply panels, and automated review workflows configured directly in your Dashboard."
+			},
+			"xernerx": {
+				"title": "Xernerx",
+				"desc": "Discover Discord bots, servers, organizations, and user profiles across the Xernerx ecosystem. View live stats, unlock server milestone badges, and climb leaderboards."
 			}
 		},
 		"contact": {

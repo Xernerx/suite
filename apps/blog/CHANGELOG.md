@@ -2,6 +2,17 @@
 
 # blog
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.30.1
+  - @xernerx/components@0.20.1
+  - @xernerx/providers@0.25.1
+  - @xernerx/feedback@0.7.4
+  - @xernerx/ui@0.10.4
+
 ## 1.2.0
 
 ### Minor Changes

@@ -2,6 +2,19 @@
 
 # @xernerx/cli
 
+## 2.9.1
+
+### Patch Changes
+
+- ## Canary Verifier Edge Diagnostics & Dependency Update
+  
+  Enhanced Canary soak verification diagnostics on non-2xx responses and updated the CLI terminal dependency.
+  
+  ### Changed
+  
+  - **Canary Smoke Check Diagnostics**: Updated `.xernerx/cli/verify-canary.mjs` to log edge response headers (`server`, `cf-ray`, `cf-mitigated`, `x-vercel-id`, `x-vercel-error`) and body snippets on non-2xx responses, and to forward an optional `x-canary-verifier-secret` header when `CANARY_VERIFIER_SECRET` is configured.
+  - **Terminal Dependency**: Updated `@xernerx/terminal` to `^1.2.4`.
+
 ## 2.9.0
 
 ### Minor Changes

@@ -119,6 +119,7 @@ jobs:
                   CANARY_COMMIT_EPOCH: ${{ needs.check-soak.outputs.canary_commit_epoch }}
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
                   VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+                  CANARY_VERIFIER_SECRET: ${{ secrets.CANARY_VERIFIER_SECRET }}
                   REQUIRE_VERCEL_SOAK: ${{ github.event.inputs.skip_vercel_logs != 'true' && 'true' || 'false' }}
               run: |
                   git fetch origin canary

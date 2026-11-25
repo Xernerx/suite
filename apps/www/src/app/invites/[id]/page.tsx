@@ -4,11 +4,21 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { buildDiscordBotAuthorizeUrl, getEnabledInviteOptions } from '@xernerx/lib';
-import { database } from '@xernerx/lib/server';
 import { InviteOptionChooser } from '@/components/InviteOptionChooser';
 import { findDefaultOfficialInvite } from '@/lib/defaultOfficialInvites';
+import { resolveAppBaseUrlForEnv, resolveDiscordBotProfileCached, resolveInviteCached, resolveInviteHostEnv } from '@/lib/resolveInvite';
 
 export const dynamic = 'force-dynamic';
+
+const METAMORPHOSIS_SEO = {
+	title: 'Invite Metamorphosis — Discord Translator | Xernerx',
+	description: 'Invite Metamorphosis to Discord with least-privilege OAuth2 presets for real-time multilingual translation, auto-translated channels, and global communities.',
+};
+
+const TODO_SEO = {
+	title: 'Invite To-Do List Bot — Discord Task Boards | Xernerx',
+	description: 'Invite To-Do List Bot to Discord with least-privilege OAuth2 presets for collaborative server task boards, personal checklists, priorities, and reminders.',
+};
 
 const OFFICIAL_INVITE_SEO: Record<string, { title: string; description: string }> = {
 	virtue: {
@@ -19,59 +29,44 @@ const OFFICIAL_INVITE_SEO: Record<string, { title: string; description: string }
 		title: 'Invite YourApps — Discord Forms & Apps Bot | Xernerx',
 		description: 'Invite YourApps to Discord with least-privilege OAuth2 presets. Build Modals V2 applications, web portals, Apply panels, and automated review workflows.',
 	},
-	metamorphosis: {
-		title: 'Invite Metamorphosis — Discord Translator | Xernerx',
-		description: 'Invite Metamorphosis to Discord with least-privilege OAuth2 presets for real-time multilingual translation, auto-translated channels, and global communities.',
-	},
+	meta: METAMORPHOSIS_SEO,
+	metamorphosis: METAMORPHOSIS_SEO,
 	zodiac: {
 		title: 'Invite Zodiac — Discord Astrology & Horoscope Bot',
 		description: 'Invite Zodiac to your Discord server with least-privilege OAuth2 presets for daily horoscopes, zodiac sign profiles, compatibility checks, and birth charts.',
 	},
-	todo: {
-		title: 'Invite To-Do List Bot — Discord Task Boards | Xernerx',
-		description: 'Invite To-Do List Bot to Discord with least-privilege OAuth2 presets for collaborative server task boards, personal checklists, priorities, and reminders.',
+	tdl: TODO_SEO,
+	todo: TODO_SEO,
+	todolistbot: TODO_SEO,
+	xernerx: {
+		title: 'Invite Xernerx Bot — Official Suite Companion | Xernerx',
+		description: 'Invite Xernerx Bot to your Discord server to sync server stats, unlock milestone badges, and enable real-time Xernerx Suite directory & webhook integrations.',
 	},
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-	const { id } = await params;
+	const [resolvedParams, reqHeaders] = await Promise.all([params, headers()]);
+	const id = resolvedParams.id;
 	const cleanKey = id.trim().toLowerCase();
-	const officialSeo = OFFICIAL_INVITE_SEO[cleanKey];
-	const fallback = findDefaultOfficialInvite(id);
-	let botName = fallback?.name || id;
+	const hostEnv = resolveInviteHostEnv(reqHeaders.get('x-forwarded-host') || reqHeaders.get('host'));
+
+	const resolved = await resolveInviteCached(id, hostEnv).catch(() => null);
+	const fallback = resolved?.fallbackInvite || findDefaultOfficialInvite(id);
+	const canonicalSlug = resolved?.invite?.id || fallback?.id || id;
+	const officialSeo = OFFICIAL_INVITE_SEO[cleanKey] || OFFICIAL_INVITE_SEO[String(canonicalSlug).toLowerCase()] || (fallback ? OFFICIAL_INVITE_SEO[fallback.dictionaryKey] : undefined);
+
+	let botName = resolved?.botDoc?.discordCache?.globalName || resolved?.botDoc?.discordCache?.username || resolved?.botDoc?.name || resolved?.invite?.name || fallback?.name || id;
 	let description =
 		officialSeo?.description || `Invite ${botName} to your Discord server with verified least-privilege OAuth2 permission presets and manage settings in the unified Xernerx Suite dashboard.`;
 
-	if (!officialSeo && process.env.MONGO_XERNERX) {
-		try {
-			const dbLookup = await Promise.race([
-				(async () => {
-					const db = await database('xernerx');
-					const foundInvite: any = await db.models.core.AppInvite.findOne({ id }).lean();
-					if (!foundInvite) return null;
-					const foundBot = await (db.models.bots as any)?.Bot?.findOne({ id: foundInvite.clientId })
-						.select('name description discordCache')
-						.lean()
-						.catch(() => null);
-					return { invite: foundInvite, botDoc: foundBot };
-				})(),
-				new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
-			]);
-			if (dbLookup?.invite) {
-				botName = dbLookup.botDoc?.discordCache?.globalName || dbLookup.botDoc?.discordCache?.username || dbLookup.botDoc?.name || dbLookup.invite.name || botName;
-				const rawDesc = String(dbLookup.botDoc?.description || '').trim();
-				if (rawDesc.length >= 60) {
-					description = `Invite ${botName} to Discord: ${rawDesc}`.slice(0, 158);
-				} else {
-					description = `Invite ${botName} to your Discord server with verified least-privilege OAuth2 permission presets and manage settings in the unified Xernerx Suite dashboard.`;
-				}
-			}
-		} catch {
-			// Fall back to official invite defaults
+	if (!officialSeo && resolved?.status === 'found') {
+		const rawDesc = String(resolved.botDoc?.description || '').trim();
+		if (rawDesc.length >= 60) {
+			description = `Invite ${botName} to Discord: ${rawDesc}`.slice(0, 158);
 		}
 	}
 
-	const canonicalUrl = `https://www.xernerx.com/invites/${encodeURIComponent(id)}`;
+	const canonicalUrl = `https://www.xernerx.com/invites/${encodeURIComponent(canonicalSlug)}`;
 	const title = officialSeo?.title || `Invite ${botName} — Official Discord Bot | Xernerx`;
 
 	return {
@@ -95,54 +90,23 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 	};
 }
 
-function resolveAppBaseUrl(host: string | null): string {
-	const h = (host || '').toLowerCase();
-	if (h.includes('.dev.xernerx.com') || h.startsWith('localhost:')) return 'https://app.dev.xernerx.com';
-	if (h.includes('.canary.xernerx.com')) return 'https://app.canary.xernerx.com';
-	return 'https://app.xernerx.com';
-}
-
 export default async function InviteSlugPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ option?: string; tier?: string }> }) {
 	const [resolvedParams, resolvedSearch, reqHeaders] = await Promise.all([params, searchParams, headers()]);
-	const appBaseUrl = resolveAppBaseUrl(reqHeaders.get('x-forwarded-host') || reqHeaders.get('host'));
+	const hostEnv = resolveInviteHostEnv(reqHeaders.get('x-forwarded-host') || reqHeaders.get('host'));
+	const appBaseUrl = resolveAppBaseUrlForEnv(hostEnv);
 
-	let invite: any = null;
-	let botDoc: any = null;
+	const resolved = await resolveInviteCached(resolvedParams.id, hostEnv);
 
-	if (process.env.MONGO_XERNERX) {
-		try {
-			const dbLookup = await Promise.race([
-				(async () => {
-					const db = await database('xernerx');
-					const foundInvite: any = await db.models.core.AppInvite.findOne({ id: resolvedParams.id }).lean();
-					if (!foundInvite) return null;
-					const foundBot = await (db.models.bots as any)?.Bot?.findOne({ id: foundInvite.clientId })
-						.select('name avatar description vanitySlug discordCache')
-						.lean()
-						.catch(() => null);
-					return { invite: foundInvite, botDoc: foundBot };
-				})(),
-				new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
-			]);
-			if (dbLookup) {
-				invite = dbLookup.invite;
-				botDoc = dbLookup.botDoc;
-			}
-		} catch {
-			// Fall back to default official invites below
-		}
-	}
-
-	const fallbackInvite = findDefaultOfficialInvite(resolvedParams.id);
-	if (!invite && fallbackInvite) {
-		invite = fallbackInvite;
-	}
-
-	if (!invite) {
+	if (resolved.status === 'not_found') {
 		notFound();
 	}
 
-	const targetSlug = botDoc?.vanitySlug || invite.id || invite.clientId;
+	if (resolved.status === 'unavailable' || !resolved.invite) {
+		throw new Error('Temporarily unable to load invite configuration. Please try again.');
+	}
+
+	const { invite, botDoc, fallbackInvite } = resolved;
+	const targetSlug = botDoc?.vanitySlug || fallbackInvite?.vanitySlug || invite.id || invite.clientId;
 	const enabledOptions = getEnabledInviteOptions(invite);
 
 	const requestedOption = (resolvedSearch.option || resolvedSearch.tier || '').trim().toLowerCase();
@@ -184,23 +148,12 @@ export default async function InviteSlugPage({ params, searchParams }: { params:
 				: `https://cdn.discordapp.com/avatars/${invite.clientId}/${botDoc.avatar}.png?size=512`
 			: fallbackInvite?.defaultAvatarUrl || null);
 
-	const tokens = Array.from(new Set([process.env.DISCORD_BOT_TOKEN, process.env.DISCORD_CLIENT_TOKEN].filter(Boolean))) as string[];
-	for (const token of tokens) {
-		try {
-			const res = await fetch(`https://discord.com/api/v10/users/${invite.clientId}`, {
-				headers: { Authorization: `Bot ${token}` },
-				signal: AbortSignal.timeout(2500),
-				next: { revalidate: 300 },
-			});
-			if (res.ok) {
-				const data = await res.json();
-				botName = data.global_name || data.username || botName;
-				botAvatar = data.avatar
-					? `https://cdn.discordapp.com/avatars/${invite.clientId}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=512`
-					: fallbackInvite?.defaultAvatarUrl || null;
-				break;
-			}
-		} catch {}
+	if (resolved.source !== 'api') {
+		const discordProfile = await resolveDiscordBotProfileCached(invite.clientId);
+		if (discordProfile) {
+			botName = discordProfile.name || botName;
+			botAvatar = discordProfile.avatarUrl || fallbackInvite?.defaultAvatarUrl || botAvatar;
+		}
 	}
 
 	const chooserOptions = enabledOptions.map((opt) => ({

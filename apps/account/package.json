@@ -1,6 +1,6 @@
 {
 	"name": "account",
-	"version": "2.18.2",
+	"version": "2.18.3",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"
@@ -20,7 +20,7 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/styles": "workspace:*",
-		"@xernerx/terminal": "^1.2.0",
+		"@xernerx/terminal": "^1.2.4",
 		"@xernerx/ui": "workspace:*",
 		"framer-motion": "^14.14.0",
 		"lucide-react": "^1.73.0",

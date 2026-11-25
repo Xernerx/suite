@@ -2,6 +2,30 @@
 
 # www
 
+## 0.30.1
+
+### Patch Changes
+
+- ## Reliable Bot Invite Pages & 24-Hour Invite Caching
+  
+  Eliminated intermittent 404 errors on bot invite pages, aligned official invite links and aliases, and added 24-hour caching for faster invite loading.
+  
+  ### Added
+  
+  - **24-Hour Invite & Bot Profile Caching**: Cached verified bot invite configurations and live Discord bot profiles for 24 hours so invite pages and permission presets load rapidly without repeated cold-start lookups.
+  - **Xernerx Bot Official Invite Support**: Added Xernerx Bot to the official invites catalog and fallback directory alongside full alias support for Metamorphosis and To-Do List Bot.
+  
+  ### Changed
+  
+  - **Invite Page Reliability**: Added automatic retry and fallback resolution when loading bot invite links so cold starts or brief backend hiccups never falsely display a 404 page, with case-insensitive slug matching.
+  - **Invites Directory Navigation**: Aligned initial invite cards with canonical bot slugs and disabled premature prefetching on dynamic invite cards to prevent link-click race conditions.
+- Updated dependencies
+  - @xernerx/lib@1.30.1
+  - @xernerx/components@0.20.1
+  - @xernerx/providers@0.25.1
+  - @xernerx/feedback@0.7.4
+  - @xernerx/ui@0.10.4
+
 ## 0.30.0
 
 ### Minor Changes

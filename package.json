@@ -17,7 +17,7 @@
 	"devDependencies": {
 		"@changesets/cli": "^3.0.3",
 		"@xernerx/cli": "workspace:*",
-		"@xernerx/terminal": "^1.2.0",
+		"@xernerx/terminal": "^1.2.4",
 		"concurrently": "^10.0.7",
 		"next": "^16.4.6",
 		"prettier": "^3.10.1",
