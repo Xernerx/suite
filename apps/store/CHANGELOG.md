@@ -4,6 +4,14 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.13.7
+
+### Patch Changes
+
+- ## Updated Dependencies
+  
+  Updated Dependencies
+
 ## 0.13.6
 
 ### Patch Changes

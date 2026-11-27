@@ -1,6 +1,6 @@
 {
 	"name": "hosting",
-	"version": "1.4.3",
+	"version": "1.4.4",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"

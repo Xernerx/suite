@@ -2,6 +2,14 @@
 
 # info
 
+## 1.13.7
+
+### Patch Changes
+
+- ## Updated Dependencies
+  
+  Updated Dependencies
+
 ## 1.13.6
 
 ### Patch Changes

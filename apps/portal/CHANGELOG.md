@@ -2,6 +2,18 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.7.9
+
+### Patch Changes
+
+- ## Updated Dependencies
+  
+  Updated Dependencies
+  
+  ### Added
+  
+  - Updated Dependencies
+
 ## 1.7.8
 
 ### Patch Changes

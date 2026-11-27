@@ -2,6 +2,14 @@
 
 # auth
 
+## 2.18.4
+
+### Patch Changes
+
+- ## Added mail signature
+  
+  Added a mail signature image for mail
+
 ## 2.18.3
 
 ### Patch Changes

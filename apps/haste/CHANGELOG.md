@@ -2,6 +2,14 @@
 
 # Changelog
 
+## 1.3.20
+
+### Patch Changes
+
+- ## Updated Dependencies
+  
+  Updated Dependencies
+
 ## 1.3.19
 
 ### Patch Changes
